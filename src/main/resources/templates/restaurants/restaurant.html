@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맛남 | 맛집 탐색</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        nav a {
+            text-decoration: none;
+            color: #333;
+            margin-right: 1rem;
+        }
+        .header-buttons button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .search-bar input {
+            width: 80%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .filters {
+            margin: 1rem 0;
+        }
+        .filters button {
+            padding: 0.3rem 1rem;
+            margin-right: 0.5rem;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .restaurant-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: #fff;
+        }
+        .restaurant-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .restaurant-card p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+        .restaurant-card button {
+            width: 100%;
+            padding: 0.5rem;
+            border: none;
+            background-color: #000;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-left">
+        <div class="logo">맛남</div>
+        <nav>
+            <a th:href="@{/}">홈</a>
+            <a th:href="@{/meetings}">모임 찾기</a>
+            <a th:href="@{/restaurants}">맛집 탐색</a>
+            <a th:href="@{/profile}">마이페이지</a>
+        </nav>
+    </div>
+    <div class="header-buttons">
+        <button th:onclick="'location.href=\'' + @{/meeting/create} + '\''">모임 만들기</button>
+    </div>
+</header>
+
+<div class="container">
+    <h1>맛집 탐색</h1>
+    <p>다른 사용자들이 공유한 맛집을 찾아보세요.</p>
+
+    <div class="search-bar">
+        <input type="text" placeholder="맛집 검색...">
+        <button>🔍</button>
+        <button style="margin-left: 1rem;">맛집 등록하기</button>
+    </div>
+
+    <div class="filters">
+        <button>전체</button>
+        <button>한식</button>
+        <button>양식</button>
+        <button>외국음식</button>
+        <button>카페/디저트</button>
+    </div>
+
+    <div class="restaurants-grid">
+        <div class="restaurant-card">
+            <h3>맛있는 한식당</h3>
+            <p>전통 한식을 현대적으로 재해석한 맛집</p>
+            <p>📍 서울 강남구 언주로</p>
+            <p>⭐ 평점 4.5/5.0</p>
+            <p>🍽️ 강호 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+        <div class="restaurant-card">
+            <h3>정통 이탈리안</h3>
+            <p>이탈리아 현지의 맛을 그대로 재현한 파스타 전문점</p>
+            <p>📍 서울 마포구 와우산로</p>
+            <p>⭐ 평점 4.8/5.0</p>
+            <p>🍽️ 백다현 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+        <div class="restaurant-card">
+            <h3>숨은 일식 맛집</h3>
+            <p>신선한 생선으로 만드는 정통 일식 오마카세</p>
+            <p>📍 서울 중구 을지로</p>
+            <p>⭐ 평점 4.2/5.0</p>
+            <p>🍽️ 최호남 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+        <div class="restaurant-card">
+            <h3>베트남 쌀국수</h3>
+            <p>현지 느낌 그대로의 정통 베트남 쌀국수 전문점</p>
+            <p>📍 서울 강남구 테헤란로</p>
+            <p>⭐ 평점 4.6/5.0</p>
+            <p>🍽️ 김희수 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+        <div class="restaurant-card">
+            <h3>힙한 브런치 카페</h3>
+            <p>서울 성수동에서 유명한 브런치 카페를 즐길 수 있는 곳</p>
+            <p>📍 서울 성동구 성수동</p>
+            <p>⭐ 평점 4.3/5.0</p>
+            <p>🍽️ 이윤영 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+        <div class="restaurant-card">
+            <h3>해운대 회 센터</h3>
+            <p>부산 해운대에서 가장 신선한 바닷 회를 맛볼 수 있는 곳</p>
+            <p>📍 부산 해운대구</p>
+            <p>⭐ 평점 4.7/5.0</p>
+            <p>🍽️ 정민 남이 공유</p>
+            <button>자세히 보기</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

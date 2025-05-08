@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모임 서비스</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        body {
+            background-color: #fff;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        .logo {
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        nav a {
+            text-decoration: none;
+            color: #333;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #000;
+            color: white;
+        }
+        .btn-outline {
+            background-color: white;
+            border: 1px solid #ddd;
+        }
+        .main-banner {
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        .main-banner h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .main-banner p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .banner-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .search-section {
+            padding: 2rem;
+            text-align: center;
+            background-color: #fff;
+        }
+        .search-section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .search-section p {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .search-button {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .meetings-section {
+            padding: 2rem;
+        }
+        .meetings-section h2 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+        .meetings-section p {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .meetings-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .meeting-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .meeting-image {
+            height: 150px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .meeting-details {
+            padding: 1rem;
+        }
+        .meeting-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .meeting-date, .meeting-location {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        .features-section {
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+        .features-section h2 {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        .feature {
+            text-align: center;
+        }
+        .feature h3 {
+            margin: 1rem 0 0.5rem;
+            font-size: 1.1rem;
+        }
+        .feature p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        footer {
+            padding: 1rem 2rem;
+            font-size: 0.8rem;
+            color: #999;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div style="display: flex; align-items: center; gap: 2rem;">
+        <div class="logo">맛남</div>
+        <nav>
+            <a th:href="@{/}">홈</a>
+            <a th:href="@{/meetups/search}">모임찾기</a>
+            <a th:href="@{/member/restaurant}">맛집찾기</a>
+            <a th:href="@{/member/mypage}">내 페이지</a>
+            <a th:href="@{/member/signin}">로그인</a>
+        </nav>
+    </div>
+    <div class="header-buttons">
+        <span style="font-size: 1.2rem; cursor: pointer;">🔔</span>
+        <span style="font-size: 1.2rem; cursor: pointer;">👤</span>
+        <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/meeting/create} + '\''">맛남 모임 만들기</button>
+    </div>
+</header>
+
+<!-- 메인 배너 -->
+<section class="main-banner" style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="max-width: 50%;">
+        <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">맛있는 식사와 새로운 만남</h1>
+        <p style="color: #666; margin-bottom: 1.5rem;">맛남에서 다양한 사람들과 함께 맛있는 식사를 즐기세요. 새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
+        <div class="banner-buttons" style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/meetups/search} + '\''">모임 찾기</button>
+            <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/member/signup} + '\''">회원가입</button>
+        </div>
+    </div>
+    <div style="width: 45%; height: 250px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+        <span style="color: #999;">이미지 영역</span>
+    </div>
+</section>
+
+<!-- 검색 섹션 -->
+<section class="search-section">
+    <h2>원하는 모임을 찾아보세요</h2>
+    <p>관심 있는 모임을 검색해보세요</p>
+    <div class="search-button">
+        <button class="btn btn-primary" style="width: 100%;" th:onclick="'location.href=\'' + @{/search} + '\''">모임 검색하기</button>
+    </div>
+</section>
+
+<!-- 인기 모임 섹션 -->
+<section class="meetings-section">
+    <h2>인기 모임</h2>
+    <p>지금 가장 인기 있는 모임을 확인해보세요:</p>
+    <div class="meetings-grid">
+        <!-- 첫 번째 모임 카드 -->
+        <div class="meeting-card">
+            <div class="meeting-image">
+                <!-- 이미지 자리 (그레이색 박스) -->
+            </div>
+            <div class="meeting-details">
+                <div class="meeting-title">강남 맛집 탐방 모임</div>
+                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
+                <div class="meeting-location">📍 서울 강남구</div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/1} + '\''">자세히 보기</button>
+            </div>
+        </div>
+
+        <!-- 두 번째 모임 카드 -->
+        <div class="meeting-card">
+            <div class="meeting-image">
+                <!-- 이미지 자리 (그레이색 박스) -->
+            </div>
+            <div class="meeting-details">
+                <div class="meeting-title">강남 맛집 탐방 모임</div>
+                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
+                <div class="meeting-location">📍 서울 강남구</div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/2} + '\''">자세히 보기</button>
+            </div>
+        </div>
+
+        <!-- 세 번째 모임 카드 -->
+        <div class="meeting-card">
+            <div class="meeting-image">
+                <!-- 이미지 자리 (그레이색 박스) -->
+            </div>
+            <div class="meeting-details">
+                <div class="meeting-title">강남 맛집 탐방 모임</div>
+                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
+                <div class="meeting-location">📍 서울 강남구</div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/3} + '\''">자세히 보기</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 기능 소개 섹션 -->
+<section class="features-section">
+    <h2>맛남의 특별한 기능</h2>
+    <div class="features-grid">
+        <!-- 첫 번째 기능 -->
+        <div class="feature">
+            <div>맞춤형 시스템</div>
+            <h3>맞춤형 시스템</h3>
+            <p>원하는 지역과 시간에 맞춰 필터링 검색이 가능해 나에게 딱 맞는 모임을 찾을 수 있습니다.</p>
+        </div>
+
+        <!-- 두 번째 기능 -->
+        <div class="feature">
+            <div>신사적 매칭</div>
+            <h3>신사적 매칭</h3>
+            <p>서로의 관심사와 매너를 고려한 매칭 시스템으로 즐거운 만남을 보장합니다.</p>
+        </div>
+
+        <!-- 세 번째 기능 -->
+        <div class="feature">
+            <div>간편 예약 기능</div>
+            <h3>간편 예약 기능</h3>
+            <p>모바일로 손쉽게 예약하고 결제까지 한번에 가능한 편리한 서비스를 제공합니다.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 푸터 -->
+<footer>
+    <p>© 2023 맛남 | 이용약관 | 개인정보처리방침</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<html lang='ko' xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Title</title>
+</head>
+<body>
+<script th:inline="javascript">
+  if([[${message}]]){
+    alert([[${message}]]);
+  }
+  location.href = '/';
+</script>
+
+</body>
+</html>

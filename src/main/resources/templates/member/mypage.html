@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>맛남 | 마이페이지</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #eee;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      margin-right: 1rem;
+    }
+    .header-buttons button {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .profile-section, .stats-section {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .profile-section img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      display: block;
+      margin-bottom: 1rem;
+    }
+    .main-section {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .main-section h2 {
+      margin-bottom: 1rem;
+    }
+    .tabs button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      border-radius: 4px;
+    }
+    .meeting-item {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    .meeting-item h4 {
+      margin-bottom: 0.5rem;
+    }
+    .meeting-item p {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+    .meeting-item a {
+      color: #007bff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <div class="logo">맛남</div>
+    <nav>
+      <a th:href="@{/}">홈</a>
+      <a th:href="@{/meetings}">모임 찾기</a>
+      <a th:href="@{/restaurants}">맛집 탐색</a>
+      <a th:href="@{/profile}">마이페이지</a>
+    </nav>
+  </div>
+  <div class="header-buttons">
+    <button th:onclick="'location.href=\'' + @{/meeting/create} + '\''">모임 만들기</button>
+  </div>
+</header>
+
+<div class="container">
+  <!-- 왼쪽: 프로필 & 통계 -->
+  <div>
+    <div class="profile-section">
+      <img src="#" alt="프로필 이미지">
+      <h3>맛있는사람</h3>
+      <p>🌡️ 맛남온도: 35°C</p>
+      <button>프로필 수정</button>
+    </div>
+    <div class="profile-section">
+      <h4>내 정보</h4>
+      <p><strong>자기소개:</strong> 맛있는 음식을 사랑하는 회원입니다.</p>
+      <p><strong>선호하는 카테고리:</strong> 카페, 한식</p>
+      <p><strong>선호하는 지역:</strong> 강남, 홍대</p>
+      <p><strong>최근 참여 모임:</strong> 강남 맛집 탐방</p>
+    </div>
+    <div class="stats-section">
+      <h4>활동 통계</h4>
+      <p>주최한 모임: 5회</p>
+      <p>참여한 모임: 12회</p>
+      <p>함께한 맛집: 8곳</p>
+    </div>
+  </div>
+
+  <!-- 오른쪽: 내 모임 목록 -->
+  <div class="main-section">
+    <h2>내 모임 목록</h2>
+    <div class="tabs">
+      <button>전체</button>
+      <button>주최 중</button>
+      <button>참여 중</button>
+      <button style="float: right;">모임 만들기</button>
+    </div>
+
+    <div class="meeting-item">
+      <h4>강남 맛집 탐방 모임 <span style="background-color: #eee; padding: 0.2rem 0.5rem; border-radius: 4px;">참여</span></h4>
+      <p>📅 2023년 6월 15일 (목)</p>
+      <p>📍 서울 강남구 언주로</p>
+      <a href="#">자세히</a>
+    </div>
+
+    <div class="meeting-item">
+      <h4>홍대 이탈리안 파스타 모임 <span style="background-color: #eee; padding: 0.2rem 0.5rem; border-radius: 4px;">완료</span></h4>
+      <p>📅 2023년 6월 19일 (월)</p>
+      <p>📍 서울 마포구 와우산로</p>
+      <a href="#">자세히</a>
+    </div>
+
+    <div class="meeting-item">
+      <h4>을지로 숨은 맛집 탐방 <span style="background-color: #eee; padding: 0.2rem 0.5rem; border-radius: 4px;">완료</span></h4>
+      <p>📅 2023년 6월 20일 (화)</p>
+      <p>📍 서울 중구 충무로</p>
+      <a href="#">자세히</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
