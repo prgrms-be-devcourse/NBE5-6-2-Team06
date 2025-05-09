@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>강남 맛집 탐방 모임</title>
+  <style>
+    body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
+    header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #eee; }
+    nav a { margin-right: 1rem; text-decoration: none; color: #333; font-size: 0.9rem; }
+    .container { display: flex; max-width: 1200px; margin: 2rem auto; }
+    .main { flex: 3; margin-right: 2rem; }
+    .sidebar { flex: 1; border-left: 1px solid #eee; padding-left: 1rem; }
+    .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
+    button { background: black; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    .info-section { margin-bottom: 2rem; }
+    .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
+    footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <a href="/">맛남</a>
+  </div>
+  <nav>
+    <a href="/home">홈</a>
+    <a href="/meetups">모임 탐색</a>
+    <a href="/mypage">마이페이지</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="main">
+    <div class="card">
+      <h2>강남 맛집 탐방 모임 <span style="font-size: 0.8rem; color: gray;">모집중</span></h2>
+      <p>📅 2023년 6월 10일 (토) | 🕖 오후 7시 ~ 8시 | 📍 서울 강남구 테헤란로 123 | 👥 선착순 4/10명</p>
+      <div class="info-section">
+        <h3>모임 소개</h3>
+        <p>강남에서 진행하는 맛집 탐방! 맛있는 음식을 즐기며 즐거운 대화가 함께하는 시간입니다. 혼자를 좋아하던 사람도 부담없이 만남을 즐기는 초보자 환영! 함께 기다립니다.</p>
+      </div>
+      <div class="info-section">
+        <h3>장소 정보</h3>
+        <p>맛남 강남점 식당<br>서울 강남구 테헤란로 123</p>
+        <div class="map-placeholder">지도가 표시될 영역</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar">
+    <div class="card">
+      <h4>모임 참여하기</h4>
+      <p>4/10명 참여중입니다.</p>
+      <button type="button">지금 참여 신청하기</button>
+    </div>
+    <div class="card">
+      <h4>방장 정보</h4>
+      <p>🙋‍♂️ 김모임</p>
+    </div>
+    <div class="card">
+      <h4>비슷한 모임</h4>
+      <p>🍜 강남 라멘 맛집 탐방</p>
+      <p>🍻 강남 호프집 투어</p>
+      <button type="button">더 많은 모임 보기</button>
+    </div>
+  </div>
+</div>
+<footer>
+  © 2025 맛남. 모든 권리 보유.
+</footer>
+</body>
+</html>
