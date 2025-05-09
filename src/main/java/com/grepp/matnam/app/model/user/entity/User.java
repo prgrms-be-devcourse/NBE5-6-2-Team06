@@ -1,9 +1,12 @@
 package com.grepp.matnam.app.model.user.entity;
 
 
+import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.user.code.Gender;
+import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.infra.entity.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,19 +40,28 @@ public class User extends BaseEntity {
     private int age;
 
     @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     private float temperature;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="userId")
     private Preference preference;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<Map> maps;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "userId")
     private List<Participant> participants;
+
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.ACTIVE;
+
+    private LocalDateTime dueDate;
+
 }

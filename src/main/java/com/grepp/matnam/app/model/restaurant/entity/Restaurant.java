@@ -28,8 +28,6 @@ public class Restaurant extends BaseEntity {
 
     private String tel;
 
-    private Float googleRating;
-
     private String mainFood;
 
     private String category;
@@ -37,6 +35,8 @@ public class Restaurant extends BaseEntity {
     private Integer recommendedCount;
 
     private String mood;
+
+    private Float googleRating;
 
     private Float naverRating;
 

@@ -24,9 +24,4 @@ public class Map extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurantId", nullable = false)
     private Restaurant restaurant;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "userId", nullable = false)
-//    private User user;
-
 }
