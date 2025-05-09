@@ -168,7 +168,7 @@
         <div class="logo">맛남</div>
         <nav>
             <a th:href="@{/}">홈</a>
-            <a th:href="@{/meetups/search}">모임찾기</a>
+            <a th:href="@{/team/search}">모임찾기</a>
             <a th:href="@{/member/restaurant}">맛집찾기</a>
             <a th:href="@{/member/mypage}">내 페이지</a>
             <a th:href="@{/member/signin}">로그인</a>
@@ -187,7 +187,7 @@
         <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">맛있는 식사와 새로운 만남</h1>
         <p style="color: #666; margin-bottom: 1.5rem;">맛남에서 다양한 사람들과 함께 맛있는 식사를 즐기세요. 새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
         <div class="banner-buttons" style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/meetups/search} + '\''">모임 찾기</button>
+            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/search} + '\''">모임 찾기</button>
             <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/member/signup} + '\''">회원가입</button>
         </div>
     </div>
@@ -201,7 +201,7 @@
     <h2>원하는 모임을 찾아보세요</h2>
     <p>관심 있는 모임을 검색해보세요</p>
     <div class="search-button">
-        <button class="btn btn-primary" style="width: 100%;" th:onclick="'location.href=\'' + @{/search} + '\''">모임 검색하기</button>
+        <button class="btn btn-primary" style="width: 100%;" th:onclick="'location.href=\'' + @{/team/search} + '\''">모임 검색하기</button>
     </div>
 </section>
 
