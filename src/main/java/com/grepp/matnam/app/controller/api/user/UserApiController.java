@@ -1,9 +1,12 @@
 package com.grepp.matnam.app.controller.api.user;
 
+import com.grepp.matnam.app.controller.api.user.payload.JwtResponse;
+import com.grepp.matnam.app.controller.api.user.payload.UserSigninRequest;
 import com.grepp.matnam.app.controller.api.user.payload.UserSignupRequest;
 import com.grepp.matnam.app.controller.api.user.payload.UserResponse;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import com.grepp.matnam.infra.jwt.JwtTokenProvider;
 import com.grepp.matnam.infra.response.ApiResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,6 +24,9 @@ public class UserApiController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
@@ -57,6 +63,35 @@ public class UserApiController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "회원가입 중 서버 오류가 발생했습니다.", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/signin")
+    @Operation(summary = "로그인", description = "사용자 로그인 후 JWT 토큰을 발급합니다.")
+    public ResponseEntity<ApiResponse> signin(@Validated @RequestBody UserSigninRequest request) {
+        try {
+            User user = userService.signin(request.getUserId(), request.getPassword());
+
+            String token = jwtTokenProvider.generateToken(user.getUserId(), user.getRole().name());
+
+            JwtResponse jwtResponse = JwtResponse.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .userId(user.getUserId())
+                    .role(user.getRole().name())
+                    .expiration(86400) // 24시간
+                    .build();
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "로그인 성공", jwtResponse));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "로그인 실패", e.getMessage()));
+
+        } catch (Exception e) {
+            e.printStackTrace(); // 디버깅을 위해 스택트레이스 출력
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "로그인 중 서버 오류가 발생했습니다.", e.getMessage()));
         }
     }
 }
