@@ -18,8 +18,8 @@ public class SwaggerConfig {
 
     private Info info() {
         return new Info()
-            .title("Mongo Basic API")
-            .description("Mongo API reference for developers")
+            .title("맛남 API")
+            .description("프로그래머스 데브코스 2차 프로젝트 맛남 API 문서입니다.")
             .version("1.0");
     }
 }
