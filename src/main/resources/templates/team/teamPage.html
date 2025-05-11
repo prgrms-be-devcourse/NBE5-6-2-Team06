@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모임 페이지 | 맛남</title>
+  <style>
+    /* 기본 스타일 */
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    header a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+    nav a {
+      margin-right: 1rem;
+      text-decoration: none;
+      color: #333;
+      font-size: 1rem;
+    }
+    .container {
+      display: flex;
+      max-width: 1200px;
+      margin: 2rem auto;
+      gap: 2rem;
+    }
+    .main {
+      flex: 2;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar {
+      flex: 1;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .card {
+      border-radius: 8px;
+      background-color: #fff;
+      padding: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+    }
+    .card h2, .card h4 {
+      margin-bottom: 1rem;
+    }
+    .card p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+    .map-placeholder {
+      background-color: #e0e0e0;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      border-radius: 8px;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background-color: #fff;
+      border-top: 1px solid #eee;
+      font-size: 0.9rem;
+      color: #777;
+    }
+    .info-section {
+      margin-bottom: 2rem;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+    .error-message {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div>
+    <a href="/">맛남</a>
+  </div>
+  <nav>
+    <a href="/index">홈</a>
+    <a href="/team/search">모임 탐색</a>
+    <a href="/member/mypage">마이페이지</a>
+  </nav>
+</header>
+
+<div class="container">
+  <div class="main">
+
+    <!-- 모임 정보 -->
+    <div class="card" th:if="${team.participants.contains(user)}">
+      <h2 th:text="${team.teamTitle}">모임 제목</h2>
+      <p th:text="'📅 ' + ${team.teamDate} + ' | 🕖 ' + ${team.meetDate} + ' | 📍 ' + ${team.restaurantName}"></p>
+      <div class="info-section">
+        <h3>모임 소개</h3>
+        <p th:text="${team.teamDetails}">모임 설명</p>
+      </div>
+      <div class="info-section">
+        <h3>장소 정보</h3>
+        <p th:text="${team.restaurantName}">식당 이름</p>
+        <p th:text="${team.googleLocation}">주소</p>
+        <div class="map-placeholder">지도 표시 영역</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <!-- 참여자 목록 -->
+    <div class="card" th:if="${team.participants.contains(user)}">
+      <h4>참여자 목록</h4>
+      <ul th:each="participant : ${team.participants}">
+        <li>
+          <span th:text="${participant.user.username}"></span>
+          <span th:text="'(' + ${participant.participantStatus} + ')'"></span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 팀 정보 -->
+    <div class="card" th:if="${team.participants.contains(user)}">
+      <h4>방장 정보</h4>
+      <p th:text="'🙋‍♂️ ' + ${team.user.username}">방장 이름</p>
+    </div>
+
+    <!-- 팀 상태 -->
+    <div class="card" th:if="${team.participants.contains(user)}">
+      <h4>팀 상태</h4>
+      <p th:text="${team.status}">모임 상태 (예: 모집중)</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  © 2025 맛남. 모든 권리 보유.
+</footer>
+</body>
+</html>
