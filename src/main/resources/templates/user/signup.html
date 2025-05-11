@@ -58,7 +58,7 @@
       margin-top: 4rem;
     }
     .signup-box {
-      width: 300px;
+      width: 400px;
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 2rem;
@@ -77,7 +77,7 @@
     .tab-buttons {
       display: flex;
       justify-content: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     .tab-buttons button {
       flex: 1;
@@ -92,32 +92,55 @@
       border-bottom: 2px solid #000;
       font-weight: bold;
     }
+    .signup-form .form-group {
+      margin-bottom: 1.2rem;
+    }
     .signup-form label {
       font-size: 0.85rem;
       margin-bottom: 0.3rem;
       display: block;
+      font-weight: 500;
     }
-    .signup-form input {
+    .signup-form input,
+    .signup-form select {
       width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
+      padding: 0.7rem;
       border: 1px solid #ddd;
       border-radius: 4px;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .signup-form select {
+      background: white;
+    }
+    .error-message {
+      color: #ff4444;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+    .success-message {
+      color: #00aa00;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
     }
     .signup-form button {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.8rem;
       background: #000;
       color: white;
       border: none;
       border-radius: 4px;
       font-size: 0.9rem;
       cursor: pointer;
+      margin-top: 1rem;
+    }
+    .signup-form button:hover {
+      background: #333;
     }
     .signup-footer {
       text-align: center;
       font-size: 0.8rem;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
     footer {
       margin-top: 5rem;
@@ -158,23 +181,65 @@
       <button class="active">이메일</button>
       <button>소셜 로그인</button>
     </div>
-    <form class="signup-form" th:action="@{/signup}" method="post">
-      <label for="email">이메일</label>
-      <input type="email" id="email" name="email" placeholder="name@example.com" required>
 
-      <label for="nickname">닉네임</label>
-      <input type="text" id="nickname" name="nickname" placeholder="사용할 닉네임을 입력하세요" required>
+    <form class="signup-form" id="signupForm">
+      <div class="form-group">
+        <label for="userId">아이디</label>
+        <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요" required>
+        <div class="error-message" id="userIdError"></div>
+      </div>
 
-      <label for="password">비밀번호</label>
-      <input type="password" id="password" name="password" placeholder="********" required>
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" placeholder="********" required>
+        <div class="error-message" id="passwordError"></div>
+      </div>
 
-      <label for="confirmPassword">비밀번호 확인</label>
-      <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********" required>
+      <div class="form-group">
+        <label for="confirmPassword">비밀번호 확인</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="********" required>
+        <div class="error-message" id="confirmPasswordError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input type="email" id="email" name="email" placeholder="name@example.com" required>
+        <div class="error-message" id="emailError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="nickname">닉네임</label>
+        <input type="text" id="nickname" name="nickname" placeholder="사용할 닉네임을 입력하세요" required>
+        <div class="error-message" id="nicknameError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="address">주소</label>
+        <input type="text" id="address" name="address" placeholder="서울시 강남구" required>
+        <div class="error-message" id="addressError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="age">나이</label>
+        <input type="number" id="age" name="age" placeholder="나이를 입력하세요" min="14" max="120" required>
+        <div class="error-message" id="ageError"></div>
+      </div>
+
+      <div class="form-group">
+        <label for="gender">성별</label>
+        <select id="gender" name="gender" required>
+          <option value="">성별을 선택하세요</option>
+          <option value="MAN">남성</option>
+          <option value="WOMAN">여성</option>
+        </select>
+        <div class="error-message" id="genderError"></div>
+      </div>
 
       <button type="submit">가입하기</button>
     </form>
+
     <div class="signup-footer">
-      이미 계정이 있으신가요? <a th:href="@{/login}" style="text-decoration: underline;">로그인</a>
+      이미 계정이 있으신가요? <a th:href="@{/user/signin}" style="text-decoration: underline;">로그인</a>
     </div>
   </div>
 </main>
@@ -183,6 +248,62 @@
 <footer>
   © 2025 맛남. 모든 권리 보유.
 </footer>
+
+<script>
+  document.getElementById('signupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+    const formData = new FormData(this);
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+
+
+    if (password !== confirmPassword) {
+      document.getElementById('confirmPasswordError').textContent = '비밀번호가 일치하지 않습니다.';
+      return;
+    }
+
+    const signupData = {
+      userId: formData.get('userId'),
+      password: password,
+      email: formData.get('email'),
+      nickname: formData.get('nickname'),
+      address: formData.get('address'),
+      age: parseInt(formData.get('age')),
+      gender: formData.get('gender')
+    };
+
+    try {
+      const response = await fetch('/api/user/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(signupData)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('회원가입이 완료되었습니다!');
+        window.location.href = '/';
+      } else {
+        if (result.message.includes('이메일')) {
+          document.getElementById('emailError').textContent = result.message;
+        } else if (result.message.includes('아이디')) {
+          document.getElementById('userIdError').textContent = result.message;
+        } else {
+          alert(result.message || '회원가입 중 오류가 발생했습니다.');
+        }
+      }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('서버와 통신 중 오류가 발생했습니다.');
+    }
+  });
+</script>
 
 </body>
 </html>
