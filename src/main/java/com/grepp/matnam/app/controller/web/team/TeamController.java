@@ -1,11 +1,14 @@
 package com.grepp.matnam.app.controller.web.team;
 
+import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,8 +41,7 @@ public class TeamController {
     // 모임 생성
     @PostMapping
     public String createTeam(@ModelAttribute Team team,
-        @RequestParam("userId") Long userId
-    ) {
+        @RequestParam("userId") String userId) {
         User user = teamService.getUserById(userId);
         team.setUser(user);
 
@@ -82,18 +84,25 @@ public class TeamController {
 
     // 모임 참여 신청
     @PostMapping("/{teamId}/apply")
-    public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam Long userId) {
+    public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = teamService.getUserById(userId);
         teamService.addParticipant(teamId, user);
         return "redirect:/teamDetail/" + teamId;
     }
 
 
-    // 모임 참여 수락
-    @PostMapping("/{teamId}/accept")
-    public String acceptParticipant(@PathVariable Long teamId, @RequestParam Long userId) {
-        teamService.acceptParticipant(teamId, userId);
-        return "redirect:/team/" + teamId;
+    // 모임 참여 수락 (주최자가 호출)
+    @PostMapping("/participants/{teamId}/{userId}")
+    public ResponseEntity<String> acceptParticipant(
+        @PathVariable Long teamId,
+        @PathVariable String userId) {
+
+        try {
+            teamService.acceptParticipant(teamId, userId);
+            return ResponseEntity.ok("참가자가 수락되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("참가자 수락에 실패했습니다.");
+        }
     }
 
     // 참여자 목록 조회(팀 페이지?)
@@ -114,7 +123,7 @@ public class TeamController {
 
     // 전체 모임 조회
     @GetMapping("/all/{userId}")
-    public String getAllTeams(@PathVariable Long userId,
+    public String getAllTeams(@PathVariable String userId,
         @RequestParam(value = "status", required = false) String status,
         Model model) {
 
@@ -134,15 +143,7 @@ public class TeamController {
         }
 
         model.addAttribute("teams", teams);
-        return "member/mypage";
-    }
-
-    // 사용자가 주최한 모임 조회
-    @GetMapping("/{userId}")
-    public String getUserTeams(@PathVariable Long userId, Model model) {
-        Iterable<Team> teams = teamService.getUserTeams(userId);
-        model.addAttribute("teams", teams);
-        return "member/mypage";
+        return "user/mypage";
     }
 
 }

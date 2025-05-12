@@ -1,10 +1,11 @@
-package com.grepp.matnam.app.controller.web.team;
+package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
+import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -65,14 +66,17 @@ public class TeamService {
 
 
     // 모임 참여 수락
-    public void acceptParticipant(Long teamId, Long userId) {
+    public void acceptParticipant(Long teamId, String userId) {
         // 참가자 정보 가져오기
-        Participant participant = participantRepository.findTeamsByUserIdAndTeamId(teamId, userId);
+        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
         if (participant != null) {
             participant.setParticipantStatus(ParticipantStatus.APPROVED);
             participantRepository.save(participant);
+        } else {
+            throw new RuntimeException("참가자가 존재하지 않거나 이미 수락되었습니다."); // 예외 수정하기
         }
     }
+
 
     public void deleteTeam(Long teamId) {
 
@@ -83,33 +87,31 @@ public class TeamService {
     }
 
 
-    // 사용자가 참여한 모임 조회 (참여 완료 및 참여 중 포함)
-    public Iterable<Team> getUserTeams(Long userId) {
-        // 사용자가 주최한 모임
-        List<Team> hostedTeams = teamRepository.findTeamsByUserId(userId);
-
-        // 사용자가 참여한 모든 모임
-        List<Team> participatedTeams = participantRepository.findTeamsByUserId(userId);
-
-        hostedTeams.addAll(participatedTeams);
-        return hostedTeams;
+    // userId로 속한 팀 목록 조회
+    public List<Team> getUserTeams(String userId) {
+        return teamRepository.findTeamsByUser_UserId(userId);
     }
 
-
-    // 주최 중 모임 조회
-    public Iterable<Team> getTeamsByLeader(Long userId) {
-        return teamRepository.findTeamsByUserId(userId);
+    // 주최자로서의 팀 조회
+    public List<Team> getTeamsByLeader(String userId) {
+        return teamRepository.findTeamsByUser_UserId(userId);
     }
 
-    // 참여 중 모임 조회
-    public Iterable<Team> getTeamsByParticipant(Long userId) {
-        return participantRepository.findTeamsByParticipantStatusAndUserId(
-            ParticipantStatus.PENDING, userId);
+    // 참여자로서의 팀 조회
+    public List<Team> getTeamsByParticipant(String userId) {
+        return teamRepository.findTeamsByParticipants_User_UserId(userId);  // 수정된 메서드 사용
+    }
+
+    // 특정 사용자와 팀 ID로 참여자 조회
+    public Participant getParticipant(String userId, Long teamId) {
+        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
     }
 
     // 사용자 정보 조회
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+    public User getUserById(String userId) {
+        return userRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
 
 }
