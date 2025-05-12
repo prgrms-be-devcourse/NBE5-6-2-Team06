@@ -96,7 +96,7 @@ public class TeamController {
         return "redirect:/team/" + teamId;
     }
 
-    // 참가자 목록 조회(팀 페이지?)
+    // 참여자 목록 조회(팀 페이지?)
     @GetMapping("/{teamId}/participants")
     public String getParticipants(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamById(teamId);
@@ -104,7 +104,7 @@ public class TeamController {
         return "team/teamPage";
     }
 
-    // 참가자 상태 변경
+    // 참여자 상태 변경
     @PatchMapping("/{participantId}/participantStatus")
     public String changeParticipantStatus(@PathVariable Long participantId, @RequestParam
     ParticipantStatus status) {

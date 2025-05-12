@@ -64,7 +64,7 @@ public class TeamService {
     }
 
 
-    // 참여자 수락
+    // 모임 참여 수락
     public void acceptParticipant(Long teamId, Long userId) {
         // 참가자 정보 가져오기
         Participant participant = participantRepository.findTeamsByUserIdAndTeamId(teamId, userId);
