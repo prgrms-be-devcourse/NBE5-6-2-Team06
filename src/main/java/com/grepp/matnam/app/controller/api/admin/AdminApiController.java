@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminApiController {
     private final RestaurantService restaurantService;
 
-    @GetMapping("/{restaurantId}")
+    @GetMapping("/restaurant/{restaurantId}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.findById(restaurantId)
             .orElseThrow(() -> new CommonException(ResponseCode.BAD_REQUEST));
@@ -36,7 +36,7 @@ public class AdminApiController {
         return ResponseEntity.ok(ApiResponse.success(restaurant));
     }
 
-    @PatchMapping("/{restaurantId}")
+    @PatchMapping("/restaurant/{restaurantId}")
     public ResponseEntity<?> updateRestaurant(@PathVariable Long restaurantId,
         @RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
 
@@ -52,7 +52,7 @@ public class AdminApiController {
         return ResponseEntity.ok("수정 성공");
     }
 
-    @DeleteMapping("/{restaurantId}")
+    @DeleteMapping("/restaurant/{restaurantId}")
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
         restaurantService.deleteById(restaurantId);
         return ResponseEntity.ok("삭제 성공");

@@ -9,17 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 폼 초기화
             document.getElementById('restaurantForm').reset();
             document.getElementById('restaurant-id').value = '';
-            
-            // 메뉴 항목 초기화
-            const menuContainer = document.getElementById('menu-items-container');
-            menuContainer.innerHTML = `
-                <div class="menu-item">
-                    <input type="text" class="menu-name" placeholder="메뉴명">
-                    <input type="text" class="menu-price" placeholder="가격">
-                    <button type="button" class="remove-menu-btn"><i class="fas fa-times"></i></button>
-                </div>
-            `;
-            
+
             // 모달 표시
             document.getElementById('restaurantModal').style.display = 'block';
         });
@@ -63,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const restaurantId = this.getAttribute('data-id');
 
             // 서버에서 식당 데이터 가져오기
-            fetch(`/api/admin/${restaurantId}`)
+            fetch(`/api/admin/restaurant/${restaurantId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('서버 응답 실패');
@@ -105,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 식당 수정 - 저장 버튼 클릭 이벤트
+    // 새 식당 추가 - 저장 버튼 클릭 이벤트
     document.getElementById('save-button').addEventListener('click', function () {
         const restaurantId = document.getElementById('restaurant-id').value;
 
@@ -126,8 +117,14 @@ document.addEventListener('DOMContentLoaded', function() {
             kakaoRating: parseFloat(document.getElementById('restaurant-kakao-rating').value)
         };
 
-        fetch(`/api/admin/${restaurantId}`, {
-            method: 'PATCH',
+        const url = restaurantId
+            ? `/api/admin/restaurant/${restaurantId}` // 수정 (PATCH)
+            : `/api/admin/restaurant`;      // 생성 (POST)
+
+        const method = restaurantId ? 'PATCH' : 'POST';
+
+        fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -135,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(async (response) => {
             if (response.ok) {
-                alert("수정이 완료되었습니다!");
+                alert("저장이 완료되었습니다!");
                 // 모달 닫기 등 후처리
                 document.getElementById('restaurantModal').style.display = 'none';
                 location.reload(); // 새로고침으로 반영
@@ -157,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(err => {
             console.error(err);
-            alert("수정 중 오류가 발생했습니다.");
+            alert("저장 중 오류가 발생했습니다.");
         });
     });
 
@@ -167,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const restaurantId = this.getAttribute('data-id');
 
             if (confirm("정말 이 식당을 삭제하시겠습니까?")) {
-                fetch(`/api/admin/${restaurantId}`, {
+                fetch(`/api/admin/restaurant/${restaurantId}`, {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json'
