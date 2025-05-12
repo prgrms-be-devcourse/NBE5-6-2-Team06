@@ -1,16 +1,16 @@
 INSERT INTO user (user_id, password, age, address, email, nickname, gender, temperature, created_at, modified_at, activated, status, role)
 VALUES
-    ('admin', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 28, '서울시 강남구', 'admin@matnam.com', '관리자', 'MAN', 36.5, '2024-05-01 10:00:00', '2024-05-01 10:00:00', 1,'ACTIVE','ROLE_ADMIN'),
-    ('user1', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 28, '서울시 강남구', 'user1@example.com', '맛집탐험가', 'MAN', 36.5, '2024-05-01 10:00:00', '2024-05-01 10:00:00', 1, 'ACTIVE','ROLE_USER'),
-    ('user2', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 32, '서울시 서초구', 'user2@example.com', '미식가레이디', 'WOMAN', 37.2, '2024-05-01 11:30:00', '2024-05-01 11:30:00', 1, 'ACTIVE','ROLE_USER'),
-    ('user3', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 25, '서울시 마포구', 'user3@example.com', '힙스터푸디', 'MAN', 36.8, '2024-05-02 09:15:00', '2024-05-02 09:15:00', 1, 'ACTIVE','ROLE_USER'),
-    ('user4', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 30, '서울시 용산구', 'user4@example.com', '맛있으면짖는개', 'WOMAN', 30.9, '2024-05-02 14:20:00', '2024-05-02 14:20:00', 1, 'ACTIVE', 'ROLE_USER'),
-    ('user5', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 27, '서울시 동대문구', 'user5@example.com', '동대문핫플러', 'MAN', 36.7, '2024-05-03 16:45:00', '2024-05-03 16:45:00', 1, 'ACTIVE','ROLE_USER'),
-    ('user6', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 35, '서울시 성북구', 'user6@example.com', '맛집여행자', 'WOMAN', 36.6, '2024-05-04 10:30:00', '2024-05-04 10:30:00', 1, 'ACTIVE', 'ROLE_USER'),
-    ('user7', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 29, '서울시 송파구', 'user7@example.com', '송파구맛집왕', 'MAN', 36.4, '2024-05-04 13:45:00', '2024-05-04 13:45:00', 1, 'ACTIVE', 'ROLE_USER'),
-    ('user8', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 31, '서울시 중구', 'user8@example.com', '미식의여왕', 'WOMAN', 37.0, '2024-05-05 09:20:00', '2024-05-05 09:20:00', 1, 'ACTIVE', 'ROLE_USER'),
-    ('user9', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 26, '서울시 광진구', 'user9@example.com', '혼밥마스터', 'MAN', 36.8, '2024-05-05 11:50:00', '2024-05-05 11:50:00', 1, 'ACTIVE', 'ROLE_USER'),
-    ('user10', '{bcrypt}$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 33, '서울시 종로구', 'user10@example.com', '종로맛집헌터', 'WOMAN', 36.5, '2024-05-06 14:15:00', '2024-05-06 14:15:00', 1,  'ACTIVE', 'ROLE_USER');
+    ('admin', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 28, '서울시 강남구', 'admin@matnam.com', '관리자', 'MAN', 36.5, '2024-05-01 10:00:00', '2024-05-01 10:00:00', 1,'ACTIVE','ROLE_ADMIN'),
+    ('user1', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 28, '서울시 강남구', 'user1@example.com', '맛집탐험가', 'MAN', 36.5, '2024-05-01 10:00:00', '2024-05-01 10:00:00', 1, 'ACTIVE','ROLE_USER'),
+    ('user2', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 32, '서울시 서초구', 'user2@example.com', '미식가레이디', 'WOMAN', 37.2, '2024-05-01 11:30:00', '2024-05-01 11:30:00', 1, 'ACTIVE','ROLE_USER'),
+    ('user3', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 25, '서울시 마포구', 'user3@example.com', '힙스터푸디', 'MAN', 36.8, '2024-05-02 09:15:00', '2024-05-02 09:15:00', 1, 'ACTIVE','ROLE_USER'),
+    ('user4', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 30, '서울시 용산구', 'user4@example.com', '맛있으면짖는개', 'WOMAN', 30.9, '2024-05-02 14:20:00', '2024-05-02 14:20:00', 1, 'ACTIVE', 'ROLE_USER'),
+    ('user5', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 27, '서울시 동대문구', 'user5@example.com', '동대문핫플러', 'MAN', 36.7, '2024-05-03 16:45:00', '2024-05-03 16:45:00', 1, 'ACTIVE','ROLE_USER'),
+    ('user6', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 35, '서울시 성북구', 'user6@example.com', '맛집여행자', 'WOMAN', 36.6, '2024-05-04 10:30:00', '2024-05-04 10:30:00', 1, 'ACTIVE', 'ROLE_USER'),
+    ('user7', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 29, '서울시 송파구', 'user7@example.com', '송파구맛집왕', 'MAN', 36.4, '2024-05-04 13:45:00', '2024-05-04 13:45:00', 1, 'ACTIVE', 'ROLE_USER'),
+    ('user8', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 31, '서울시 중구', 'user8@example.com', '미식의여왕', 'WOMAN', 37.0, '2024-05-05 09:20:00', '2024-05-05 09:20:00', 1, 'ACTIVE', 'ROLE_USER'),
+    ('user9', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 26, '서울시 광진구', 'user9@example.com', '혼밥마스터', 'MAN', 36.8, '2024-05-05 11:50:00', '2024-05-05 11:50:00', 1, 'ACTIVE', 'ROLE_USER'),
+    ('user10', '$2a$10$DLmC62iFtw6t/XTcLHhU/ONfwogNazrbae9PsnZ9DWz4/lIFr2jFK', 33, '서울시 종로구', 'user10@example.com', '종로맛집헌터', 'WOMAN', 36.5, '2024-05-06 14:15:00', '2024-05-06 14:15:00', 1,  'ACTIVE', 'ROLE_USER');
 
 -- 식당(restaurant) 데이터
 INSERT INTO restaurant (activated, google_rating, kakao_rating, naver_rating, recommended_count, created_at, modified_at, address, category, main_food, mood, name, open_time, summary, tel)
