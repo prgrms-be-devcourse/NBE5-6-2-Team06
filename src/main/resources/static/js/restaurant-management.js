@@ -195,33 +195,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 초기 메뉴 삭제 버튼 이벤트 설정
     setupRemoveMenuButtons();
-    
-    // // 식당 저장 버튼 클릭 이벤트
-    // const saveRestaurantBtn = document.querySelector('#restaurantModal .save-btn');
-    // if (saveRestaurantBtn) {
-    //     saveRestaurantBtn.addEventListener('click', function() {
-    //         // 폼 유효성 검사
-    //         const restaurantName = document.getElementById('restaurant-name').value;
-    //         const restaurantCategory = document.getElementById('restaurant-category').value;
-    //         const restaurantAddress = document.getElementById('restaurant-address').value;
-    //
-    //         if (!restaurantName || !restaurantCategory || !restaurantAddress) {
-    //             alert('필수 항목을 모두 입력해주세요.');
-    //             return;
-    //         }
-    //
-    //         // 실제 구현에서는 서버로 데이터 전송
-    //         // 여기서는 모달 닫기만 수행
-    //         document.getElementById('restaurantModal').style.display = 'none';
-    //
-    //         // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-    //         alert('식당 정보가 저장되었습니다.');
-    //
-    //         // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-    //         // window.location.reload();
-    //     });
-    // }
-    
+
     // 카테고리 저장 버튼 클릭 이벤트
     const saveCategoryBtn = document.querySelector('#categoryModal .save-btn');
     if (saveCategoryBtn) {
