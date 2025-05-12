@@ -56,4 +56,8 @@ public class User extends BaseEntity {
     private Status status = Status.ACTIVE;
 
     private LocalDateTime dueDate;
+
+    public boolean isActivated() {
+        return this.activated;
+    }
 }

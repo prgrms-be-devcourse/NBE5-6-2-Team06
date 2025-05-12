@@ -1,10 +1,6 @@
 package com.grepp.matnam.app.controller.api.user;
 
-import com.grepp.matnam.app.controller.api.user.payload.JwtResponse;
-import com.grepp.matnam.app.controller.api.user.payload.PreferenceRequest;
-import com.grepp.matnam.app.controller.api.user.payload.UserSigninRequest;
-import com.grepp.matnam.app.controller.api.user.payload.UserSignupRequest;
-import com.grepp.matnam.app.controller.api.user.payload.UserResponse;
+import com.grepp.matnam.app.controller.api.user.payload.*;
 import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
@@ -150,6 +146,27 @@ public class UserApiController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "취향 변경 중 서버 오류가 발생했습니다.", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping
+    @Operation(summary = "회원 탈퇴", description = "사용자 계정을 비활성화(탈퇴) 처리합니다.")
+    public ResponseEntity<ApiResponse> deactivateAccount(@Validated @RequestBody UserDeactivateRequest request) {
+        try {
+            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            userService.deactivateAccount(currentUserId, request.getPassword());
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원 탈퇴 성공", null));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "회원 탈퇴 실패", e.getMessage()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "회원 탈퇴 중 서버 오류가 발생했습니다.", e.getMessage()));
         }
     }
 }

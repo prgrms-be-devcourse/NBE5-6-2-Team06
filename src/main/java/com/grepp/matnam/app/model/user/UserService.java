@@ -66,9 +66,9 @@ public class UserService {
                     return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
                 });
 
-        if (user.getStatus() != Status.ACTIVE) {
+        if (user.getStatus() != Status.ACTIVE || !user.isActivated()) {
             log.info("로그인 실패: 비활성화된 계정 - " + userId + ", 상태=" + user.getStatus());
-            throw new IllegalArgumentException("비활성화된 계정입니다.");
+            throw new IllegalArgumentException("비활성화(탈퇴) 계정입니다.");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -78,5 +78,27 @@ public class UserService {
 
         log.info("로그인 성공: " + userId);
         return user;
+    }
+
+    public User deactivateAccount(String userId, String password) {
+        log.info("회원 탈퇴 시도: " + userId);
+
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    log.info("회원 탈퇴 실패: 사용자 없음 - " + userId);
+                    return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+                });
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.info("회원 탈퇴 실패: 비밀번호 불일치 - " + userId);
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        user.unActivated();
+
+        User updatedUser = userRepository.save(user);
+        log.info("회원 탈퇴 완료: " + updatedUser.getUserId());
+
+        return updatedUser;
     }
 }
