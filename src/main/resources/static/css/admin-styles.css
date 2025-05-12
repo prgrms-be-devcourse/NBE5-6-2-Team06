@@ -1356,3 +1356,9 @@ h1 {
         aspect-ratio: 16/9;
     }
 }
+
+.error-message {
+    color: #ff4444;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}

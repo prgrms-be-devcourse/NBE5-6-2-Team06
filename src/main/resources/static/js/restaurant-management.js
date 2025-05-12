@@ -40,52 +40,129 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('categoryModal').style.display = 'block';
         });
     }
-    
-    // 식당 수정 버튼 클릭 이벤트
-    const editButtons = document.querySelectorAll('.action-btn.edit');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const restaurantId = this.getAttribute('data-id');
-            
-            // 실제 구현에서는 서버에서 데이터를 가져와야 함
-            // 여기서는 예시 데이터로 모달 채우기
-            document.getElementById('restaurant-modal-title').textContent = '식당 정보 수정';
-            document.getElementById('restaurant-id').value = restaurantId;
-            
-            // 예시 데이터 (실제로는 서버에서 가져온 데이터로 채워야 함)
-            document.getElementById('restaurant-name').value = '맛있는 치킨';
-            document.getElementById('restaurant-category').value = '한식';
-            document.getElementById('restaurant-address').value = '서울 강남구 테헤란로 123';
-            document.getElementById('restaurant-phone').value = '02-123-4567';
-            document.getElementById('restaurant-hours').value = '평일 11:00-22:00, 주말 11:00-23:00';
-            document.getElementById('restaurant-main-menu').value = '후라이드 치킨';
-            document.getElementById('restaurant-price-range').value = '보통';
-            document.getElementById('restaurant-description').value = '맛있는 치킨을 제공하는 식당입니다.';
-            
-            // 분위기 체크박스 설정 (예시)
-            document.getElementById('mood-clean').checked = true;
-            document.getElementById('mood-spacious').checked = true;
-            
-            // 메뉴 항목 설정 (예시)
-            const menuContainer = document.getElementById('menu-items-container');
-            menuContainer.innerHTML = `
-                <div class="menu-item">
-                    <input type="text" class="menu-name" placeholder="메뉴명" value="후라이드 치킨">
-                    <input type="text" class="menu-price" placeholder="가격" value="18,000원">
-                    <button type="button" class="remove-menu-btn"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="menu-item">
-                    <input type="text" class="menu-name" placeholder="메뉴명" value="양념 치킨">
-                    <input type="text" class="menu-price" placeholder="가격" value="19,000원">
-                    <button type="button" class="remove-menu-btn"><i class="fas fa-times"></i></button>
-                </div>
-            `;
-            
-            // 모달 표시
-            document.getElementById('restaurantModal').style.display = 'block';
+    // 최대 선택 가능 개수
+    const MAX_MOOD_SELECTION = 3;
+
+    // 체크박스 선택 제한
+    const moodCheckboxes = document.querySelectorAll('input[name="restaurant-mood"]');
+    moodCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const checkedCount = document.querySelectorAll('input[name="restaurant-mood"]:checked').length;
+            if (checkedCount > MAX_MOOD_SELECTION) {
+                checkbox.checked = false;
+                alert(`최대 ${MAX_MOOD_SELECTION}개까지만 선택할 수 있습니다.`);
+            }
         });
     });
-    
+
+    // 식당 수정 버튼 클릭 이벤트
+    const editButtons = document.querySelectorAll('.action-btn.edit');
+
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const restaurantId = this.getAttribute('data-id');
+
+            // 서버에서 식당 데이터 가져오기
+            fetch(`/api/admin/${restaurantId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('서버 응답 실패');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data.data);
+                const result = data.data;
+                // 받아온 데이터로 모달 채우기
+                document.getElementById('restaurant-modal-title').textContent = '식당 정보 수정';
+                document.getElementById('restaurant-id').value = result.restaurantId;
+                document.getElementById('restaurant-name').value = result.name;
+                document.getElementById('restaurant-category').value = result.category;
+                document.getElementById('restaurant-address').value = result.address;
+                document.getElementById('restaurant-phone').value = result.tel;
+                document.getElementById('restaurant-hours').value = result.openTime;
+                document.getElementById('restaurant-main-menu').value = result.mainFood;
+                document.getElementById('restaurant-description').value = result.summary;
+                document.getElementById('restaurant-google-rating').value = result.googleRating;
+                document.getElementById('restaurant-naver-rating').value = result.naverRating;
+                document.getElementById('restaurant-kakao-rating').value = result.kakaoRating;
+
+
+                // 분위기 체크박스 설정 (예: 쉼표로 구분된 문자열인 경우)
+                const moodArray = result.mood.split(',').map(m => m.trim());
+                moodCheckboxes.forEach(checkbox => {
+                    checkbox.checked = moodArray.includes(checkbox.value);
+                });
+
+                // 모달 표시
+                document.getElementById('restaurantModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('식당 정보를 불러오는 중 오류 발생:', error);
+                alert('식당 정보를 불러오지 못했습니다.');
+            });
+        });
+    });
+
+    // 식당 수정 - 저장 버튼 클릭 이벤트
+    document.getElementById('save-button').addEventListener('click', function () {
+        const restaurantId = document.getElementById('restaurant-id').value;
+
+        // 선택된 mood 값들 최대 3개
+        const moodValues = Array.from(document.querySelectorAll('input[name="restaurant-mood"]:checked'))
+        .map(cb => cb.value);
+
+        const payload = {
+            name: document.getElementById('restaurant-name').value,
+            category: document.getElementById('restaurant-category').value,
+            address: document.getElementById('restaurant-address').value,
+            tel: document.getElementById('restaurant-phone').value,
+            openTime: document.getElementById('restaurant-hours').value,
+            mainFood: document.getElementById('restaurant-main-menu').value,
+            summary: document.getElementById('restaurant-description').value,
+            mood: moodValues.join(','),
+            googleRating: parseFloat(document.getElementById('restaurant-google-rating').value),
+            naverRating: parseFloat(document.getElementById('restaurant-naver-rating').value),
+            kakaoRating: parseFloat(document.getElementById('restaurant-kakao-rating').value)
+        };
+
+        fetch(`/api/admin/${restaurantId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(async (response) => {
+            if (response.ok) {
+                alert("수정이 완료되었습니다!");
+                // 모달 닫기 등 후처리
+                document.getElementById('restaurantModal').style.display = 'none';
+                location.reload(); // 새로고침으로 반영
+            } else {
+                const errorMessages = await response.json();
+                document.querySelector('#error-name').textContent = errorMessages.name;
+                document.querySelector('#error-category').textContent = errorMessages.category;
+                document.querySelector('#error-address').textContent = errorMessages.address;
+                document.querySelector('#error-phone').textContent = errorMessages.tel;
+                document.querySelector('#error-hours').textContent = errorMessages.openTime;
+                document.querySelector('#error-main-menu').textContent = errorMessages.mainFood;
+                document.querySelector('#error-description').textContent = errorMessages.summary;
+                document.querySelector('#error-mood').textContent = errorMessages.mood;
+                document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
+                document.querySelector('#error-naver-rating').textContent = errorMessages.naverRating;
+                document.querySelector('#error-kakao-rating').textContent = errorMessages.kakaoRating;
+                alert('필수 항목을 모두 입력해주세요.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("수정 중 오류가 발생했습니다.");
+        });
+    });
+
+
+
     // 메뉴 추가 버튼 클릭 이벤트
     const addMenuBtn = document.querySelector('.add-menu-btn');
     if (addMenuBtn) {
@@ -119,31 +196,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // 초기 메뉴 삭제 버튼 이벤트 설정
     setupRemoveMenuButtons();
     
-    // 식당 저장 버튼 클릭 이벤트
-    const saveRestaurantBtn = document.querySelector('#restaurantModal .save-btn');
-    if (saveRestaurantBtn) {
-        saveRestaurantBtn.addEventListener('click', function() {
-            // 폼 유효성 검사
-            const restaurantName = document.getElementById('restaurant-name').value;
-            const restaurantCategory = document.getElementById('restaurant-category').value;
-            const restaurantAddress = document.getElementById('restaurant-address').value;
-            
-            if (!restaurantName || !restaurantCategory || !restaurantAddress) {
-                alert('필수 항목을 모두 입력해주세요.');
-                return;
-            }
-            
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('restaurantModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            alert('식당 정보가 저장되었습니다.');
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
-        });
-    }
+    // // 식당 저장 버튼 클릭 이벤트
+    // const saveRestaurantBtn = document.querySelector('#restaurantModal .save-btn');
+    // if (saveRestaurantBtn) {
+    //     saveRestaurantBtn.addEventListener('click', function() {
+    //         // 폼 유효성 검사
+    //         const restaurantName = document.getElementById('restaurant-name').value;
+    //         const restaurantCategory = document.getElementById('restaurant-category').value;
+    //         const restaurantAddress = document.getElementById('restaurant-address').value;
+    //
+    //         if (!restaurantName || !restaurantCategory || !restaurantAddress) {
+    //             alert('필수 항목을 모두 입력해주세요.');
+    //             return;
+    //         }
+    //
+    //         // 실제 구현에서는 서버로 데이터 전송
+    //         // 여기서는 모달 닫기만 수행
+    //         document.getElementById('restaurantModal').style.display = 'none';
+    //
+    //         // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
+    //         alert('식당 정보가 저장되었습니다.');
+    //
+    //         // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
+    //         // window.location.reload();
+    //     });
+    // }
     
     // 카테고리 저장 버튼 클릭 이벤트
     const saveCategoryBtn = document.querySelector('#categoryModal .save-btn');

@@ -130,6 +130,7 @@
                         <div class="form-group">
                             <label for="restaurant-name">식당명 <span class="required">*</span></label>
                             <input type="text" id="restaurant-name" required>
+                            <span id="error-name" class="error-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="restaurant-category">카테고리 <span class="required">*</span></label>
@@ -142,104 +143,106 @@
                                 <option value="분식">분식</option>
                                 <option value="디저트">디저트</option>
                             </select>
+                            <span id="error-category" class="error-message"></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="restaurant-address">주소 <span class="required">*</span></label>
                         <input type="text" id="restaurant-address" required>
+                        <span id="error-address" class="error-message"></span>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="restaurant-phone">전화번호</label>
                             <input type="text" id="restaurant-phone">
+                            <span id="error-phone" class="error-message"></span>
                         </div>
                         <div class="form-group">
                             <label for="restaurant-hours">영업 시간</label>
                             <input type="text" id="restaurant-hours" placeholder="예: 평일 11:00-22:00, 주말 11:00-23:00">
+                            <span id="error-hours" class="error-message"></span>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="restaurant-main-menu">대표 메뉴</label>
                             <input type="text" id="restaurant-main-menu" placeholder="대표 메뉴를 입력하세요">
-                        </div>
-                        <div class="form-group">
-                            <label for="restaurant-price-range">가격대</label>
-                            <select id="restaurant-price-range">
-                                <option value="">가격대 선택</option>
-                                <option value="저렴">저렴 (1만원 미만)</option>
-                                <option value="보통">보통 (1-3만원)</option>
-                                <option value="고급">고급 (3만원 이상)</option>
-                            </select>
+                            <span id="error-main-menu" class="error-message"></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="restaurant-description">식당 설명</label>
                         <textarea id="restaurant-description" rows="3" placeholder="식당에 대한 간략한 설명을 입력하세요"></textarea>
+                        <span id="error-description" class="error-message"></span>
                     </div>
-
                     <div class="form-group">
-                        <label>분위기 (해당하는 항목 모두 선택)</label>
+                        <label>분위기 (해당하는 항목 최소 1개에서 최대 3개 선택)</label>
+                        <span id="error-mood" class="error-message"></span>
                         <div class="checkbox-group">
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-clean" name="restaurant-mood" value="청결한">
-                                <label for="mood-clean">청결한</label>
+                                <input type="checkbox" id="goodTalk" name="restaurant-mood" value="대화하기 좋은">
+                                <label for="goodTalk">대화하기 좋은</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-spacious" name="restaurant-mood" value="매장이 넓은">
-                                <label for="mood-spacious">매장이 넓은</label>
+                                <input type="checkbox" id="manyDrink" name="restaurant-mood" value="술이 다양한">
+                                <label for="manyDrink">술이 다양한</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-quiet" name="restaurant-mood" value="조용한">
-                                <label for="mood-quiet">조용한</label>
+                                <input type="checkbox" id="goodMusic" name="restaurant-mood" value="음악이 좋은">
+                                <label for="goodMusic">음악이 좋은</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-lively" name="restaurant-mood" value="활기찬">
-                                <label for="mood-lively">활기찬</label>
+                                <input type="checkbox" id="clean" name="restaurant-mood" value="깨끗한">
+                                <label for="clean">깨끗한</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-romantic" name="restaurant-mood" value="로맨틱한">
-                                <label for="mood-romantic">로맨틱한</label>
+                                <input type="checkbox" id="goodView" name="restaurant-mood" value="뷰가 좋은">
+                                <label for="goodView">뷰가 좋은</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-modern" name="restaurant-mood" value="모던한">
-                                <label for="mood-modern">모던한</label>
+                                <input type="checkbox" id="isTerrace" name="restaurant-mood" value="테라스가 있는">
+                                <label for="isTerrace">테라스가 있는</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-traditional" name="restaurant-mood" value="전통적인">
-                                <label for="mood-traditional">전통적인</label>
+                                <input type="checkbox" id="goodPicture" name="restaurant-mood" value="사진이 잘 나오는">
+                                <label for="goodPicture">사진이 잘 나오는</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-family" name="restaurant-mood" value="가족 친화적">
-                                <label for="mood-family">가족 친화적</label>
+                                <input type="checkbox" id="goodMenu" name="restaurant-mood" value="메뉴가 다양한">
+                                <label for="goodMenu">메뉴가 다양한</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-group" name="restaurant-mood" value="단체 모임">
-                                <label for="mood-group">단체 모임</label>
+                                <input type="checkbox" id="longStay" name="restaurant-mood" value="오래 머물 수 있는">
+                                <label for="longStay">오래 머물 수 있는</label>
                             </div>
                             <div class="checkbox-item">
-                                <input type="checkbox" id="mood-view" name="restaurant-mood" value="전망 좋은">
-                                <label for="mood-view">전망 좋은</label>
+                                <input type="checkbox" id="bigStore" name="restaurant-mood" value="매장이 넓은">
+                                <label for="bigStore">매장이 넓은</label>
                             </div>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="restaurant-menu-items">메뉴 항목</label>
-                        <div id="menu-items-container">
-                            <div class="menu-item">
-                                <input type="text" class="menu-name" placeholder="메뉴명">
-                                <input type="text" class="menu-price" placeholder="가격">
-                                <button type="button" class="remove-menu-btn"><i class="fas fa-times"></i></button>
-                            </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="restaurant-google-rating">구글 평점</label>
+                            <input type="text" id="restaurant-google-rating" placeholder="구글 평점을 입력하세요.">
+                            <span id="error-google-rating" class="error-message"></span>
                         </div>
-                        <button type="button" class="add-menu-btn secondary-btn"><i class="fas fa-plus"></i> 메뉴 추가</button>
+                        <div class="form-group">
+                            <label for="restaurant-naver-rating">네이버 평점</label>
+                            <input type="text" id="restaurant-naver-rating" placeholder="네이버 평점을 입력하세요.">
+                            <span id="error-naver-rating" class="error-message"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurant-kakao-rating">카카오 평점</label>
+                            <input type="text" id="restaurant-kakao-rating" placeholder="카카오 평점을 입력하세요.">
+                            <span id="error-kakao-rating" class="error-message"></span>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button class="secondary-btn cancel-btn">취소</button>
-                <button class="primary-btn save-btn">저장</button>
+                <button class="primary-btn save-btn" id="save-button">저장</button>
             </div>
         </div>
     </div>
