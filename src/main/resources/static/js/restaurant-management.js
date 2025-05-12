@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(async (response) => {
             if (response.ok) {
-                alert("저장이 완료되었습니다!");
+                response.text().then(message => {alert(message)});
                 // 모달 닫기 등 후처리
                 document.getElementById('restaurantModal').style.display = 'none';
                 location.reload(); // 새로고침으로 반영
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     if (response.ok) {
-                        alert("식당이 삭제되었습니다.");
+                        response.text().then(message => {alert(message)});
                         window.location.href = "/admin/restaurant";
                     } else {
                         alert("삭제 실패: 서버 오류");

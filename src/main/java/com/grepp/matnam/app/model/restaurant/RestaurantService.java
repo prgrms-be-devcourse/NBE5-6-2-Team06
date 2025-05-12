@@ -60,4 +60,9 @@ public class RestaurantService {
         }
         restaurantRepository.deleteById(restaurantId);
     }
+
+    @Transactional
+    public void createRestaurant(RestaurantRequest request) {
+        restaurantRepository.save(request.toEntity());
+    }
 }

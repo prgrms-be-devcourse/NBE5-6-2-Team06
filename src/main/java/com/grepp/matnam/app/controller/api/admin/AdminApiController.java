@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,12 +50,27 @@ public class AdminApiController {
         }
 
         restaurantService.updateRestaurant(restaurantId, request);
-        return ResponseEntity.ok("수정 성공");
+        return ResponseEntity.ok("식당이 수정되었습니다.");
     }
 
     @DeleteMapping("/restaurant/{restaurantId}")
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
         restaurantService.deleteById(restaurantId);
-        return ResponseEntity.ok("삭제 성공");
+        return ResponseEntity.ok("식당이 삭제되었습니다.");
+    }
+
+    @PostMapping("/restaurant")
+    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        restaurantService.createRestaurant(request);
+        return ResponseEntity.ok("식당이 추가되었습니다.");
     }
 }

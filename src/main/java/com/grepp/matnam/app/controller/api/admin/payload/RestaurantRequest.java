@@ -1,11 +1,13 @@
 package com.grepp.matnam.app.controller.api.admin.payload;
 
+import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class RestaurantRequest {
+
     @NotBlank
     private String name;
 
@@ -38,4 +40,23 @@ public class RestaurantRequest {
 
     @NotNull(message = "평점을 입력해주세요.")
     private Float kakaoRating;
+
+    public Restaurant toEntity() {
+        Restaurant restaurant = new Restaurant();
+
+        restaurant.setName(name);
+        restaurant.setCategory(category);
+        restaurant.setAddress(address);
+        restaurant.setTel(tel);
+        restaurant.setOpenTime(openTime);
+        restaurant.setMainFood(mainFood);
+        restaurant.setSummary(summary);
+        restaurant.setMood(mood);
+        restaurant.setGoogleRating(googleRating);
+        restaurant.setNaverRating(naverRating);
+        restaurant.setKakaoRating(kakaoRating);
+        restaurant.setRecommendedCount(0);
+
+        return restaurant;
+    }
 }
