@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @Slf4j
@@ -67,7 +68,19 @@ public class RestaurantService {
         restaurantRepository.save(request.toEntity());
     }
 
-    public Page<Restaurant> findByCategory(Category category, Pageable pageable) {
-        return restaurantRepository.findByCategory(category, pageable);
+//    public Page<Restaurant> findByCategory(String category, Pageable pageable) {
+//        return restaurantRepository.findByCategory(category, pageable);
+//    }
+
+    public Page<Restaurant> findByFilter(String category, String keyword, Pageable pageable) {
+        if (StringUtils.hasText(category) && StringUtils.hasText(keyword)) {
+            return restaurantRepository.findByCategoryAndNameContaining(category, keyword, pageable);
+        } else if (StringUtils.hasText(category)) {
+            return restaurantRepository.findByCategory(category, pageable);
+        } else if (StringUtils.hasText(keyword)) {
+            return restaurantRepository.findByNameContaining(keyword, pageable);
+        } else {
+            return restaurantRepository.findAll(pageable);
+        }
     }
 }
