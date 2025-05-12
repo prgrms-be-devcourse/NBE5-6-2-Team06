@@ -42,12 +42,9 @@ function updateLoginLogoutButton() {
         document.querySelector('a[href*="signin"]');
 
     if (loginButton && auth.isLoggedIn()) {
-        loginButton.textContent = '로그아웃';
-        loginButton.href = 'javascript:void(0)';
-        loginButton.onclick = function() {
-            auth.logout();
-            return false;
-        };
+        loginButton.textContent = '마이페이지';
+        loginButton.href = '/user/mypage';
+        loginButton.onclick = null;
     }
 
     const navMenu = document.querySelector('nav');
@@ -57,12 +54,8 @@ function updateLoginLogoutButton() {
         const authLink = document.createElement('a');
 
         if (auth.isLoggedIn()) {
-            authLink.textContent = '로그아웃';
-            authLink.href = 'javascript:void(0)';
-            authLink.onclick = function() {
-                auth.logout();
-                return false;
-            };
+            authLink.textContent = '마이페이지';
+            authLink.href = '/user/mypage';
         } else {
             authLink.textContent = '로그인';
             authLink.href = '/user/signin';
