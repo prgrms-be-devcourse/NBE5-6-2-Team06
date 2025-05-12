@@ -1,5 +1,6 @@
 **/application.properties
-**/resources/static
+**/resources/static/img
+.DS_Store
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,maven,gradle,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,maven,gradle,java
@@ -189,3 +190,5 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,maven,gradle,java
+
+spring.iml
