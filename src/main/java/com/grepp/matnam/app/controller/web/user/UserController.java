@@ -17,4 +17,9 @@ public class UserController {
     public String signin() {
         return "user/signin";
     }
+
+    @GetMapping("/preference")
+    public String preference() {
+        return "user/preference";
+    }
 }
