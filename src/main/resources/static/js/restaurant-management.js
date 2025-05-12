@@ -161,40 +161,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // 식당 삭제 버튼 클릭 이벤트
+    document.querySelectorAll('.action-btn.delete').forEach(button => {
+        button.addEventListener('click', function () {
+            const restaurantId = this.getAttribute('data-id');
 
-
-    // 메뉴 추가 버튼 클릭 이벤트
-    const addMenuBtn = document.querySelector('.add-menu-btn');
-    if (addMenuBtn) {
-        addMenuBtn.addEventListener('click', function() {
-            const menuContainer = document.getElementById('menu-items-container');
-            const newMenuItem = document.createElement('div');
-            newMenuItem.className = 'menu-item';
-            newMenuItem.innerHTML = `
-                <input type="text" class="menu-name" placeholder="메뉴명">
-                <input type="text" class="menu-price" placeholder="가격">
-                <button type="button" class="remove-menu-btn"><i class="fas fa-times"></i></button>
-            `;
-            menuContainer.appendChild(newMenuItem);
-            
-            // 새로 추가된 메뉴 항목의 삭제 버튼에 이벤트 리스너 추가
-            setupRemoveMenuButtons();
+            if (confirm("정말 이 식당을 삭제하시겠습니까?")) {
+                fetch(`/api/admin/${restaurantId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("식당이 삭제되었습니다.");
+                        window.location.href = "/admin/restaurant";
+                    } else {
+                        alert("삭제 실패: 서버 오류");
+                    }
+                })
+                .catch(error => {
+                    console.error("에러 발생:", error);
+                    alert("삭제 중 문제가 발생했습니다.");
+                });
+            }
         });
-    }
-    
-    // 메뉴 삭제 버튼 이벤트 설정 함수
-    function setupRemoveMenuButtons() {
-        const removeButtons = document.querySelectorAll('.remove-menu-btn');
-        removeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const menuItem = this.closest('.menu-item');
-                menuItem.remove();
-            });
-        });
-    }
-    
-    // 초기 메뉴 삭제 버튼 이벤트 설정
-    setupRemoveMenuButtons();
+    });
 
     // 카테고리 저장 버튼 클릭 이벤트
     const saveCategoryBtn = document.querySelector('#categoryModal .save-btn');

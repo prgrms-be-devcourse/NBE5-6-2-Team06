@@ -38,7 +38,7 @@ public class RestaurantService {
     @Transactional
     public void updateRestaurant(Long restaurantId,  RestaurantRequest request) {
         Restaurant restaurant = restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new CommonException(ResponseCode.BAD_REQUEST));
+            .orElseThrow(() -> new IllegalArgumentException("해당 식당이 존재하지 않습니다."));
 
         restaurant.setName(request.getName());
         restaurant.setCategory(request.getCategory());
@@ -51,5 +51,13 @@ public class RestaurantService {
         restaurant.setGoogleRating(request.getGoogleRating());
         restaurant.setNaverRating(request.getNaverRating());
         restaurant.setKakaoRating(request.getKakaoRating());
+    }
+
+    @Transactional
+    public void deleteById(Long restaurantId) {
+        if (!restaurantRepository.existsById(restaurantId)) {
+            throw new IllegalArgumentException("해당 식당이 존재하지 않습니다.");
+        }
+        restaurantRepository.deleteById(restaurantId);
     }
 }

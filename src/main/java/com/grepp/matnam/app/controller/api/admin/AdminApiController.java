@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,5 +50,11 @@ public class AdminApiController {
 
         restaurantService.updateRestaurant(restaurantId, request);
         return ResponseEntity.ok("수정 성공");
+    }
+
+    @DeleteMapping("/{restaurantId}")
+    public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
+        restaurantService.deleteById(restaurantId);
+        return ResponseEntity.ok("삭제 성공");
     }
 }
