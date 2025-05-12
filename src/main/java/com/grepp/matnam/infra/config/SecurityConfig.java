@@ -34,9 +34,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // #TODO: 접근 제한 추가
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
                 )
+                // #TODO: JWT 인증 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
