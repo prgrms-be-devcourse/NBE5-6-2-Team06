@@ -43,67 +43,32 @@
                         <th>주소</th>
                         <th>전화번호</th>
                         <th>대표 메뉴</th>
-                        <th>평점</th>
+                        <th>평균 평점</th>
                         <th>액션</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="restaurant : ${restaurants}">
-                        <td th:text="${restaurant.id}">1</td>
-                        <td th:text="${restaurant.name}">맛있는 치킨</td>
-                        <td><span class="badge" th:text="${restaurant.categoryName}">한식</span></td>
-                        <td th:text="${restaurant.address}">서울 강남구 테헤란로 123</td>
-                        <td th:text="${restaurant.phone}">02-123-4567</td>
-                        <td th:text="${restaurant.mainMenu}">후라이드 치킨</td>
+                    <tr th:each="restaurant : ${page.content()}">
+                        <td th:text="${restaurant.restaurantId}"></td>
+                        <td th:text="${restaurant.name}"></td>
+                        <td><span class="badge" th:text="${restaurant.category}"></span></td>
+                        <td th:text="${restaurant.address}"></td>
+                        <td th:text="${restaurant.tel}"></td>
+                        <td th:text="${restaurant.mainFood}"></td>
                         <td>
                             <div class="rating">
-                                <th:block th:each="i : ${#numbers.sequence(1, 5)}">
-                                    <i th:class="${i <= restaurant.rating ? 'fas fa-star' : (i <= restaurant.rating + 0.5 ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
-                                </th:block>
-                                <span th:text="${restaurant.rating}">4.5</span>
+                                <span th:text="${#numbers.formatDecimal(((restaurant.googleRating + restaurant.naverRating + restaurant.kakaoRating) / 3), 1, 1)}"></span>
                             </div>
                         </td>
                         <td>
-                            <button class="action-btn view" th:data-id="${restaurant.id}"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit" th:data-id="${restaurant.id}"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete" th:data-id="${restaurant.id}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-                    <tr th:if="${restaurants == null || restaurants.isEmpty()}">
-                        <td>1</td>
-                        <td>맛있는 치킨</td>
-                        <td><span class="badge">한식</span></td>
-                        <td>서울 강남구 테헤란로 123</td>
-                        <td>02-123-4567</td>
-                        <td>후라이드 치킨</td>
-                        <td>
-                            <div class="rating">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star-half-alt"></i>
-                                <span>4.5</span>
-                            </div>
-                        </td>
-                        <td>
-                            <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+                            <button class="action-btn edit" th:data-id="${restaurant.restaurantId}"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete" th:data-id="${restaurant.restaurantId}"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="pagination" th:if="${totalPages > 0}">
-                <button class="page-btn prev" th:disabled="${currentPage == 1}"><i class="fas fa-chevron-left"></i></button>
-                <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <button class="page-btn" th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i}">1</button>
-                </th:block>
-                <button class="page-btn next" th:disabled="${currentPage == totalPages}"><i class="fas fa-chevron-right"></i></button>
-            </div>
+            <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
         </div>
 
         <!-- 카테고리 관리 탭 -->
