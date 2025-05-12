@@ -54,7 +54,17 @@ public class UserApiController {
                     .role(savedUser.getRole())
                     .build();
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원가입 성공", response));
+            String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
+
+            JwtResponse jwtResponse = JwtResponse.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .userId(savedUser.getUserId())
+                    .role(savedUser.getRole().name())
+                    .expiration(86400)
+                    .build();
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원가입 성공", jwtResponse));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -79,7 +89,7 @@ public class UserApiController {
                     .type("Bearer")
                     .userId(user.getUserId())
                     .role(user.getRole().name())
-                    .expiration(86400) // 24시간
+                    .expiration(86400)
                     .build();
 
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "로그인 성공", jwtResponse));
@@ -89,7 +99,7 @@ public class UserApiController {
                     .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "로그인 실패", e.getMessage()));
 
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅을 위해 스택트레이스 출력
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "로그인 중 서버 오류가 발생했습니다.", e.getMessage()));
         }
