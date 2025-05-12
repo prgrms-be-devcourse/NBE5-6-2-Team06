@@ -307,7 +307,11 @@
             goodMusic: false,
             clean: false,
             goodView: false,
+<<<<<<< HEAD
             terrace: false,
+=======
+            terrace: false,  // 수정: isTerrace -> terrace
+>>>>>>> origin/feature/jun
             goodPicture: false,
             goodMenu: false,
             longStay: false,
@@ -318,18 +322,37 @@
             item.addEventListener('click', function() {
                 const prefName = this.getAttribute('data-pref');
 
+<<<<<<< HEAD
                 const jsonField = prefName === 'isTerrace' ? 'terrace' : prefName;
 
                 if (this.classList.contains('selected')) {
+=======
+                // HTML 속성과 JSON 객체 필드 이름을 매핑
+                const jsonField = prefName === 'isTerrace' ? 'terrace' : prefName;
+
+                if (this.classList.contains('selected')) {
+                    // 선택 해제
+>>>>>>> origin/feature/jun
                     this.classList.remove('selected');
                     selectedPrefs[jsonField] = false;
                     selectedCount--;
                 } else {
+<<<<<<< HEAD
+=======
+                    // 선택 추가
+>>>>>>> origin/feature/jun
                     this.classList.add('selected');
                     selectedPrefs[jsonField] = true;
                     selectedCount++;
                 }
 
+<<<<<<< HEAD
+=======
+                // 디버깅용 로그
+                console.log(`클릭한 항목: ${prefName}, JSON 필드: ${jsonField}, 값: ${selectedPrefs[jsonField]}`);
+                console.log('현재 선택된 취향:', selectedPrefs);
+
+>>>>>>> origin/feature/jun
                 updateProgress();
 
                 if (selectedCount > 0) {
@@ -353,6 +376,10 @@
             }
 
             try {
+<<<<<<< HEAD
+=======
+                // 전송 전 데이터 확인
+>>>>>>> origin/feature/jun
                 console.log('전송할 데이터:', JSON.stringify(selectedPrefs, null, 2));
 
                 const response = await auth.fetchWithAuth('/api/user/preference', {
