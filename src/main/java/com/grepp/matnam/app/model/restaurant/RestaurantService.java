@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.model.restaurant;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
 import com.grepp.matnam.infra.response.ResponseCode;
@@ -64,5 +65,9 @@ public class RestaurantService {
     @Transactional
     public void createRestaurant(RestaurantRequest request) {
         restaurantRepository.save(request.toEntity());
+    }
+
+    public Page<Restaurant> findByCategory(Category category, Pageable pageable) {
+        return restaurantRepository.findByCategory(category, pageable);
     }
 }

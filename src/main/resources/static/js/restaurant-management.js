@@ -14,22 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('restaurantModal').style.display = 'block';
         });
     }
-    
-    // 카테고리 추가 버튼 클릭 이벤트
-    const addCategoryBtn = document.getElementById('add-category-btn');
-    if (addCategoryBtn) {
-        addCategoryBtn.addEventListener('click', function() {
-            // 모달 제목 설정
-            document.getElementById('category-modal-title').textContent = '새 카테고리 추가';
-            
-            // 폼 초기화
-            document.getElementById('categoryForm').reset();
-            document.getElementById('category-id').value = '';
-            
-            // 모달 표시
-            document.getElementById('categoryModal').style.display = 'block';
-        });
-    }
+
     // 최대 선택 가능 개수
     const MAX_MOOD_SELECTION = 3;
 
@@ -185,28 +170,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // 카테고리 저장 버튼 클릭 이벤트
-    const saveCategoryBtn = document.querySelector('#categoryModal .save-btn');
-    if (saveCategoryBtn) {
-        saveCategoryBtn.addEventListener('click', function() {
-            // 폼 유효성 검사
-            const categoryName = document.getElementById('category-name').value;
-            
-            if (!categoryName) {
-                alert('카테고리명을 입력해주세요.');
-                return;
-            }
-            
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('categoryModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            alert('카테고리가 저장되었습니다.');
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
-        });
-    }
 });

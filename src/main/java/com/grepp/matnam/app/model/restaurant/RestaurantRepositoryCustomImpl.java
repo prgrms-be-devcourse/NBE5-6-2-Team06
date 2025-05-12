@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.restaurant;
 
+import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.QRestaurant;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -21,13 +22,32 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
-            .orderBy(restaurant.restaurantId.asc())
+            .orderBy(restaurant.restaurantId.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .from(restaurant);
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public Page<Restaurant> findByCategory(Category category, Pageable pageable) {
+        List<Restaurant> content = queryFactory
+            .select(restaurant)
+            .from(restaurant)
+            .where(restaurant.category.eq(category.getKoreanName()))
+            .orderBy(restaurant.restaurantId.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+            .select(restaurant.count())
+            .where(restaurant.category.eq(category.getKoreanName()))
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);

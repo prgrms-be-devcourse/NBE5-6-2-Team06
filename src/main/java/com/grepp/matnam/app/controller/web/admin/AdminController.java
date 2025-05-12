@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.web.admin;
 
 import com.grepp.matnam.app.model.restaurant.RestaurantService;
+import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
 import com.grepp.matnam.infra.payload.PageParam;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Slf4j
@@ -61,13 +63,20 @@ public class AdminController {
     }
 
     @GetMapping("/restaurant")
-    public String restaurantManagement(@Valid PageParam param, BindingResult bindingResult, Model model) {
+    public String restaurantManagement(@RequestParam(required = false) Category category, @Valid PageParam param, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()){
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
 
         Pageable pageable = PageRequest.of(param.getPage()-1, param.getSize());
-        Page<Restaurant> page = restaurantService.findPaged(pageable);
+        Page<Restaurant> page;
+
+        if (category != null) {
+            page = restaurantService.findByCategory(category, pageable);
+            model.addAttribute("selectedCategory", category.getKoreanName());
+        } else {
+            page = restaurantService.findPaged(pageable);
+        }
 
         if (param.getPage() != 1 && page.getContent().isEmpty()){
             throw new CommonException(ResponseCode.BAD_REQUEST);
@@ -76,11 +85,8 @@ public class AdminController {
 
         model.addAttribute("pageTitle", "식당 및 메뉴 관리");
         model.addAttribute("currentPage", "restaurant-management");
-//        List<Restaurant> restaurants = restaurantService.findAll();
-//        restaurants.forEach(e -> log.info("{}", e));
         model.addAttribute("page", response);
-        // 여기에 식당 관리 데이터를 모델에 추가
-        // 예: 식당 목록, 카테고리 목록 등
+        model.addAttribute("categories", Category.values());
 
         return "admin/restaurant-management";
     }
