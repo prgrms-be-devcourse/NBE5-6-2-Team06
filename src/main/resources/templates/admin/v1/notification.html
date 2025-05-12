@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <!-- 알림 관리 페이지 -->
+  <div class="page-content" id="notification">
+    <h1>알림 관리</h1>
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="notification-templates">알림 템플릿</div>
+        <div class="tab" data-tab="notification-history">알림 내역</div>
+        <div class="tab" data-tab="notification-settings">알림 설정</div>
+      </div>
+
+      <div class="tab-content active" id="notification-templates">
+        <div class="action-bar">
+          <button class="primary-btn"><i class="fas fa-plus"></i> 새 템플릿 추가</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>템플릿명</th>
+              <th>유형</th>
+              <th>내용</th>
+              <th>마지막 수정일</th>
+              <th>액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1</td>
+              <td>모임 초대</td>
+              <td>푸시, 이메일</td>
+              <td>{{user}}님이 {{meeting}}에 초대했습니다.</td>
+              <td>2023-06-10</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>모임 확정</td>
+              <td>푸시, 이메일, SMS</td>
+              <td>{{meeting}} 모임이 확정되었습니다.</td>
+              <td>2023-06-12</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>모임 취소</td>
+              <td>푸시, 이메일, SMS</td>
+              <td>{{meeting}} 모임이 취소되었습니다.</td>
+              <td>2023-06-12</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>계정 정지</td>
+              <td>이메일</td>
+              <td>귀하의 계정이 {{reason}}으로 인해 {{duration}} 동안 정지되었습니다.</td>
+              <td>2023-06-15</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-content" id="notification-history">
+        <div class="filter-container">
+          <div class="search-filter">
+            <input type="text" placeholder="내용 검색">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-options">
+            <select id="notification-type-filter">
+              <option value="all">모든 유형</option>
+              <option value="push">푸시</option>
+              <option value="email">이메일</option>
+              <option value="sms">SMS</option>
+            </select>
+            <select id="notification-status-filter">
+              <option value="all">모든 상태</option>
+              <option value="sent">전송됨</option>
+              <option value="failed">실패</option>
+              <option value="read">읽음</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>수신자</th>
+              <th>유형</th>
+              <th>내용</th>
+              <th>전송일시</th>
+              <th>상태</th>
+              <th>액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1</td>
+              <td>김철수</td>
+              <td>푸시</td>
+              <td>강남 맛집 탐방 모임이 확정되었습니다.</td>
+              <td>2023-06-15 14:30</td>
+              <td><span class="status read">읽음</span></td>
+              <td>
+                <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                <button class="action-btn resend"><i class="fas fa-redo"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>이영희</td>
+              <td>이메일</td>
+              <td>귀하의 계정이 부적절한 언어 사용으로 인해 7일 동안 정지되었습니다.</td>
+              <td>2023-06-15 10:15</td>
+              <td><span class="status sent">전송됨</span></td>
+              <td>
+                <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                <button class="action-btn resend"><i class="fas fa-redo"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>박지민</td>
+              <td>SMS</td>
+              <td>홍대 카페 투어 모임에 새로운 참가자가 있습니다.</td>
+              <td>2023-06-14 16:45</td>
+              <td><span class="status failed">실패</span></td>
+              <td>
+                <button class="action-btn view"><i class="fas fa-eye"></i></button>
+                <button class="action-btn resend"><i class="fas fa-redo"></i></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <button class="page-btn prev"><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="notification-settings">
+        <div class="settings-card">
+          <h3>푸시 알림 설정</h3>
+          <div class="setting-item">
+            <label>푸시 알림 활성화:</label>
+            <div class="toggle-switch">
+              <input type="checkbox" id="push-enabled" checked>
+              <label for="push-enabled"></label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>FCM API 키:</label>
+            <input type="password" value="••••••••••••••••••••••••••••••" id="fcm-api-key">
+            <button class="action-btn view"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="setting-item">
+            <label>배치 크기:</label>
+            <input type="number" value="100" id="push-batch-size">
+          </div>
+          <button class="primary-btn">설정 저장</button>
+        </div>
+
+        <div class="settings-card">
+          <h3>이메일 알림 설정</h3>
+          <div class="setting-item">
+            <label>이메일 알림 활성화:</label>
+            <div class="toggle-switch">
+              <input type="checkbox" id="email-enabled" checked>
+              <label for="email-enabled"></label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>SMTP 서버:</label>
+            <input type="text" value="smtp.example.com" id="smtp-server">
+          </div>
+          <div class="setting-item">
+            <label>SMTP 포트:</label>
+            <input type="number" value="587" id="smtp-port">
+          </div>
+          <div class="setting-item">
+            <label>SMTP 사용자명:</label>
+            <input type="text" value="admin@example.com" id="smtp-username">
+          </div>
+          <div class="setting-item">
+            <label>SMTP 비밀번호:</label>
+            <input type="password" value="••••••••••••" id="smtp-password">
+            <button class="action-btn view"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="setting-item">
+            <label>발신자 이메일:</label>
+            <input type="email" value="noreply@example.com" id="sender-email">
+          </div>
+          <div class="setting-item">
+            <label>발신자 이름:</label>
+            <input type="text" value="모임 서비스" id="sender-name">
+          </div>
+          <button class="primary-btn">설정 저장</button>
+        </div>
+
+        <div class="settings-card">
+          <h3>SMS 알림 설정</h3>
+          <div class="setting-item">
+            <label>SMS 알림 활성화:</label>
+            <div class="toggle-switch">
+              <input type="checkbox" id="sms-enabled" checked>
+              <label for="sms-enabled"></label>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>SMS 제공업체:</label>
+            <select id="sms-provider">
+              <option value="twilio">Twilio</option>
+              <option value="nexmo">Nexmo</option>
+              <option value="coolsms" selected>CoolSMS</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label>API 키:</label>
+            <input type="password" value="••••••••••••••••••••••••••••••" id="sms-api-key">
+            <button class="action-btn view"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="setting-item">
+            <label>API 시크릿:</label>
+            <input type="password" value="••••••••••••••••••••••••••••••" id="sms-api-secret">
+            <button class="action-btn view"><i class="fas fa-eye"></i></button>
+          </div>
+          <div class="setting-item">
+            <label>발신 번호:</label>
+            <input type="text" value="01012345678" id="sender-number">
+          </div>
+          <button class="primary-btn">설정 저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

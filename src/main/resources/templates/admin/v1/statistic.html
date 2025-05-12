@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <!-- 통계 및 분석 페이지 -->
+  <div class="page-content" id="statistics">
+    <h1>통계 및 분석</h1>
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="user-stats">사용자 통계</div>
+        <div class="tab" data-tab="success-rate">성공률 분석</div>
+        <div class="tab" data-tab="regional-stats">지역별 통계</div>
+      </div>
+
+      <div class="tab-content active" id="user-stats">
+        <div class="filter-container">
+          <div class="date-filter">
+            <label>기간:</label>
+            <select id="period-filter">
+              <option value="7days">최근 7일</option>
+              <option value="30days">최근 30일</option>
+              <option value="90days">최근 90일</option>
+              <option value="1year">최근 1년</option>
+              <option value="custom">직접 설정</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="chart-container">
+            <h3>연령대별 사용자 분포</h3>
+            <canvas id="ageDistributionChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>성별 사용자 분포</h3>
+            <canvas id="genderDistributionChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>일일 활성 사용자</h3>
+            <canvas id="dailyActiveUsersChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>신규 가입자 추이</h3>
+            <canvas id="newUsersChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="success-rate">
+        <div class="filter-container">
+          <div class="date-filter">
+            <label>기간:</label>
+            <select id="success-period-filter">
+              <option value="30days">최근 30일</option>
+              <option value="90days">최근 90일</option>
+              <option value="1year">최근 1년</option>
+              <option value="custom">직접 설정</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="chart-container large">
+            <h3>모임 성공률 추이</h3>
+            <canvas id="meetingSuccessRateChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>카테고리별 성공률</h3>
+            <canvas id="categorySuccessRateChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>인원수별 성공률</h3>
+            <canvas id="memberCountSuccessRateChart"></canvas>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <h3>성공률 상위 모임 주최자</h3>
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>순위</th>
+              <th>사용자</th>
+              <th>모임 수</th>
+              <th>성공 모임</th>
+              <th>성공률</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1</td>
+              <td>김철수</td>
+              <td>15</td>
+              <td>14</td>
+              <td>93.3%</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>박지민</td>
+              <td>12</td>
+              <td>11</td>
+              <td>91.7%</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>이영희</td>
+              <td>10</td>
+              <td>9</td>
+              <td>90.0%</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="tab-content" id="regional-stats">
+        <div class="filter-container">
+          <div class="date-filter">
+            <label>기간:</label>
+            <select id="regional-period-filter">
+              <option value="30days">최근 30일</option>
+              <option value="90days">최근 90일</option>
+              <option value="1year">최근 1년</option>
+              <option value="custom">직접 설정</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="chart-container large">
+            <h3>지역별 모임 분포</h3>
+            <div id="regionMapChart" class="map-chart"></div>
+          </div>
+          <div class="chart-container">
+            <h3>지역별 모임 수</h3>
+            <canvas id="regionMeetingCountChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3>지역별 성공률</h3>
+            <canvas id="regionSuccessRateChart"></canvas>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <h3>인기 지역 순위</h3>
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>순위</th>
+              <th>지역</th>
+              <th>모임 수</th>
+              <th>참여자 수</th>
+              <th>평균 만족도</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1</td>
+              <td>서울 강남구</td>
+              <td>45</td>
+              <td>320</td>
+              <td>4.8/5.0</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>서울 마포구</td>
+              <td>38</td>
+              <td>285</td>
+              <td>4.7/5.0</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>부산 해운대구</td>
+              <td>30</td>
+              <td>210</td>
+              <td>4.6/5.0</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

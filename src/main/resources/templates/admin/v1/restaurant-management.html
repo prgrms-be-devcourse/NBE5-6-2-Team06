@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <!-- 식당 및 메뉴 관리 페이지 -->
+  <div class="page-content" id="restaurant-management">
+    <h1>식당 및 메뉴 관리</h1>
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="restaurant-list">식당 목록</div>
+        <div class="tab" data-tab="category-management">카테고리 관리</div>
+      </div>
+
+      <div class="tab-content active" id="restaurant-list">
+        <div class="action-bar">
+          <button class="primary-btn"><i class="fas fa-plus"></i> 새 식당 추가</button>
+          <div class="search-filter">
+            <input type="text" placeholder="식당명 검색">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-options">
+            <select id="restaurant-category-filter">
+              <option value="all">모든 카테고리</option>
+              <option value="korean">한식</option>
+              <option value="japanese">일식</option>
+              <option value="chinese">중식</option>
+              <option value="western">양식</option>
+            </select>
+            <select id="restaurant-sort">
+              <option value="name">이름순</option>
+              <option value="rating">평점순</option>
+              <option value="newest">최신순</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="restaurant-grid">
+          <div class="restaurant-card">
+            <div class="restaurant-image">
+              <img src="https://via.placeholder.com/300x200" alt="식당 이미지">
+            </div>
+            <div class="restaurant-info">
+              <h3>맛있는 치킨</h3>
+              <p class="category"><span class="badge">한식</span></p>
+              <p class="address">서울 강남구 테헤란로 123</p>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span>4.5</span>
+              </div>
+            </div>
+            <div class="restaurant-actions">
+              <button class="action-btn view"><i class="fas fa-eye"></i></button>
+              <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+              <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="restaurant-card">
+            <div class="restaurant-image">
+              <img src="https://via.placeholder.com/300x200" alt="식당 이미지">
+            </div>
+            <div class="restaurant-info">
+              <h3>초밥왕</h3>
+              <p class="category"><span class="badge">일식</span></p>
+              <p class="address">서울 마포구 홍대로 456</p>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <span>4.0</span>
+              </div>
+            </div>
+            <div class="restaurant-actions">
+              <button class="action-btn view"><i class="fas fa-eye"></i></button>
+              <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+              <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="restaurant-card">
+            <div class="restaurant-image">
+              <img src="https://via.placeholder.com/300x200" alt="식당 이미지">
+            </div>
+            <div class="restaurant-info">
+              <h3>짜장면 하우스</h3>
+              <p class="category"><span class="badge">중식</span></p>
+              <p class="address">서울 송파구 올림픽로 789</p>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <span>5.0</span>
+              </div>
+            </div>
+            <div class="restaurant-actions">
+              <button class="action-btn view"><i class="fas fa-eye"></i></button>
+              <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+              <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="restaurant-card">
+            <div class="restaurant-image">
+              <img src="https://via.placeholder.com/300x200" alt="식당 이미지">
+            </div>
+            <div class="restaurant-info">
+              <h3>파스타 천국</h3>
+              <p class="category"><span class="badge">양식</span></p>
+              <p class="address">서울 서초구 반포대로 321</p>
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <i class="far fa-star"></i>
+                <span>3.5</span>
+              </div>
+            </div>
+            <div class="restaurant-actions">
+              <button class="action-btn view"><i class="fas fa-eye"></i></button>
+              <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+              <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pagination">
+          <button class="page-btn prev"><i class="fas fa-chevron-left"></i></button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn next"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="category-management">
+        <div class="action-bar">
+          <button class="primary-btn"><i class="fas fa-plus"></i> 새 카테고리 추가</button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>카테고리명</th>
+              <th>식당 수</th>
+              <th>생성일</th>
+              <th>액션</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>1</td>
+              <td>한식</td>
+              <td>24</td>
+              <td>2023-01-15</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>일식</td>
+              <td>18</td>
+              <td>2023-01-15</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>중식</td>
+              <td>15</td>
+              <td>2023-01-15</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>양식</td>
+              <td>20</td>
+              <td>2023-01-15</td>
+              <td>
+                <button class="action-btn edit"><i class="fas fa-edit"></i></button>
+                <button class="action-btn delete"><i class="fas fa-trash"></i></button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

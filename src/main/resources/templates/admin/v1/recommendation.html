@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+  <!-- 추천 시스템 설정 페이지 -->
+  <div class="page-content" id="recommendation">
+    <h1>추천 시스템 설정</h1>
+    <div class="recommendation-settings">
+      <div class="settings-card">
+        <h3>추천 알고리즘 설정</h3>
+        <div class="setting-item">
+          <label>알고리즘 유형:</label>
+          <select id="algorithm-type">
+            <option value="collaborative">협업 필터링</option>
+            <option value="content">콘텐츠 기반</option>
+            <option value="hybrid" selected>하이브리드</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label>가중치 설정:</label>
+          <div class="slider-container">
+            <label>사용자 선호도:</label>
+            <input type="range" min="0" max="100" value="60" class="slider" id="preference-weight">
+            <span>60%</span>
+          </div>
+          <div class="slider-container">
+            <label>인기도:</label>
+            <input type="range" min="0" max="100" value="20" class="slider" id="popularity-weight">
+            <span>20%</span>
+          </div>
+          <div class="slider-container">
+            <label>위치 근접성:</label>
+            <input type="range" min="0" max="100" value="20" class="slider" id="location-weight">
+            <span>20%</span>
+          </div>
+        </div>
+        <button class="primary-btn">설정 저장</button>
+      </div>
+
+      <div class="settings-card">
+        <h3>2차 장소 추천 설정</h3>
+        <div class="setting-item">
+          <label>추천 기준:</label>
+          <select id="second-place-criteria">
+            <option value="distance">거리 기반</option>
+            <option value="category" selected>카테고리 기반</option>
+            <option value="rating">평점 기반</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label>최대 추천 거리:</label>
+          <div class="input-with-unit">
+            <input type="number" value="2" id="max-distance">
+            <span>km</span>
+          </div>
+        </div>
+        <div class="setting-item">
+          <label>추천 개수:</label>
+          <input type="number" value="3" id="recommendation-count">
+        </div>
+        <button class="primary-btn">설정 저장</button>
+      </div>
+
+      <div class="settings-card">
+        <h3>추천 데이터 관리</h3>
+        <div class="setting-item">
+          <label>데이터 갱신 주기:</label>
+          <select id="data-refresh-interval">
+            <option value="1hour">1시간</option>
+            <option value="6hours">6시간</option>
+            <option value="12hours">12시간</option>
+            <option value="24hours" selected>24시간</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <label>최소 데이터 포인트:</label>
+          <input type="number" value="10" id="min-data-points">
+        </div>
+        <div class="setting-item">
+          <label>콜드 스타트 처리:</label>
+          <select id="cold-start-handling">
+            <option value="popular">인기 항목 추천</option>
+            <option value="random">무작위 추천</option>
+            <option value="hybrid" selected>하이브리드</option>
+          </select>
+        </div>
+        <div class="action-buttons">
+          <button class="primary-btn">설정 저장</button>
+          <button class="secondary-btn">데이터 수동 갱신</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="recommendation-test">
+      <h3>추천 시스템 테스트</h3>
+      <div class="test-container">
+        <div class="test-input">
+          <div class="input-group">
+            <label>테스트 사용자:</label>
+            <select id="test-user">
+              <option value="">사용자 선택</option>
+              <option value="1">김철수</option>
+              <option value="2">이영희</option>
+              <option value="3">박지민</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>위치:</label>
+            <input type="text" placeholder="위치 입력" id="test-location">
+          </div>
+          <div class="input-group">
+            <label>시간대:</label>
+            <select id="test-time">
+              <option value="morning">아침 (6-11시)</option>
+              <option value="lunch">점심 (11-14시)</option>
+              <option value="afternoon">오후 (14-17시)</option>
+              <option value="dinner">저녁 (17-21시)</option>
+              <option value="night">밤 (21-6시)</option>
+            </select>
+          </div>
+          <button class="primary-btn">추천 테스트</button>
+        </div>
+        <div class="test-results">
+          <h4>추천 결과</h4>
+          <div class="result-list">
+            <div class="result-item">
+              <div class="result-image">
+                <img src="https://via.placeholder.com/100" alt="식당 이미지">
+              </div>
+              <div class="result-info">
+                <h5>맛있는 치킨</h5>
+                <p>한식 | 서울 강남구</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                  <span>4.5</span>
+                </div>
+                <p class="confidence">추천 신뢰도: 95%</p>
+              </div>
+            </div>
+            <div class="result-item">
+              <div class="result-image">
+                <img src="https://via.placeholder.com/100" alt="식당 이미지">
+              </div>
+              <div class="result-info">
+                <h5>초밥왕</h5>
+                <p>일식 | 서울 마포구</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="far fa-star"></i>
+                  <span>4.0</span>
+                </div>
+                <p class="confidence">추천 신뢰도: 87%</p>
+              </div>
+            </div>
+            <div class="result-item">
+              <div class="result-image">
+                <img src="https://via.placeholder.com/100" alt="식당 이미지">
+              </div>
+              <div class="result-info">
+                <h5>파스타 천국</h5>
+                <p>양식 | 서울 서초구</p>
+                <div class="rating">
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star"></i>
+                  <i class="fas fa-star-half-alt"></i>
+                  <i class="far fa-star"></i>
+                  <span>3.5</span>
+                </div>
+                <p class="confidence">추천 신뢰도: 78%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

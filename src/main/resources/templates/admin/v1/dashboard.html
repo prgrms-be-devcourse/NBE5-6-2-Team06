@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}"
+>
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+  <!-- 대시보드 페이지 -->
+  <div class="page-content active" id="dashboard">
+    <h1>대시보드</h1>
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3>총 회원 수</h3>
+          <p class="stat-number">1,245</p>
+          <p class="stat-change positive">+12% <i class="fas fa-arrow-up"></i></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-check"></i>
+        </div>
+        <div class="stat-info">
+          <h3>오늘 이용 회원</h3>
+          <p class="stat-number">87</p>
+          <p class="stat-change positive">+5% <i class="fas fa-arrow-up"></i></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-slash"></i>
+        </div>
+        <div class="stat-info">
+          <h3>오늘 이용 비회원</h3>
+          <p class="stat-number">32</p>
+          <p class="stat-change negative">-2% <i class="fas fa-arrow-down"></i></p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-user-friends"></i>
+        </div>
+        <div class="stat-info">
+          <h3>활성 모임</h3>
+          <p class="stat-number">56</p>
+          <p class="stat-change positive">+8% <i class="fas fa-arrow-up"></i></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart">
+        <h3>사용자 활동 추이</h3>
+        <canvas id="userActivityChart"></canvas>
+      </div>
+      <div class="chart">
+        <h3>모임 성공률</h3>
+        <canvas id="meetingSuccessChart"></canvas>
+      </div>
+    </div>
+
+    <div class="recent-activities">
+      <h3>최근 활동</h3>
+      <div class="activity-list">
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <div class="activity-details">
+            <p>새로운 회원 가입: <strong>김철수</strong></p>
+            <span class="activity-time">10분 전</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-flag"></i>
+          </div>
+          <div class="activity-details">
+            <p>신고 접수: <strong>부적절한 채팅</strong></p>
+            <span class="activity-time">30분 전</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-user-friends"></i>
+          </div>
+          <div class="activity-details">
+            <p>새로운 모임 생성: <strong>강남 맛집 탐방</strong></p>
+            <span class="activity-time">1시간 전</span>
+          </div>
+        </div>
+        <div class="activity-item">
+          <div class="activity-icon">
+            <i class="fas fa-utensils"></i>
+          </div>
+          <div class="activity-details">
+            <p>새로운 식당 등록: <strong>맛있는 치킨</strong></p>
+            <span class="activity-time">2시간 전</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <th:block th:fragment="frg_static">
+    <link rel="stylesheet" th:href="@{/css/admin-styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </th:block>
+</head>
+<body>
+<th:block th:fragment="frg_header">
+  <div class="header">
+    <div class="search-bar">
+      <input type="text" placeholder="검색...">
+      <i class="fas fa-search"></i>
+    </div>
+    <div class="admin-profile">
+      <div class="notification">
+        <i class="fas fa-bell"></i>
+        <span class="badge">3</span>
+      </div>
+      <div class="profile">
+        <img src="https://via.placeholder.com/40" alt="Admin Profile">
+        <span>관리자</span>
+      </div>
+    </div>
+  </div>
+</th:block>
+
+<!--  side nav  -->
+<th:block th:fragment="frg_sidenav">
+  <!-- 사이드바 네비게이션 -->
+  <div class="sidebar">
+    <div class="logo">
+      <h2>관리자 패널</h2>
+    </div>
+    <ul class="nav-links">
+      <li class="nav-item active" data-page="dashboard" onclick="location.href='/admin/dashboard'">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>대시보드</span>
+      </li>
+      <li class="nav-item" data-page="user-management" onclick="location.href='/admin/user'">
+        <i class="fas fa-users"></i>
+        <span>사용자 관리</span>
+      </li>
+      <li class="nav-item" data-page="team-management" onclick="location.href='/admin/team'">
+        <i class="fas fa-user-friends"></i>
+        <span>모임 관리</span>
+      </li>
+      <li class="nav-item" data-page="restaurant-management" onclick="location.href='/admin/restaurant'">
+        <i class="fas fa-utensils"></i>
+        <span>식당 및 메뉴 관리</span>
+      </li>
+      <li class="nav-item" data-page="statistic" onclick="location.href='/admin/statistic'">
+        <i class="fas fa-chart-bar"></i>
+        <span>통계 및 분석</span>
+      </li>
+      <li class="nav-item" data-page="recommendation" onclick="location.href='/admin/recommendation'">
+        <i class="fas fa-thumbs-up"></i>
+        <span>추천 시스템 설정</span>
+      </li>
+      <li class="nav-item" data-page="notification" onclick="location.href='/admin/notification'">
+        <i class="fas fa-bell"></i>
+        <span>알림 관리</span>
+      </li>
+    </ul>
+    <div class="logout">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>로그아웃</span>
+    </div>
+  </div>
+</th:block>
+
+<ul class="pagination" th:fragment="frg_pagination">
+  <li class="waves-effect">
+    <a th:href="@{${page.url()}(page=${page.prevPage()})}"><i class="material-icons">chevron_left</i></a>
+  </li>
+  <li class="waves-effect" th:each="num : ${#numbers.sequence(page.startNumber(), page.endNumber())}">
+    <a th:href="@{${page.url()}(page=${num})}" th:text="${num}">1</a>
+  </li>
+  <li class="waves-effect">
+    <a th:href="@{${page.url()}(page=${page.nextPage()})}"><i class="material-icons">chevron_right</i></a>
+  </li>
+</ul>
+
+<!--  footer  -->
+<th:block th:fragment="frg_footer">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 네비게이션 처리
+      const navItems = document.querySelectorAll('.nav-item');
+      const pages = document.querySelectorAll('.page-content');
+
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const pageId = this.getAttribute('data-page');
+
+          // 활성 네비게이션 아이템 업데이트
+          navItems.forEach(nav => nav.classList.remove('active'));
+          this.classList.add('active');
+
+          // 페이지 표시
+          pages.forEach(page => page.classList.remove('active'));
+          document.getElementById(pageId).classList.add('active');
+        });
+      });
+
+      // 탭 처리
+      const tabs = document.querySelectorAll('.tab');
+
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabContainer = this.closest('.tab-container');
+          const tabId = this.getAttribute('data-tab');
+
+          // 활성 탭 업데이트
+          tabContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+
+          // 탭 콘텐츠 표시
+          tabContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          tabContainer.querySelector(`#${tabId}`).classList.add('active');
+        });
+      });
+
+      // 히스토리 탭 처리
+      const historyTabs = document.querySelectorAll('.history-tab');
+
+      historyTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const historyContainer = this.closest('.user-history');
+          const tabId = this.getAttribute('data-tab');
+
+          // 활성 탭 업데이트
+          historyContainer.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+
+          // 탭 콘텐츠 표시
+          historyContainer.querySelectorAll('.history-content').forEach(content => content.classList.remove('active'));
+          historyContainer.querySelector(`#${tabId}`).classList.add('active');
+        });
+      });
+
+      // 모달 처리
+      const modals = document.querySelectorAll('.modal');
+      const closeButtons = document.querySelectorAll('.close-modal, .cancel-btn');
+
+      // 사용자 편집 모달 열기
+      const editButtons = document.querySelectorAll('.action-btn.edit');
+      editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          document.getElementById('userEditModal').style.display = 'block';
+        });
+      });
+
+      // 사용자 정지 모달 열기
+      const suspendButtons = document.querySelectorAll('.action-btn.suspend, .suspend-btn');
+      suspendButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          document.getElementById('suspendUserModal').style.display = 'block';
+        });
+      });
+
+      // 신고 상세 모달 열기
+      const viewReportButtons = document.querySelectorAll('.action-btn.view');
+      viewReportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          document.getElementById('reportViewModal').style.display = 'block';
+        });
+      });
+
+      // 모달 닫기
+      closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          modals.forEach(modal => {
+            modal.style.display = 'none';
+          });
+        });
+      });
+
+      // 모달 외부 클릭 시 닫기
+      window.addEventListener('click', function(event) {
+        modals.forEach(modal => {
+          if (event.target === modal) {
+            modal.style.display = 'none';
+          }
+        });
+      });
+
+      // 슬라이더 값 표시
+      const sliders = document.querySelectorAll('.slider');
+      sliders.forEach(slider => {
+        const valueDisplay = slider.nextElementSibling;
+        slider.addEventListener('input', function() {
+          valueDisplay.textContent = `${this.value}%`;
+        });
+      });
+
+      // 차트 렌더링
+      renderCharts();
+    });
+
+    // 차트 렌더링 함수
+    function renderCharts() {
+      // 사용자 활동 추이 차트
+      const userActivityCtx = document.getElementById('userActivityChart');
+      if (userActivityCtx) {
+        new Chart(userActivityCtx, {
+          type: 'line',
+          data: {
+            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+            datasets: [{
+              label: '활성 사용자',
+              data: [650, 700, 750, 800, 850, 900],
+              borderColor: '#4a6cf7',
+              backgroundColor: 'rgba(74, 108, 247, 0.1)',
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // 모임 성공률 차트
+      const meetingSuccessCtx = document.getElementById('meetingSuccessChart');
+      if (meetingSuccessCtx) {
+        new Chart(meetingSuccessCtx, {
+          type: 'bar',
+          data: {
+            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+            datasets: [{
+              label: '성공률 (%)',
+              data: [75, 78, 80, 82, 85, 88],
+              backgroundColor: '#4a6cf7'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100
+              }
+            }
+          }
+        });
+      }
+
+      // 연령대별 사용자 분포 차트
+      const ageDistributionCtx = document.getElementById('ageDistributionChart');
+      if (ageDistributionCtx) {
+        new Chart(ageDistributionCtx, {
+          type: 'pie',
+          data: {
+            labels: ['10대', '20대', '30대', '40대', '50대 이상'],
+            datasets: [{
+              data: [5, 45, 30, 15, 5],
+              backgroundColor: [
+                '#4a6cf7',
+                '#6c757d',
+                '#28a745',
+                '#ffc107',
+                '#dc3545'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'right',
+              }
+            }
+          }
+        });
+      }
+
+      // 성별 사용자 분포 차트
+      const genderDistributionCtx = document.getElementById(
+          'genderDistributionChart');
+      if (genderDistributionCtx) {
+        new Chart(genderDistributionCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['남성', '여성', '기타'],
+            datasets: [{
+              data: [55, 42, 3],
+              backgroundColor: [
+                '#4a6cf7',
+                '#dc3545',
+                '#6c757d'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'right',
+              }
+            }
+          }
+        });
+      }
+
+      // 일일 활성 사용자 차트
+      const dailyActiveUsersCtx = document.getElementById(
+          'dailyActiveUsersChart');
+      if (dailyActiveUsersCtx) {
+        new Chart(dailyActiveUsersCtx, {
+          type: 'line',
+          data: {
+            labels: ['월', '화', '수', '목', '금', '토', '일'],
+            datasets: [{
+              label: '활성 사용자',
+              data: [120, 150, 180, 200, 250, 300, 220],
+              borderColor: '#28a745',
+              backgroundColor: 'rgba(40, 167, 69, 0.1)',
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // 신규 가입자 추이 차트
+      const newUsersCtx = document.getElementById('newUsersChart');
+      if (newUsersCtx) {
+        new Chart(newUsersCtx, {
+          type: 'bar',
+          data: {
+            labels: ['월', '화', '수', '목', '금', '토', '일'],
+            datasets: [{
+              label: '신규 가입자',
+              data: [15, 12, 18, 20, 25, 30, 22],
+              backgroundColor: '#17a2b8'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // 모임 성공률 추이 차트
+      const meetingSuccessRateCtx = document.getElementById(
+          'meetingSuccessRateChart');
+      if (meetingSuccessRateCtx) {
+        new Chart(meetingSuccessRateCtx, {
+          type: 'line',
+          data: {
+            labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+            datasets: [{
+              label: '성공률 (%)',
+              data: [75, 78, 80, 82, 85, 88],
+              borderColor: '#28a745',
+              backgroundColor: 'rgba(40, 167, 69, 0.1)',
+              tension: 0.3,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: 'top',
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 100
+              }
+            }
+          }
+        });
+      }
+
+      // // 카테고리별 성공률 차트
+      // const categorySuccessRateCtx = document.getElementById('categorySuccessRateChart');
+      // if (categorySuccessRateCtx) {
+      //     new Chart
+    }
+  </script>
+</th:block>
+
+</body>
+</html>

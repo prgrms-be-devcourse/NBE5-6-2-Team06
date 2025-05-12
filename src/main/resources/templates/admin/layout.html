@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} ?: '관리자 페이지'">관리자 페이지</title>
+    <link rel="stylesheet" th:href="@{/css/admin-styles.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 사이드바 네비게이션 -->
+        <div th:replace="~{admin/fragments/sidenav :: sidenav}"></div>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="main-content">
+            <!-- 헤더 -->
+            <div th:replace="~{admin/fragments/header :: header}"></div>
+
+            <!-- 페이지 콘텐츠 -->
+            <div layout:fragment="content">
+                <!-- 각 페이지의 내용이 여기에 들어갑니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/admin-common.js}"></script>
+    <!-- 페이지별 스크립트 -->
+    <th:block layout:fragment="script"></th:block>
+</body>
+</html>
