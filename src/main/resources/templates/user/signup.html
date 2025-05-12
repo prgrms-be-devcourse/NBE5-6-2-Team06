@@ -162,7 +162,6 @@
       <a th:href="@{/}">홈</a>
       <a th:href="@{/meetings}">모임 찾기</a>
       <a th:href="@{/restaurants}">맛집 탐색</a>
-      <a th:href="@{/profile}">마이페이지</a>
     </nav>
   </div>
   <div class="header-right">
@@ -250,6 +249,12 @@
 </footer>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.auth === 'undefined') {
+      console.error('auth.js가 로드되지 않았습니다. 페이지에 auth.js를 포함해주세요.');
+    }
+  });
+
   document.getElementById('signupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -258,7 +263,6 @@
     const formData = new FormData(this);
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
-
 
     if (password !== confirmPassword) {
       document.getElementById('confirmPasswordError').textContent = '비밀번호가 일치하지 않습니다.';
@@ -288,7 +292,17 @@
 
       if (response.ok) {
         alert('회원가입이 완료되었습니다!');
-        window.location.href = '/';
+
+        if (result.data && result.data.token) {
+          localStorage.setItem('jwtToken', result.data.token);
+          localStorage.setItem('userId', result.data.userId);
+          localStorage.setItem('userRole', result.data.role);
+          console.log('저장된 토큰:', result.data.token);
+        } else {
+          console.error('토큰이 응답에 없습니다:', result);
+        }
+
+        window.location.href = '/user/preference';
       } else {
         if (result.message.includes('이메일')) {
           document.getElementById('emailError').textContent = result.message;

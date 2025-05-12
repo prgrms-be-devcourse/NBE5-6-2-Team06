@@ -1,9 +1,11 @@
 package com.grepp.matnam.app.controller.api.user;
 
 import com.grepp.matnam.app.controller.api.user.payload.JwtResponse;
+import com.grepp.matnam.app.controller.api.user.payload.PreferenceRequest;
 import com.grepp.matnam.app.controller.api.user.payload.UserSigninRequest;
 import com.grepp.matnam.app.controller.api.user.payload.UserSignupRequest;
 import com.grepp.matnam.app.controller.api.user.payload.UserResponse;
+import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.jwt.JwtTokenProvider;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +27,9 @@ public class UserApiController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PreferenceService preferenceService;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -54,7 +60,17 @@ public class UserApiController {
                     .role(savedUser.getRole())
                     .build();
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원가입 성공", response));
+            String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
+
+            JwtResponse jwtResponse = JwtResponse.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .userId(savedUser.getUserId())
+                    .role(savedUser.getRole().name())
+                    .expiration(86400)
+                    .build();
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원가입 성공", jwtResponse));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest()
@@ -79,7 +95,7 @@ public class UserApiController {
                     .type("Bearer")
                     .userId(user.getUserId())
                     .role(user.getRole().name())
-                    .expiration(86400) // 24시간
+                    .expiration(86400)
                     .build();
 
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "로그인 성공", jwtResponse));
@@ -89,9 +105,51 @@ public class UserApiController {
                     .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "로그인 실패", e.getMessage()));
 
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅을 위해 스택트레이스 출력
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "로그인 중 서버 오류가 발생했습니다.", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/preference")
+    @Operation(summary = "취향 설정", description = "사용자의 취향을 설정합니다.")
+    public ResponseEntity<ApiResponse> setPreference(@Validated @RequestBody PreferenceRequest request) {
+        try {
+            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            preferenceService.savePreference(currentUserId, request);
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "취향 설정 성공", null));
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "취향 설정 실패", e.getMessage()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "취향 설정 중 서버 오류가 발생했습니다.", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/preference")
+    @Operation(summary = "취향 변경", description = "사용자의 취향을 변경합니다.")
+    public ResponseEntity<ApiResponse> updatePreference(@Validated @RequestBody PreferenceRequest request) {
+        try {
+            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            preferenceService.updatePreference(currentUserId, request);
+
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "취향 변경 성공", null));
+
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest()
+                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "취향 변경 실패", e.getMessage()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "취향 변경 중 서버 오류가 발생했습니다.", e.getMessage()));
         }
     }
 }
