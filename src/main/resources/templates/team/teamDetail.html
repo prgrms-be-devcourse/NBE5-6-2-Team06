@@ -23,9 +23,9 @@
     <a href="/">맛남</a>
   </div>
   <nav>
-    <a href="/">홈</a>
-    <a href="/team/search">모임 탐색</a>
-    <a href="/user/mypage">마이페이지</a>
+    <a th:href="@{/}">홈</a>
+    <a th:href="@{/team/search}">모임찾기</a>
+    <a th:href="@{/user/mypage}">마이페이지</a>
   </nav>
 </header>
 <div class="container">
@@ -60,7 +60,7 @@
     </div>
     <div class="card">
       <h4>방장 정보</h4>
-      <p th:text="'🙋‍♂️ ' + ${team.user.username}">방장 이름</p>
+      <p th:text="'🙋‍♂️ ' + ${team.user.nickname}">방장 이름</p>
     </div>
     <div class="card">
       <h4>비슷한 모임</h4>

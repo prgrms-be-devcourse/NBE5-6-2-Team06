@@ -93,8 +93,9 @@
     <h1>맛남</h1>
   </div>
   <nav>
-    <a href="/mypage">마이페이지</a>
-    <a href="/logout">로그아웃</a>
+    <a th:href="@{/}">홈</a>
+    <a th:href="@{/user/mypage}" class="active">마이페이지</a>
+    <a th:href="@{/user/logout}">로그아웃</a>
   </nav>
 </header>
 <div class="container">

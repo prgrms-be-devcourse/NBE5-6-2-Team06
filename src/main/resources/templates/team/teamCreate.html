@@ -109,9 +109,9 @@
   <div><a href="/" style="text-decoration:none; color:black; font-weight:bold;">맛남</a></div>
   <nav>
     <a th:href="@{/}">홈</a>
-    <a th:href="@{/search}">모임 찾기</a>
+    <a th:href="@{/team/search}">모임 찾기</a>
     <a th:href="@{/restaurants}">맛집 탐색</a>
-    <a th:href="@{/mypage}">마이페이지</a>
+    <a th:href="@{/user/mypage}">마이페이지</a>
   </nav>
   <div class="header-buttons">
     <button th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>

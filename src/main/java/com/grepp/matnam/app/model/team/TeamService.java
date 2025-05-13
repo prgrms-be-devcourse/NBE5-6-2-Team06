@@ -108,19 +108,19 @@ public class TeamService {
 
 
     // userId로 속한 팀 목록 조회
-    public List<Team> getUserTeams(String userId) {
-        return teamRepository.findTeamsByUser_UserId(userId);
-    }
+//    public List<Team> getUserTeams(String userId) {
+//        return teamRepository.findTeamsByUser_UserId(userId);
+//    }
 
     // 주최자로서의 팀 조회
-    public List<Team> getTeamsByLeader(String userId) {
-        return teamRepository.findTeamsByUser_UserId(userId);
-    }
+//    public List<Team> getTeamsByLeader(String userId) {
+//        return teamRepository.findTeamsByUser_UserId(userId);
+//    }
 
     // 참여자로서의 팀 조회
-    public List<Team> getTeamsByParticipant(String userId) {
-        return teamRepository.findTeamsByParticipants_User_UserId(userId);
-    }
+//    public List<Team> getTeamsByParticipant(String userId) {
+//        return teamRepository.findTeamsByParticipants_User_UserId(userId);
+//    }
 
     // 참여자 조회
     public List<Participant> getParticipant(Long teamId) {
