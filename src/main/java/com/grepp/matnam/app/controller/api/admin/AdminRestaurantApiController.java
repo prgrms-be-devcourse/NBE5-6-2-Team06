@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/restaurant")
 @Slf4j
 @RequiredArgsConstructor
-public class AdminApiController {
+public class AdminRestaurantApiController {
     private final RestaurantService restaurantService;
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @GetMapping("/{restaurantId}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.findById(restaurantId)
             .orElseThrow(() -> new CommonException(ResponseCode.BAD_REQUEST));
@@ -37,7 +37,7 @@ public class AdminApiController {
         return ResponseEntity.ok(ApiResponse.success(restaurant));
     }
 
-    @PatchMapping("/restaurant/{restaurantId}")
+    @PatchMapping("/{restaurantId}")
     public ResponseEntity<?> updateRestaurant(@PathVariable Long restaurantId,
         @RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
 
@@ -53,13 +53,13 @@ public class AdminApiController {
         return ResponseEntity.ok("식당이 수정되었습니다.");
     }
 
-    @DeleteMapping("/restaurant/{restaurantId}")
+    @DeleteMapping("/{restaurantId}")
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
         restaurantService.deleteById(restaurantId);
         return ResponseEntity.ok("식당이 삭제되었습니다.");
     }
 
-    @PostMapping("/restaurant")
+    @PostMapping
     public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {

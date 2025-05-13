@@ -8,7 +8,6 @@ import com.grepp.matnam.infra.payload.PageParam;
 import com.grepp.matnam.infra.response.PageResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,51 +23,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @Slf4j
-@RequestMapping("/admin")
+@RequestMapping("/admin/restaurant")
 @RequiredArgsConstructor
-public class AdminController {
+public class AdminRestaurantController {
 
     private final RestaurantService restaurantService;
 
-    @GetMapping({"", "/","/dashboard"})
-    public String dashboard(Model model) {
-        model.addAttribute("pageTitle", "대시보드");
-        model.addAttribute("currentPage", "dashboard");
-
-        // 여기에 대시보드 데이터를 모델에 추가
-        // 예: 총 회원 수, 오늘 서비스 이용 인원 등
-
-        return "admin/dashboard";
-    }
-
-    @GetMapping("/user")
-    public String userManagement(Model model) {
-        model.addAttribute("pageTitle", "사용자 관리");
-        model.addAttribute("currentPage", "user-management");
-
-        // 여기에 사용자 관리 데이터를 모델에 추가
-        // 예: 사용자 목록, 신고 목록 등
-
-        return "admin/user-management";
-    }
-
-    @GetMapping("/team")
-    public String teamManagement(Model model) {
-        model.addAttribute("pageTitle", "모임 관리");
-        model.addAttribute("currentPage", "team-management");
-
-        // 여기에 모임 관리 데이터를 모델에 추가
-        // 예: 모임 목록 등
-
-        return "admin/team-management";
-    }
-
-    @GetMapping("/restaurant")
+    @GetMapping
     public String restaurantManagement(@RequestParam(required = false) Category category,
         @RequestParam(required = false) String keyword,
         @RequestParam(required = false, defaultValue = "newest") String sort,
         @Valid PageParam param, BindingResult bindingResult, Model model) {
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
 
@@ -84,7 +50,7 @@ public class AdminController {
                 sortOption = Sort.by(Sort.Order.desc("createdAt")); // 최신순
         }
 
-        Pageable pageable = PageRequest.of(param.getPage()-1, param.getSize(), sortOption);
+        Pageable pageable = PageRequest.of(param.getPage() - 1, param.getSize(), sortOption);
 
         String categoryKoreanName = "";
         String categoryName = "";
@@ -92,9 +58,10 @@ public class AdminController {
             categoryKoreanName = category.getKoreanName();
             categoryName = category.name();
         }
-        Page<Restaurant> page = restaurantService.findByFilter(categoryKoreanName, keyword, pageable);
+        Page<Restaurant> page = restaurantService.findByFilter(categoryKoreanName, keyword,
+            pageable);
 
-        if (param.getPage() != 1 && page.getContent().isEmpty()){
+        if (param.getPage() != 1 && page.getContent().isEmpty()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
         PageResponse<Restaurant> response = new PageResponse<>("/admin/restaurant", page, 5);
@@ -110,25 +77,4 @@ public class AdminController {
         return "admin/restaurant-management";
     }
 
-    @GetMapping("/statistics")
-    public String statistics(Model model) {
-        model.addAttribute("pageTitle", "통계 및 분석");
-        model.addAttribute("currentPage", "statistics");
-
-        // 여기에 통계 데이터를 모델에 추가
-        // 예: 사용자 통계, 성공률 분석 등
-
-        return "admin/statistics";
-    }
-
-    @GetMapping("/notification")
-    public String notification(Model model) {
-        model.addAttribute("pageTitle", "알림 관리");
-        model.addAttribute("currentPage", "notification");
-
-        // 여기에 알림 데이터를 모델에 추가
-        // 예: 알림 목록 등
-
-        return "admin/notification";
-    }
 }
