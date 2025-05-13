@@ -44,9 +44,8 @@ public class TeamController {
 
     // 모임 생성
     @PostMapping
-    public String createTeam(@ModelAttribute Team team,
-        @RequestParam("userId") String userId) {
-        User user = teamService.getUserById(userId);
+    public String createTeam(@ModelAttribute Team team, @RequestParam("userId") String userId) {
+        User user = userService.getUserById(userId);
         team.setUser(user);
 
         teamService.saveTeam(team);
@@ -58,11 +57,13 @@ public class TeamController {
     // 팀 페이지 조회
     @GetMapping("/teamPage/{teamId}")
     public String getTeamPage(@PathVariable Long teamId, Model model) {
-        //Team team = teamService.getTeamById(teamId);
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        String userNickname = userService.getUserNickname(userId);
+        User user = userService.getUserById(userId);
 
+        String userNickname = user.getNickname();
+
+        // 팀 정보와 사용자 정보를 모델에 추가
         model.addAttribute("teamId", teamId);
         model.addAttribute("userId", userId);
         model.addAttribute("userNickname", userNickname);
@@ -70,17 +71,14 @@ public class TeamController {
         return "team/teamPage";
     }
 
+
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
     public String getTeamDetail(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamById(teamId);
-
         model.addAttribute("team", team);
-
         return "team/teamDetail";
     }
-
-
 
     // 모임 수정
     @PatchMapping("/detail/{teamId}")
@@ -94,32 +92,27 @@ public class TeamController {
     @DeleteMapping("/detail/{teamId}")
     public String deleteTeam(@PathVariable Long teamId) {
         teamService.deleteTeam(teamId);
-        return "redirect:/team/" + teamId + "/detail";
+        return "redirect:/team/search";
     }
 
     // 모임 상태 변경
     @PatchMapping("/{teamId}/status")
     public String changeTeamStatus(@PathVariable Long teamId, @RequestParam Status status) {
         teamService.changeTeamStatus(teamId, status);
-        return "redirect:/team/{teamId}/detail" + teamId;
+        return "redirect:/team/" + teamId + "/detail";
     }
-
 
     // 모임 참여 신청
     @PostMapping("/{teamId}/apply")
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
-        User user = teamService.getUserById(userId);
+        User user = userService.getUserById(userId); // 수정: userService에서 가져옴
         teamService.addParticipant(teamId, user);
-        return "redirect:/team/{teamId}/detail" + teamId;
+        return "redirect:/team/" + teamId + "/detail";
     }
-
 
     // 모임 참여 수락 (주최자가 호출)
     @PostMapping("/participants/{teamId}/{userId}")
-    public ResponseEntity<String> acceptParticipant(
-        @PathVariable Long teamId,
-        @PathVariable String userId) {
-
+    public ResponseEntity<String> acceptParticipant(@PathVariable Long teamId, @PathVariable String userId) {
         try {
             teamService.acceptParticipant(teamId, userId);
             return ResponseEntity.ok("참가자가 수락되었습니다.");
@@ -128,7 +121,7 @@ public class TeamController {
         }
     }
 
-    // 참여자 목록 조회(팀 페이지?)
+    // 참여자 목록 조회(팀 페이지)
     @GetMapping("/{teamId}/{userId}/participants")
     public String getParticipants(@PathVariable Long teamId, @PathVariable String userId, Model model) {
         Participant participant = teamService.getParticipant(userId, teamId);
@@ -148,13 +141,9 @@ public class TeamController {
         return "redirect:/team/" + teamId + "/detail";
     }
 
-
     // 전체 모임 조회
     @GetMapping("/all/{userId}")
-    public String getAllTeams(@PathVariable String userId,
-        @RequestParam(value = "status", required = false) String status,
-        Model model) {
-
+    public String getAllTeams(@PathVariable String userId, @RequestParam(value = "status", required = false) String status, Model model) {
         Iterable<Team> teams;
 
         // 주최 중인 모임 조회
@@ -173,5 +162,4 @@ public class TeamController {
         model.addAttribute("teams", teams);
         return "user/mypage";
     }
-
 }

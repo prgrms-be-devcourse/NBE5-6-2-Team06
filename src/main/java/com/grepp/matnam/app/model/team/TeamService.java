@@ -100,14 +100,7 @@ public class TeamService {
 
     // 특정 사용자와 팀 ID로 참여자 조회
     public Participant getParticipant(String userId, Long teamId) {
-        // teamRepository를 사용하여 Participant를 조회
-        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);  // participantRepository로 수정
-    }
-
-    // 사용자 정보 조회
-    public User getUserById(String userId) {
-        return userRepository.findByUserId(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
     }
 
 
