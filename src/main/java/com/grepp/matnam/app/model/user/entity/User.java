@@ -60,4 +60,8 @@ public class User extends BaseEntity {
     public boolean isActivated() {
         return this.activated;
     }
+
+    public LocalDateTime createdAt() {
+        return this.createdAt;
+    }
 }
