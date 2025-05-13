@@ -76,19 +76,32 @@ public class TeamService {
     // 모임 참여 수락
     @Transactional
     public void acceptParticipant(Long teamId, String userId) {
-        // 참가자 정보 가져오기
         Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
-        if (participant != null) {
-            participant.setParticipantStatus(ParticipantStatus.APPROVED);
-            participantRepository.save(participant);
-        } else {
-            throw new RuntimeException("참가자가 존재하지 않거나 이미 수락되었습니다."); // 예외 수정하기
+
+        if (participant == null) {
+            throw new RuntimeException("참가자가 존재하지 않거나 팀에 속하지 않습니다.");
         }
+
+        if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+            throw new RuntimeException("참가자는 이미 수락되었습니다.");
+        }
+
+        participant.setParticipantStatus(ParticipantStatus.APPROVED);
+        participantRepository.save(participant);
     }
 
 
-    public void deleteTeam(Long teamId) {
 
+    public void deleteTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+        List<Participant> participants = participantRepository.findByTeam_TeamId(teamId);
+        if (participants != null && !participants.isEmpty()) {
+            participantRepository.deleteAll(participants);
+        }
+
+        teamRepository.delete(team);
     }
 
 
@@ -108,9 +121,10 @@ public class TeamService {
     }
 
     // 특정 사용자와 팀 ID로 참여자 조회
-    public Participant getParticipant(String userId, Long teamId) {
-        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+    public List<Participant> getParticipant(Long teamId) {
+        return participantRepository.findByTeam_TeamId(teamId);
     }
+
 
 
     public Team getTeamById(Long teamId) {

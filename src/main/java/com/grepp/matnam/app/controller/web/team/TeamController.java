@@ -10,6 +10,7 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -40,27 +41,26 @@ public class TeamController {
     private final TeamReviewRepository teamReviewRepository;
     private final ParticipantRepository participantRepository;
 
+    // 모임 검색 페이지
     @GetMapping("/search")
     public String search() {
         return "team/teamSearch";
     }
 
+    // 모임 생성 페이지
     @GetMapping("/create")
     public String create() {
         return "team/teamCreate";
     }
 
-    // 모임 생성
-    @PostMapping
-    public String createTeam(@ModelAttribute Team team, @RequestParam("userId") String userId) {
-        User user = userService.getUserById(userId);
-        team.setUser(user);
-
-        teamService.saveTeam(team);
-        teamService.addParticipant(team.getTeamId(), user);
-
-        return "redirect:/team/search";
+    // 모임 상세 조회
+    @GetMapping("/detail/{teamId}")
+    public String getTeamDetail(@PathVariable Long teamId, Model model) {
+        Team team = teamService.getTeamById(teamId);
+        model.addAttribute("team", team);
+        return "team/teamDetail";
     }
+
 
     // 팀 페이지 조회
     @GetMapping("/teamPage/{teamId}")
@@ -78,14 +78,6 @@ public class TeamController {
         return "team/teamPage";
     }
 
-
-    // 모임 상세 조회
-    @GetMapping("/detail/{teamId}")
-    public String getTeamDetail(@PathVariable Long teamId, Model model) {
-        Team team = teamService.getTeamById(teamId);
-        model.addAttribute("team", team);
-        return "team/teamDetail";
-    }
 
     // 모임 수정
     @PatchMapping("/detail/{teamId}")
@@ -129,13 +121,16 @@ public class TeamController {
     }
 
     // 참여자 목록 조회(팀 페이지)
-    @GetMapping("/{teamId}/{userId}/participants")
-    public String getParticipants(@PathVariable Long teamId, @PathVariable String userId, Model model) {
-        Participant participant = teamService.getParticipant(userId, teamId);
+    @GetMapping("/{teamId}/participants")
+    public String getParticipants(@PathVariable Long teamId, Model model) {
+        List<Participant> participants = teamService.getParticipant(teamId);
+
         model.addAttribute("teamId", teamId);
-        model.addAttribute("participants", participant.getTeam().getParticipants());
+        model.addAttribute("participants", participants);
+
         return "team/teamPage";
     }
+
 
     // 참여자 상태 변경
     @PatchMapping("/{participantId}/participantStatus")
