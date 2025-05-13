@@ -58,12 +58,11 @@ public class TeamController {
     // 팀 페이지 조회
     @GetMapping("/teamPage/{teamId}")
     public String getTeamPage(@PathVariable Long teamId, Model model) {
-        Team team = teamService.getTeamById(teamId);
+        //Team team = teamService.getTeamById(teamId);
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        String userNickname = team.getUser().getNickname();
+        String userNickname = userService.getUserNickname(userId);
 
-        model.addAttribute("team", team);
         model.addAttribute("teamId", teamId);
         model.addAttribute("userId", userId);
         model.addAttribute("userNickname", userNickname);
