@@ -8,6 +8,7 @@ import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.infra.entity.BaseEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
@@ -66,4 +67,10 @@ public class User extends BaseEntity {
     public LocalDateTime createdAt() {
         return this.createdAt;
     }
+
+    private LocalDate dueDate;
+
+    private Integer suspendDuration;
+
+    private String dueReason;
 }

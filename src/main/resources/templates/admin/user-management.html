@@ -62,12 +62,15 @@
                     th:text="${user.status.koreanName}"></span>
             </td>
             <td>
-              <button class="action-btn edit" th:data-id="${user.userId}"><i
+              <button class="action-btn edit"
+                      th:data-id="${user.userId}"
+                      th:data-nickname="${user.nickname}"
+                      th:data-email="${user.email}"
+                      th:data-status="${user.status.name()}"
+                      th:data-suspendDuration="${user.suspendDuration}"
+                      th:data-dueReason="${user.dueReason}"
+              ><i
                   class="fas fa-edit"></i></button>
-              <button th:if="${user.status == 'active'}" class="action-btn suspend"
-                      th:data-id="${user.userId}"><i class="fas fa-ban"></i></button>
-              <button th:if="${user.status == 'suspended'}" class="action-btn activate"
-                      th:data-id="${user.userId}"><i class="fas fa-check"></i></button>
               <button class="action-btn delete" th:data-id="${user.userId}"><i
                   class="fas fa-trash"></i></button>
             </td>
@@ -148,31 +151,52 @@
       </div>
     </div>
 
-    <!-- 사용자 편집 모달 -->
+    <!-- 사용자 상태 수정 모달 -->
     <div class="modal" id="userEditModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>사용자 정보 수정</h2>
+          <h2>사용자 상태 수정</h2>
           <span class="close-modal">&times;</span>
         </div>
         <div class="modal-body">
           <form id="userEditForm">
             <input type="hidden" id="edit-user-id">
             <div class="form-group">
-              <label for="edit-user-name">이름</label>
-              <input type="text" id="edit-user-name">
+              <label for="edit-user-name">아이디</label>
+              <input type="text" id="edit-user-name" disabled>
+            </div>
+            <div class="form-group">
+              <label for="edit-user-nickname">닉네임</label>
+              <input type="text" id="edit-user-nickname" disabled>
             </div>
             <div class="form-group">
               <label for="edit-user-email">이메일</label>
-              <input type="email" id="edit-user-email">
+              <input type="email" id="edit-user-email" disabled>
             </div>
             <div class="form-group">
               <label for="edit-user-status">상태</label>
               <select id="edit-user-status">
-                <option value="active">활성</option>
-                <option value="suspended">정지</option>
-                <option value="inactive">비활성</option>
+                <option value="ACTIVE">정상</option>
+                <option value="SUSPENDED">정지</option>
+                <option value="BANNED">영구 정지</option>
               </select>
+            </div>
+            <div id="suspend-options" style="display: none;">
+              <div class="form-group">
+                <label for="edit-suspend-duration">정지 기간</label>
+                <select id="edit-suspend-duration">
+                  <option value="1">1일</option>
+                  <option value="3">3일</option>
+                  <option value="7">7일</option>
+                  <option value="15">15일</option>
+                  <option value="30">30일</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="edit-suspend-reason">정지 사유</label>
+                <textarea id="edit-suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
+              </div>
             </div>
           </form>
         </div>
@@ -321,5 +345,6 @@
   <th:block layout:fragment="script">
     <script th:src="@{/js/user-management.js}"></script>
   </th:block>
+</div>
 </body>
 </html>

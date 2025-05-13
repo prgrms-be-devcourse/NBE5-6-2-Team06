@@ -1,9 +1,11 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.model.user.dto.UserDto;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.auth.code.Role;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -151,5 +153,24 @@ public class UserService {
         } else {
             return userRepository.findAllUsers(pageable);
         }
+    }
+
+    public void updateUserStatus(String userId, UserStatusRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setStatus(request.getStatus());
+
+        if (request.getStatus() == Status.SUSPENDED) {
+            user.setSuspendDuration(request.getSuspendDuration());
+            user.setDueDate(LocalDate.now().plusDays(request.getSuspendDuration()));
+            user.setDueReason(request.getDueReason());
+        } else {
+            user.setSuspendDuration(null);
+            user.setDueDate(null);
+            user.setDueReason(null);
+        }
+
+        userRepository.save(user);
     }
 }

@@ -3,6 +3,7 @@ package com.grepp.matnam.app.model.user.dto;
 import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +33,11 @@ public class UserDto {
 
     private Status status;
 
-    private LocalDateTime dueDate;
+    private LocalDate dueDate;
+
+    private Integer suspendDuration;
+
+    private String dueReason;
 
     private Boolean activated;
 
