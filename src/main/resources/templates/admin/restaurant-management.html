@@ -88,28 +88,7 @@
           </tbody>
         </table>
       </div>
-
-      <div class="pagination">
-        <a class="page-btn prev"
-           th:classappend="${currentPage == 1} ? 'disabled'"
-           th:href="@{${page.url()}(page=${page.prevPage()}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}">
-          <i class="fas fa-chevron-left"></i>
-        </a>
-
-        <th:block th:each="num : ${#numbers.sequence(page.startNumber(), page.endNumber())}">
-          <a class="page-btn"
-             th:classappend="${num == currentPage} ? 'active'"
-             th:href="@{${page.url()}(page=${num}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}"
-             th:text="${num}">1</a>
-        </th:block>
-
-        <a class="page-btn next"
-           th:classappend="${currentPage == totalPages} ? 'disabled'"
-           th:href="@{${page.url()}(page=${page.nextPage()}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}">
-          <i class="fas fa-chevron-right"></i>
-        </a>
-      </div>
-
+      <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
     </div>
 
     <!-- 식당 추가/수정 모달 (개선) -->

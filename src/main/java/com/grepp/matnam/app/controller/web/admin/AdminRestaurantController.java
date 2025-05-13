@@ -64,7 +64,7 @@ public class AdminRestaurantController {
         if (param.getPage() != 1 && page.getContent().isEmpty()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
-        PageResponse<Restaurant> response = new PageResponse<>("/admin/restaurant", page, 5);
+        PageResponse<Restaurant> response = new PageResponse<>("/admin/restaurant?category=" + categoryName + "&keyword=" + keyword + "&sort=" + sort, page, 5);
 
         model.addAttribute("pageTitle", "식당 관리");
         model.addAttribute("currentPage", "restaurant-management");
