@@ -105,7 +105,7 @@ public class TeamController {
     // 모임 참여 신청
     @PostMapping("/{teamId}/apply")
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
-        User user = userService.getUserById(userId); // 수정: userService에서 가져옴
+        User user = userService.getUserById(userId);
         teamService.addParticipant(teamId, user);
         return "redirect:/team/" + teamId + "/detail";
     }
