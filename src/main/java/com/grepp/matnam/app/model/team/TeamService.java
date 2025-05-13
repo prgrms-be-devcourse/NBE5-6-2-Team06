@@ -12,6 +12,8 @@ import java.util.List;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -136,6 +138,14 @@ public class TeamService {
         return participantRepository.findById(participantId).orElse(null);
     }
 
+
+    public Page<Team> getAllTeams(Pageable pageable) {
+        return teamRepository.findAllWithParticipants(pageable);
+    }
+
+    public Team getTeamByIdWithParticipants(Long teamId) {
+        return teamRepository.findByIdWithParticipants(teamId).orElse(null);
+    }
     // 모임 완료 처리
     @Transactional
     public void completeTeam(Long teamId) {

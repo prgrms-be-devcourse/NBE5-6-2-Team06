@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.team;
 
 import com.grepp.matnam.app.controller.api.team.payload.TeamRequest;
+import com.grepp.matnam.app.controller.api.team.payload.TeamResponse;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
@@ -29,21 +30,25 @@ public class TeamApiController {
     private final UserService userService;
 
     // 모임 생성 API
-    @PostMapping
-    public ResponseEntity<String> createTeam(@RequestBody TeamRequest request) {
+    @PostMapping("/create")
+    public ResponseEntity<TeamResponse> createTeam(@RequestBody TeamRequest request) {
         User user = userService.getUserById(request.getUserId());
         Team team = request.getTeam();
         team.setUser(user);
+
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);
-        return ResponseEntity.ok("Team created successfully");
+
+        TeamResponse teamResponse = new TeamResponse(team);
+        return ResponseEntity.ok(teamResponse);
     }
+
 
 
     // 모임 상세 조회 API
     @GetMapping("/detail/{teamId}")
     public ResponseEntity<Team> getTeamDetail(@PathVariable Long teamId) {
-        Team team = teamService.getTeamById(teamId);
+        Team team = teamService.getTeamByIdWithParticipants(teamId);
         return ResponseEntity.ok(team);
     }
 

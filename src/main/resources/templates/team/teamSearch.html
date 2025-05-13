@@ -109,6 +109,38 @@
     .link-button:hover {
       background-color: #333;
     }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .pagination a, .pagination span {
+      padding: 0.5rem 1rem;
+      margin: 0 0.2rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-decoration: none;
+      color: #333;
+    }
+
+    .pagination a:hover {
+      background-color: #eee;
+    }
+
+    .pagination .current {
+      background-color: #000;
+      color: #fff;
+      border-color: #000;
+    }
+
+    .pagination .disabled {
+      color: #999;
+      border-color: #eee;
+      cursor: default;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -116,9 +148,9 @@
   <div class="header-left">
     <div class="logo">맛남</div>
     <nav>
-      <a th:href="@{/team/search}">모임찾기</a> <!-- 모임 찾기 페이지 -->
+      <a th:href="@{/team/search}">모임찾기</a>
       <a th:href="@{restaurants}">맛집 탐색</a>
-      <a th:href="@{user/mypage}">마이페이지</a>
+      <a th:href="@{/user/mypage}">마이페이지</a>
     </nav>
   </div>
   <div class="header-buttons">
@@ -143,49 +175,27 @@
   </div>
 
   <div class="meetings-grid">
-    <!-- Example meeting card -->
-    <div class="meeting-card">
-      <h3>강남 맛집 탐방 모임</h3>
-      <p>📅 2023년 6월 15일 (목) 오후 7시</p>
-      <p>📍 서울 강남구</p>
-      <p>👥 4/6명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
+    <div class="meeting-card" th:each="team : ${teams}">
+      <h3 th:text="${team.teamTitle}"></h3>
+      <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy-MM-dd HH:mm')}"></span></p>
+      <p>📍 <span th:text="${team.restaurantName}"></span></p>
+      <p>👥 <span th:text="${team.participants.size()}"></span>/ <span th:text="${team.maxPeople}"></span>명 참여중</p>
+      <a class="link-button" th:href="@{/team/detail/{teamId}(teamId=${team.teamId})}">자세히 보기</a>
     </div>
-    <div class="meeting-card">
-      <h3>홍대 이탈리안 파스타 모임</h3>
-      <p>📅 2023년 6월 19일 (월) 오후 6시</p>
-      <p>📍 서울 마포구 와우산로</p>
-      <p>👥 3/5명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
+    <div th:if="${teams.isEmpty()}">
+      <p>현재 등록된 모임이 없습니다.</p>
     </div>
-    <div class="meeting-card">
-      <h3>을지로 숨은 맛집 탐방</h3>
-      <p>📅 2023년 6월 20일 (화) 오후 7시</p>
-      <p>📍 서울 중구 충무로</p>
-      <p>👥 5/8명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
-    </div>
-    <div class="meeting-card">
-      <h3>이태원 세계 음식 탐험</h3>
-      <p>📅 2023년 6월 22일 (목) 오후 6시</p>
-      <p>📍 서울 용산구 이태원로</p>
-      <p>👥 3/6명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
-    </div>
-    <div class="meeting-card">
-      <h3>성수동 카페 투어</h3>
-      <p>📅 2023년 6월 24일 (토) 오후 2시</p>
-      <p>📍 서울 성동구 성수동</p>
-      <p>👥 3/5명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
-    </div>
-    <div class="meeting-card">
-      <h3>부산 해운대 회 모임</h3>
-      <p>📅 2023년 6월 25일 (일) 오후 6시</p>
-      <p>📍 부산 해운대구</p>
-      <p>👥 6/8명 참여중</p>
-      <a class="link-button" th:href="@{/team/detail}">자세히 보기</a>
-    </div>
+  </div>
+
+  <div class="pagination" th:if="${page.totalPages > 0}">
+    <a th:if="${page.hasPrevious()}" th:href="@{/team/search(page=${page.number - 1}, size=${page.size})}">이전</a>
+
+    <th:block th:each="pageNumber : ${#numbers.sequence(0, page.totalPages - 1)}">
+      <span th:if="${pageNumber == page.number}" class="current" th:text="${pageNumber + 1}"></span>
+      <a th:unless="${pageNumber == page.number}" th:href="@{/team/search(page=${pageNumber}, size=${page.size})}" th:text="${pageNumber + 1}"></a>
+    </th:block>
+
+    <a th:if="${page.hasNext()}" th:href="@{/team/search(page=${page.number + 1}, size=${page.size})}">다음</a>
   </div>
 </div>
 </body>
