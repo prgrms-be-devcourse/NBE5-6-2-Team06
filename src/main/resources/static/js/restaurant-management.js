@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // 폼 초기화
             document.getElementById('restaurantForm').reset();
             document.getElementById('restaurant-id').value = '';
+            document.querySelector('#error-mood').textContent = "";
 
             // 모달 표시
             document.getElementById('restaurantModal').style.display = 'block';
@@ -63,11 +64,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('restaurant-kakao-rating').value = result.kakaoRating;
 
 
-                // 분위기 체크박스 설정 (예: 쉼표로 구분된 문자열인 경우)
-                const moodArray = result.mood.split(',').map(m => m.trim());
+                // 분위기 체크박스 설정
                 moodCheckboxes.forEach(checkbox => {
-                    checkbox.checked = moodArray.includes(checkbox.value);
+                    const fieldName = checkbox.value; // 예: "goodTalk", "clean" 등
+                    if (result.hasOwnProperty(fieldName)) {
+                        checkbox.checked = result[fieldName] === true;
+                    } else {
+                        checkbox.checked = false;
+                    }
                 });
+                document.querySelector('#error-mood').textContent = "";
 
                 // 모달 표시
                 document.getElementById('restaurantModal').style.display = 'block';
@@ -84,9 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('save-button').addEventListener('click', function () {
         const restaurantId = document.getElementById('restaurant-id').value;
 
-        // 선택된 mood 값들 최대 3개
-        const moodValues = Array.from(document.querySelectorAll('input[name="restaurant-mood"]:checked'))
-        .map(cb => cb.value);
+        const moodValues = Array.from(document.querySelectorAll('input[name="restaurant-mood"]:checked'));
 
         const payload = {
             name: document.getElementById('restaurant-name').value,
@@ -96,11 +100,15 @@ document.addEventListener('DOMContentLoaded', function() {
             openTime: document.getElementById('restaurant-hours').value,
             mainFood: document.getElementById('restaurant-main-menu').value,
             summary: document.getElementById('restaurant-description').value,
-            mood: moodValues.join(','),
             googleRating: parseFloat(document.getElementById('restaurant-google-rating').value),
             naverRating: parseFloat(document.getElementById('restaurant-naver-rating').value),
             kakaoRating: parseFloat(document.getElementById('restaurant-kakao-rating').value)
         };
+
+        // 분위기 체크박스를 기반으로 각 mood 항목을 boolean으로 추가
+        moodCheckboxes.forEach(cb => {
+            payload[cb.value] = cb.checked;
+        });
 
         const url = restaurantId
             ? `/api/admin/restaurant/${restaurantId}` // 수정 (PATCH)
@@ -134,6 +142,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
                 document.querySelector('#error-naver-rating').textContent = errorMessages.naverRating;
                 document.querySelector('#error-kakao-rating').textContent = errorMessages.kakaoRating;
+                if (moodValues.length < 1) {
+                    document.querySelector('#error-mood').textContent = "최소 1개 이상의 분위기를 선택해주세요.";
+                }
                 alert('필수 항목을 모두 입력해주세요.');
             }
         })

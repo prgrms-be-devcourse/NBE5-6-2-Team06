@@ -13,7 +13,6 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Restaurant extends BaseEntity {
 
     @Id
@@ -43,5 +42,28 @@ public class Restaurant extends BaseEntity {
     private Float naverRating;
 
     private Float kakaoRating;
+
+    // 각 식당 대표 분위기 추가
+    private boolean goodTalk;
+    private boolean manyDrink;
+    private boolean goodMusic;
+    private boolean clean;
+    private boolean goodView;
+    private boolean isTerrace;
+    private boolean goodPicture;
+    private boolean goodMenu;
+    private boolean longStay;
+    private boolean bigStore;
+
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+            "name='" + name + '\'' +
+            ", summary='" + summary + '\'' +
+            ", mainFood='" + mainFood + '\'' +
+            ", category='" + category + '\'' +
+            ", mood='" + mood + '\'' +
+            '}';
+    }
 
 }

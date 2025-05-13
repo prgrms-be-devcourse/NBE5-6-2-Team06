@@ -1,11 +1,13 @@
 package com.grepp.matnam.app.controller.api.admin.payload;
 
+import com.grepp.matnam.app.controller.api.admin.annotation.AtLeastOneMoodSelected;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
+@AtLeastOneMoodSelected
 public class RestaurantRequest {
 
     @NotBlank
@@ -29,7 +31,6 @@ public class RestaurantRequest {
     @NotBlank(message = "카테고리를 선택해주세요.")
     private String category;
 
-    @NotBlank(message = "최소 1개 이상의 분위기를 선택해주세요.")
     private String mood;
 
     @NotNull(message = "평점을 입력해주세요.")
@@ -41,6 +42,17 @@ public class RestaurantRequest {
     @NotNull(message = "평점을 입력해주세요.")
     private Float kakaoRating;
 
+    private boolean goodTalk;
+    private boolean manyDrink;
+    private boolean goodMusic;
+    private boolean clean;
+    private boolean goodView;
+    private boolean isTerrace;
+    private boolean goodPicture;
+    private boolean goodMenu;
+    private boolean longStay;
+    private boolean bigStore;
+
     public Restaurant toEntity() {
         Restaurant restaurant = new Restaurant();
 
@@ -51,7 +63,16 @@ public class RestaurantRequest {
         restaurant.setOpenTime(openTime);
         restaurant.setMainFood(mainFood);
         restaurant.setSummary(summary);
-        restaurant.setMood(mood);
+        restaurant.setGoodTalk(goodTalk);
+        restaurant.setManyDrink(manyDrink);
+        restaurant.setGoodMusic(goodMusic);
+        restaurant.setClean(clean);
+        restaurant.setGoodView(goodView);
+        restaurant.setTerrace(isTerrace);
+        restaurant.setGoodPicture(goodPicture);
+        restaurant.setGoodMenu(goodMenu);
+        restaurant.setLongStay(longStay);
+        restaurant.setBigStore(bigStore);
         restaurant.setGoogleRating(googleRating);
         restaurant.setNaverRating(naverRating);
         restaurant.setKakaoRating(kakaoRating);
