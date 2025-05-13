@@ -3,6 +3,7 @@ package com.grepp.matnam.app.controller.web.team;
 import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamReviewRepository;
 import com.grepp.matnam.app.controller.api.team.payload.TeamRequest;
+import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -14,6 +15,7 @@ import com.grepp.matnam.app.model.user.entity.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -125,8 +127,14 @@ public class TeamController {
     @PostMapping("/{teamId}/apply")
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = userService.getUserById(userId);
+
+        // 이미 신청한 참여자인지 확인
+        if (participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId)) {
+            return "redirect:/team/" + teamId + "/page?error=이미 신청한 모임입니다.";
+        }
+
         teamService.addParticipant(teamId, user);
-        return "redirect:/team/detail/" + teamId;
+        return "redirect:/team/" + teamId + "/page";
     }
 
     // 모임 참여 수락 (주최자가 호출)
