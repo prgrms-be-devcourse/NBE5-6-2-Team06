@@ -8,6 +8,8 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,7 +33,7 @@ public class TeamService {
     // 참여자 추가
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found"));
+                .orElseThrow(() -> new RuntimeException("Team not found"));
 
         Participant participant = new Participant();
         participant.setTeam(team);
@@ -51,7 +53,7 @@ public class TeamService {
     // 참여자 상태 변경
     public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
         Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
+                .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
         participant.setParticipantStatus(status);
         participantRepository.save(participant);
     }
@@ -59,13 +61,20 @@ public class TeamService {
     // 모임 상태 변경
     public void changeTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
+                .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
+        Status prevStatus = team.getStatus();
         team.setStatus(status);
         teamRepository.save(team);
+
+        // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
+        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
+            increaseTemperatureForCompletedTeam(team);
+        }
     }
 
 
     // 모임 참여 수락
+    @Transactional
     public void acceptParticipant(Long teamId, String userId) {
         // 참가자 정보 가져오기
         Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
@@ -105,11 +114,43 @@ public class TeamService {
 
 
     public Team getTeamById(Long teamId) {
-        return null;
+        return teamRepository.findById(teamId)
+                .orElse(null);
     }
 
     public Participant getParticipantById(Long participantId) {
         return participantRepository.findById(participantId).orElse(null);
+    }
+
+    // 모임 완료 처리
+    @Transactional
+    public void completeTeam(Long teamId) {
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+        Status prevStatus = team.getStatus();
+
+        team.setStatus(Status.COMPLETED);
+        teamRepository.save(team);
+
+        if (prevStatus != Status.COMPLETED) {
+            increaseTemperatureForCompletedTeam(team);
+        }
+    }
+
+    private void increaseTemperatureForCompletedTeam(Team team) {
+        List<Participant> participants = participantRepository.findByTeam_TeamId(team.getTeamId());
+
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                User user = participant.getUser();
+                float currentTemp = user.getTemperature();
+                float newTemp = currentTemp + 0.1f;
+
+                user.setTemperature(newTemp);
+                userRepository.save(user);
+            }
+        }
     }
 
 }
