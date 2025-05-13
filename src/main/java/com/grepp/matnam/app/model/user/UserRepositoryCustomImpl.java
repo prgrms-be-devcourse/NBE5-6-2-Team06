@@ -1,7 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.model.user.code.Status;
-import com.grepp.matnam.app.model.user.dto.UserDto;
 import com.grepp.matnam.app.model.user.entity.QUser;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.querydsl.core.BooleanBuilder;
@@ -27,7 +26,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
 
     @Override
-    public Page<UserDto> findAllUsers(Pageable pageable) {
+    public Page<User> findAllUsers(Pageable pageable) {
         List<User> content = queryFactory
             .select(user)
             .from(user)
@@ -42,13 +41,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .where(user.activated)
             .from(user);
 
-        List<UserDto> result = content.stream().map(e -> mapper.map(e, UserDto.class)).toList();
-
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
-    public Page<UserDto> findByStatusAndKeywordContaining(String status, String keyword,
+    public Page<User> findByStatusAndKeywordContaining(String status, String keyword,
         Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
@@ -76,13 +73,11 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .where(builder.and(user.status.eq(Status.valueOf(status))))
             .from(user);
 
-        List<UserDto> result = content.stream().map(e -> mapper.map(e, UserDto.class)).toList();
-
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
-    public Page<UserDto> findByStatus(String status, Pageable pageable) {
+    public Page<User> findByStatus(String status, Pageable pageable) {
 
         List<User> content = queryFactory
             .select(user)
@@ -100,13 +95,12 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .where(user.status.eq(Status.valueOf(status)))
             .from(user);
 
-        List<UserDto> result = content.stream().map(e -> mapper.map(e, UserDto.class)).toList();
 
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     @Override
-    public Page<UserDto> findByKeywordContaining(String keyword, Pageable pageable) {
+    public Page<User> findByKeywordContaining(String keyword, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (StringUtils.hasText(keyword)) {
@@ -133,9 +127,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .where(builder)
             .from(user);
 
-        List<UserDto> result = content.stream().map(e -> mapper.map(e, UserDto.class)).toList();
-
-        return PageableExecutionUtils.getPage(result, pageable, countQuery::fetchOne);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {

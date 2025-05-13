@@ -58,8 +58,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-    private LocalDateTime dueDate;
-
     public boolean isActivated() {
         return this.activated;
     }

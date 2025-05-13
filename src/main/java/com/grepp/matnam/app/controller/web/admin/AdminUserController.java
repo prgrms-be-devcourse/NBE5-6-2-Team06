@@ -2,7 +2,7 @@ package com.grepp.matnam.app.controller.web.admin;
 
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.code.Status;
-import com.grepp.matnam.app.model.user.dto.UserDto;
+import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
 import com.grepp.matnam.infra.payload.PageParam;
 import com.grepp.matnam.infra.response.PageResponse;
@@ -52,12 +52,12 @@ public class AdminUserController {
         if (status != null) {
             statusName = status.name();
         }
-        Page<UserDto> page = userService.findByFilter(statusName, keyword, pageable);
+        Page<User> page = userService.findByFilter(statusName, keyword, pageable);
 
         if (param.getPage() != 1 && page.getContent().isEmpty()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
-        PageResponse<UserDto> response = new PageResponse<>("/admin/user/list?status=" + statusName + "&keyword=" + keyword + "&sort=" + sort, page, 5);
+        PageResponse<User> response = new PageResponse<>("/admin/user/list?status=" + statusName + "&keyword=" + keyword + "&sort=" + sort, page, 5);
 
         model.addAttribute("activeTab", "user-list");
         model.addAttribute("pageTitle", "사용자 관리");
