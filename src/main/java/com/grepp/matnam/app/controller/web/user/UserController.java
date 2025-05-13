@@ -63,20 +63,8 @@ public class UserController {
     }
 
     @GetMapping("/mypage")
-    public String mypage(Model model, HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        boolean jwtCookieFound = false;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("jwtToken".equals(cookie.getName())) {
-                    jwtCookieFound = true;
-                    break;
-                }
-            }
-        }
-        log.info("마이페이지 접근 - JWT 쿠키 존재: " + jwtCookieFound);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    public String mypage(Model model) {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication != null ? authentication.getName() : "인증 정보 없음";
         log.info("마이페이지 접근 - 현재 인증 사용자: {}", currentUser);
 
