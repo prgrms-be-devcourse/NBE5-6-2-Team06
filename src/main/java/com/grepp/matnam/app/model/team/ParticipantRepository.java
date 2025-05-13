@@ -1,13 +1,9 @@
 package com.grepp.matnam.app.model.team;
 
-import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.entity.Participant;
-import com.grepp.matnam.app.model.team.entity.Team;
-import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
-
 
 
     // userId와 teamId로 Participant 조회
