@@ -122,7 +122,7 @@ public class TeamService {
         return teamRepository.findTeamsByParticipants_User_UserId(userId);
     }
 
-    // 특정 사용자와 팀 ID로 참여자 조회
+    // 참여자 조회
     public List<Participant> getParticipant(Long teamId) {
         return participantRepository.findByTeam_TeamId(teamId);
     }

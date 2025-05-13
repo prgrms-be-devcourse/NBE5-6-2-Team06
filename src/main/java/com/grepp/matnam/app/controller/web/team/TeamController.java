@@ -46,15 +46,6 @@ public class TeamController {
     private final TeamReviewRepository teamReviewRepository;
     private final ParticipantRepository participantRepository;
 
-    // 모임 검색 페이지
-    @GetMapping("/search")
-    public String searchTeams(@PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
-        Page<Team> teamPage = teamService.getAllTeams(pageable);
-        model.addAttribute("teams", teamPage.getContent());
-        model.addAttribute("page", teamPage);
-        return "team/teamSearch";
-    }
-
 
     // 모임 생성 페이지
     @GetMapping("/create")
@@ -62,6 +53,7 @@ public class TeamController {
         return "team/teamCreate";
     }
 
+    // 모임 생성
     @PostMapping("/create")
     public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
         User user = userService.getUserById(teamRequest.getUserId());
@@ -75,14 +67,24 @@ public class TeamController {
         return "redirect:/" + team.getTeamId() + "/detail";
     }
 
+    // 모임 검색 페이지
+    @GetMapping("/search")
+    public String searchTeams(@PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+        Page<Team> teamPage = teamService.getAllTeams(pageable);
+        model.addAttribute("teams", teamPage.getContent());
+        model.addAttribute("page", teamPage);
+        return "team/teamSearch";
+    }
+
 
     // 모임 상세 조회
-    @GetMapping("/{teamId}/detail")
+    @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
         return "team/teamDetail";
     }
+
 
     // 팀 페이지 조회
     @GetMapping("/page/{teamId}")
@@ -138,7 +140,7 @@ public class TeamController {
         }
     }
 
-    // 참여자 목록 조회(팀 페이지)
+    // 참여자 조회(팀 페이지)
     @GetMapping("/{teamId}/participants")
     public String getParticipants(@PathVariable Long teamId, Model model) {
         List<Participant> participants = teamService.getParticipant(teamId);
@@ -171,6 +173,7 @@ public class TeamController {
         model.addAttribute("teams", teams);
         return "user/mypage";
     }
+
 
     // 모임 완료 후 리뷰 작성 페이지 표시
     @GetMapping("/{teamId}/reviews")
