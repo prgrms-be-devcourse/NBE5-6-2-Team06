@@ -34,7 +34,9 @@ public class UserApiController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
-    public ResponseEntity<ApiResponse> signup(@Validated @RequestBody UserSignupRequest request) {
+    public ResponseEntity<ApiResponse> signup(
+            @Validated @RequestBody UserSignupRequest request,
+            HttpServletResponse response) {
         try {
             User user = new User();
             user.setUserId(request.getUserId());
@@ -47,18 +49,22 @@ public class UserApiController {
 
             User savedUser = userService.signup(user);
 
-            UserResponse response = UserResponse.builder()
-                    .userId(savedUser.getUserId())
-                    .email(savedUser.getEmail())
-                    .address(savedUser.getAddress())
-                    .nickname(savedUser.getNickname())
-                    .age(savedUser.getAge())
-                    .gender(savedUser.getGender())
-                    .temperature(savedUser.getTemperature())
-                    .role(savedUser.getRole())
-                    .build();
-
             String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
+
+            Cookie jwtCookie = new Cookie("jwtToken", token);
+            jwtCookie.setMaxAge(86400); // 24시간
+            jwtCookie.setPath("/");
+            response.addCookie(jwtCookie);
+
+            Cookie userIdCookie = new Cookie("userId", savedUser.getUserId());
+            userIdCookie.setMaxAge(86400);
+            userIdCookie.setPath("/");
+            response.addCookie(userIdCookie);
+
+            Cookie roleCookie = new Cookie("userRole", savedUser.getRole().name());
+            roleCookie.setMaxAge(86400);
+            roleCookie.setPath("/");
+            response.addCookie(roleCookie);
 
             JwtResponse jwtResponse = JwtResponse.builder()
                     .token(token)
