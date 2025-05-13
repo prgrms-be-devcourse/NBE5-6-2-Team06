@@ -1,16 +1,20 @@
 package com.grepp.matnam.app.controller.web.team;
 
+import com.grepp.matnam.app.model.team.ParticipantRepository;
+import com.grepp.matnam.app.model.team.TeamReviewRepository;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
+import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +27,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/team")
 @RequiredArgsConstructor
@@ -31,6 +37,8 @@ public class TeamController {
 
     private final TeamService teamService;
     private final UserService userService;
+    private final TeamReviewRepository teamReviewRepository;
+    private final ParticipantRepository participantRepository;
 
     @GetMapping("/search")
     public String search() {
@@ -161,5 +169,38 @@ public class TeamController {
 
         model.addAttribute("teams", teams);
         return "user/mypage";
+    }
+
+    // 모임 완료 후 리뷰 작성 페이지 표시
+    @GetMapping("/{teamId}/reviews")
+    public String showTeamReviewPage(@PathVariable Long teamId, Model model) {
+        Team team = teamService.getTeamById(teamId);
+
+        if (team == null) {
+            return "redirect:/error/404";
+        }
+
+        if (team.getStatus() != Status.COMPLETED) {
+            return "redirect:/team/" + teamId + "?error=notCompleted";
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserId = authentication.getName();
+
+        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(currentUserId, teamId);
+        if (participant == null) {
+            return "redirect:/team/" + teamId + "?error=notParticipant";
+        }
+
+        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);
+
+        List<TeamReview> myReviews = teamReviewRepository.findByTeam_TeamIdAndReviewer(teamId, currentUserId);
+
+        model.addAttribute("team", team);
+        model.addAttribute("participants", participants);
+        model.addAttribute("myReviews", myReviews);
+        model.addAttribute("currentUserId", currentUserId);
+
+        return "team/teamReview";
     }
 }
