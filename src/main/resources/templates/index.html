@@ -182,6 +182,18 @@
     </div>
 </header>
 
+<message>
+<div id="messageBox" style="display: none;
+                           background-color: #4CAF50;
+                           color: white;
+                           text-align: center;
+                           padding: 15px;
+                           margin-bottom: 20px;
+                           border-radius: 4px;">
+    회원 탈퇴가 완료되었습니다.
+</div>
+</message>
+
 <!-- 메인 배너 -->
 <section class="main-banner" style="display: flex; align-items: center; justify-content: space-between;">
     <div style="max-width: 50%;">
@@ -283,5 +295,26 @@
 <footer>
     <p>© 2023 맛남 | 이용약관 | 개인정보처리방침</p>
 </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+
+        if (message === 'account_deactivated') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.style.display = 'block';
+
+            setTimeout(function() {
+                messageBox.style.display = 'none';
+
+                const url = new URL(window.location);
+                url.searchParams.delete('message');
+                window.history.replaceState({}, document.title, url);
+            }, 5000);
+        }
+    });
+</script>
+
 </body>
 </html>
