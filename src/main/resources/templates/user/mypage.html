@@ -517,7 +517,7 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
         </div>
         <div th:each="team : ${participatingTeams}" class="meeting-item">
           <h4>
@@ -527,7 +527,7 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
         </div>
       </div>
 
@@ -545,7 +545,7 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
         </div>
       </div>
 
@@ -563,7 +563,7 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
         </div>
       </div>
     </div>

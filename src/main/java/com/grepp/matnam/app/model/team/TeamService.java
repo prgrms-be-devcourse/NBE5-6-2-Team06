@@ -25,8 +25,6 @@ public class TeamService {
 
     private final ParticipantRepository participantRepository;
 
-    private final UserRepository userRepository;
-
     // 모임 생성
     public void saveTeam(Team team) {
         teamRepository.save(team);
@@ -78,7 +76,8 @@ public class TeamService {
     // 모임 참여 수락
     @Transactional
     public void acceptParticipant(Long teamId, String userId) {
-        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId,
+            teamId);
 
         if (participant == null) {
             throw new RuntimeException("참가자가 존재하지 않거나 팀에 속하지 않습니다.");
@@ -93,7 +92,6 @@ public class TeamService {
     }
 
 
-
     public void deleteTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
@@ -106,28 +104,23 @@ public class TeamService {
         teamRepository.delete(team);
     }
 
-
-    // userId로 속한 팀 목록 조회
-//    public List<Team> getUserTeams(String userId) {
-//        return teamRepository.findTeamsByUser_UserId(userId);
-//    }
-
     // 주최자로서의 팀 조회
-//    public List<Team> getTeamsByLeader(String userId) {
-//        return teamRepository.findTeamsByUser_UserId(userId);
-//    }
+    public List<Team> getTeamsByLeader(String userId) {
+        return teamRepository.findTeamsByUser_UserId(userId);
+    }
 
-    // 참여자로서의 팀 조회
-//    public List<Team> getTeamsByParticipant(String userId) {
-//        return teamRepository.findTeamsByParticipants_User_UserId(userId);
-//    }
+    //참여자로서의 팀 조회
+    public List<Team> getTeamsByParticipant(String userId) {
+        return teamRepository.findTeamsByParticipantUserId(userId);
+    }
 
-    // 참여자 조회
+    // 참여자 조회(참여 목록)
     public List<Participant> getParticipant(Long teamId) {
         return participantRepository.findByTeam_TeamId(teamId);
     }
 
 
+    // 참여자 상세 정보 조회(참여 상태)
 
     public Team getTeamById(Long teamId) {
         return teamRepository.findById(teamId)
@@ -138,11 +131,12 @@ public class TeamService {
         return participantRepository.findById(participantId).orElse(null);
     }
 
-
+    // 모임 검색 페이지
     public Page<Team> getAllTeams(Pageable pageable) {
         return teamRepository.findAllWithParticipants(pageable);
     }
 
+    // 모임 상세 조회
     public Team getTeamByIdWithParticipants(Long teamId) {
         return teamRepository.findByIdWithParticipants(teamId).orElse(null);
     }

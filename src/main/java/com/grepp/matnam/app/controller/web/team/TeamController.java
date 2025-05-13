@@ -159,20 +159,20 @@ public class TeamController {
         return "redirect:/team/" + teamId + "/detail";
     }
 
-    // 전체 모임 조회
-//    @GetMapping("/all/{userId}")
-//    public String getAllTeams(@PathVariable String userId, @RequestParam(value = "status", required = false) String status, Model model) {
-//        Iterable<Team> teams;
-//        if ("LEADER".equals(status)) {
-//            teams = teamService.getTeamsByLeader(userId);
-//        } else if ("MEMBER".equals(status)) {
-//            teams = teamService.getTeamsByParticipant(userId);
-//        } else {
-//            teams = teamService.getUserTeams(userId);
-//        }
-//        model.addAttribute("teams", teams);
-//        return "user/mypage";
-//    }
+    // 사용자 전체 모임 조회
+    @GetMapping("/mypage")
+    public String mypageTeam(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
+
+        List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
+        model.addAttribute("hostingTeams", hostingTeams);
+
+        List<Team> participatingTeams = teamService.getTeamsByParticipant(userId);
+        model.addAttribute("participatingTeams", participatingTeams);
+
+        return "user/mypage";
+    }
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시
