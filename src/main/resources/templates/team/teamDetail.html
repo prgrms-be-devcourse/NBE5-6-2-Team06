@@ -56,7 +56,10 @@
     <div class="card">
       <h4>모임 참여하기</h4>
       <p th:text="${team.participants.size()} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
-      <button type="button">지금 참여 신청하기</button>
+      <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
+        <input type="hidden" name="userId" th:value="${#authentication.name}">
+        <button type="submit">지금 참여 신청하기</button>
+      </form>
     </div>
     <div class="card">
       <h4>방장 정보</h4>

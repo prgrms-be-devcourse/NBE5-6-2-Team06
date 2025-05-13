@@ -126,7 +126,7 @@ public class TeamController {
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = userService.getUserById(userId);
         teamService.addParticipant(teamId, user);
-        return "redirect:/team/" + teamId + "/detail";
+        return "redirect:/team/detail/" + teamId;
     }
 
     // 모임 참여 수락 (주최자가 호출)
