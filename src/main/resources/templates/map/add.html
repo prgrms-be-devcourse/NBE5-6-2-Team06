@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>맛남 | 내 맛집 지도</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 14px;
+            color: #333;
+            background-color: #f9f9f9;
+            height: 100%;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+
+        .header-left, .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            padding-bottom: 2px;
+        }
+
+        nav a.active, nav a:hover {
+            border-bottom: 2px solid #000;
+        }
+
+        .btn-primary {
+            background: #000;
+            color: #fff;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        #map {
+            flex: 2;
+            height: 100%;
+        }
+
+        #menu_wrap {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            box-shadow: -3px 0 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .option {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .option input {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .option button {
+            padding: 8px 12px;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form input, form textarea {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        form button[type="submit"] {
+            width: 100%;
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #placesList li {
+            list-style: none;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        #placesList h5 {
+            margin: 0;
+            font-size: 15px;
+        }
+
+        #placesList span {
+            display: block;
+            font-size: 13px;
+            color: #777;
+        }
+
+        #pagination {
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        #pagination a {
+            margin: 0 5px;
+            text-decoration: none;
+            color: #555;
+        }
+
+        #pagination .on {
+            font-weight: bold;
+            color: #000;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 12px;
+            padding: 1rem;
+            background: #fff;
+            border-top: 1px solid #eee;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="header-left">
+        <div class="logo">맛남</div>
+        <nav>
+            <a th:href="@{/}">홈</a>
+            <a th:href="@{/team/list}">모임 찾기</a>
+            <a th:href="@{/map}">맛집 탐색</a>
+            <a th:href="@{/user/mypage}" class="active">마이페이지</a>
+        </nav>
+    </div>
+    <div class="header-right">
+        <span title="알림">🔔</span>
+        <span title="프로필">👤</span>
+        <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+    </div>
+</header>
+
+<div id="main-container">
+    <div id="map"></div>
+    <div id="menu_wrap">
+        <div class="option">
+            <input type="text" id="keyword" placeholder="예: 강남 맛집">
+            <button onclick="searchPlaces()">검색</button>
+        </div>
+
+        <form id="saveForm" onsubmit="savePlace(event)">
+            <h4>📍 맛집 저장</h4>
+            <input type="text" id="placeName" placeholder="상호명" required>
+            <input type="text" id="roadAddress" placeholder="주소" required>
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+            <textarea id="memo" placeholder="메모 (선택)"></textarea>
+            <button type="submit">저장하기</button>
+        </form>
+
+        <ul id="placesList"></ul>
+        <div id="pagination"></div>
+    </div>
+</div>
+
+<footer>© 2025 맛남. 모든 권리 보유.</footer>
+
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f&libraries=services"></script>
+<script>
+    let map, markers = [], myPlaceMarkers = [];
+    const ps = new kakao.maps.services.Places();
+
+    function initMap() {
+        const container = document.getElementById('map');
+        const options = { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 3 };
+        map = new kakao.maps.Map(container, options);
+        loadMyPinnedPlaces();
+    }
+
+    function searchPlaces() {
+        const keyword = document.getElementById('keyword').value.trim();
+        if (!keyword) return alert("검색어를 입력하세요.");
+        ps.keywordSearch(keyword, placesSearchCB);
+    }
+
+    function placesSearchCB(data, status, pagination) {
+        if (status !== kakao.maps.services.Status.OK) return alert("검색 실패");
+        displayPlaces(data);
+        displayPagination(pagination);
+    }
+
+    function displayPlaces(places) {
+        const listEl = document.getElementById('placesList');
+        const bounds = new kakao.maps.LatLngBounds();
+        removeMarkers();
+        listEl.innerHTML = '';
+
+        places.forEach((place, i) => {
+            const pos = new kakao.maps.LatLng(place.y, place.x);
+            const marker = new kakao.maps.Marker({ map, position: pos });
+            markers.push(marker);
+            bounds.extend(pos);
+
+            const el = document.createElement('li');
+            el.innerHTML = `<h5>${place.place_name}</h5><span>${place.road_address_name || place.address_name}</span>`;
+            el.onclick = () => {
+                map.setCenter(pos);
+                fillFormWithPlace(place);
+            };
+            listEl.appendChild(el);
+        });
+
+        map.setBounds(bounds);
+    }
+
+    function removeMarkers() {
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+    }
+
+    function displayPagination(pagination) {
+        const el = document.getElementById('pagination');
+        el.innerHTML = '';
+        for (let i = 1; i <= pagination.last; i++) {
+            const a = document.createElement('a');
+            a.href = "#";
+            a.innerText = i;
+            if (i === pagination.current) a.className = 'on';
+            else a.onclick = () => pagination.gotoPage(i);
+            el.appendChild(a);
+        }
+    }
+
+    function fillFormWithPlace(place) {
+        document.getElementById('placeName').value = place.place_name;
+        document.getElementById('roadAddress').value = place.road_address_name || place.address_name;
+        document.getElementById('latitude').value = place.y;
+        document.getElementById('longitude').value = place.x;
+    }
+
+    function savePlace(e) {
+        e.preventDefault();
+        const body = {
+            placeName: document.getElementById('placeName').value,
+            roadAddress: document.getElementById('roadAddress').value,
+            latitude: parseFloat(document.getElementById('latitude').value),
+            longitude: parseFloat(document.getElementById('longitude').value),
+            memo: document.getElementById('memo').value,
+            pinned: true
+        };
+        fetch('/api/mymap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(res => {
+            if (!res.ok) throw new Error("저장 실패");
+            alert("저장되었습니다!");
+            loadMyPinnedPlaces();
+        }).catch(err => alert("에러 발생: " + err));
+    }
+
+    function loadMyPinnedPlaces() {
+        fetch('/api/mymap/mine')
+            .then(res => res.json())
+            .then(data => {
+                myPlaceMarkers.forEach(m => m.setMap(null));
+                myPlaceMarkers = [];
+
+                data.forEach(place => {
+                    const marker = new kakao.maps.Marker({
+                        map: map,
+                        position: new kakao.maps.LatLng(place.latitude, place.longitude)
+                    });
+
+                    const info = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:5px;font-size:13px;">
+              <b>${place.placeName}</b><br>${place.roadAddress}<br>${place.memo || ''}
+            </div>`
+                    });
+
+                    kakao.maps.event.addListener(marker, 'click', () => {
+                        info.open(map, marker);
+                    });
+
+                    myPlaceMarkers.push(marker);
+                });
+            });
+    }
+
+    window.onload = initMap;
+</script>
+</body>
+</html>
