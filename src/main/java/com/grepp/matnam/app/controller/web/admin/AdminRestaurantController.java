@@ -71,7 +71,6 @@ public class AdminRestaurantController {
         model.addAttribute("page", response);
         model.addAttribute("categories", Category.values());
         model.addAttribute("selectedCategory", categoryKoreanName);
-        model.addAttribute("categoryName", categoryName);
         model.addAttribute("sort", sort);
 
         return "admin/restaurant-management";
