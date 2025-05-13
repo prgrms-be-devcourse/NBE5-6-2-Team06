@@ -29,7 +29,7 @@ public class AdminUserController {
 
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping({"", "/", "/list"})
     public String userManagement(@RequestParam(required = false) Status status,
         @RequestParam(required = false, defaultValue = "") String keyword,
         @RequestParam(required = false, defaultValue = "newest") String sort,
@@ -57,13 +57,24 @@ public class AdminUserController {
         if (param.getPage() != 1 && page.getContent().isEmpty()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
         }
-        PageResponse<UserDto> response = new PageResponse<>("/admin/user?status=" + statusName + "&keyword=" + keyword + "&sort=" + sort, page, 5);
+        PageResponse<UserDto> response = new PageResponse<>("/admin/user/list?status=" + statusName + "&keyword=" + keyword + "&sort=" + sort, page, 5);
 
+        model.addAttribute("activeTab", "user-list");
         model.addAttribute("pageTitle", "사용자 관리");
         model.addAttribute("currentPage", "user-management");
         model.addAttribute("page", response);
         model.addAttribute("status", statusName);
         model.addAttribute("sort", sort);
+
+        return "admin/user-management";
+    }
+
+    @GetMapping("/report")
+    public String userReports(Model model) {
+        // 신고 관리 데이터 조회 등
+        model.addAttribute("activeTab", "user-reports");
+        model.addAttribute("pageTitle", "사용자 관리");
+        model.addAttribute("currentPage", "user-management");
 
         return "admin/user-management";
     }

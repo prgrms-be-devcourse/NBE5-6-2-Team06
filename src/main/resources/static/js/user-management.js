@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             try {
-                const response = await fetch(`/api/admin/user/${userId}`, {
+                const response = await fetch(`/api/admin/user/list/${userId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            fetch(`/api/admin/user/${userId}`, {
+            fetch(`/api/admin/user/list/${userId}`, {
                 method: 'DELETE',
             })
             .then(response => {

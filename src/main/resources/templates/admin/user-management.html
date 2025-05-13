@@ -9,11 +9,14 @@
   <h1>사용자 관리</h1>
   <div class="tab-container">
     <div class="tabs">
-      <div class="tab active" data-tab="user-list">회원 목록</div>
-      <div class="tab" data-tab="user-reports">신고 관리</div>
+      <a th:href="@{/admin/user/list}" class="tab" th:classappend="${activeTab == 'user-list'} ? 'active'"
+         data-tab="user-list">회원 목록</a>
+      <a th:href="@{/admin/user/report}" class="tab"
+         th:classappend="${activeTab == 'user-reports'} ? 'active'" data-tab="user-reports">신고
+        관리</a>
     </div>
 
-    <div class="tab-content active" id="user-list">
+    <div class="tab-content" id="user-list" th:classappend="${activeTab == 'user-list'} ? 'active'" th:if="${activeTab == 'user-list'}">
       <form method="get" action="/admin/user">
         <div class="filter-container">
           <div class="search-filter">
@@ -80,271 +83,271 @@
       </div>
 
       <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
+    </div>
 
-      <!-- 신고 관리 탭 -->
-      <div class="tab-content" id="user-reports">
-        <div class="filter-container">
-          <div class="search-filter">
-            <input type="text" placeholder="신고 내용 검색">
-            <button class="search-btn"><i class="fas fa-search"></i></button>
+    <!-- 신고 관리 탭 -->
+    <div class="tab-content" id="user-reports" th:classappend="${activeTab == 'user-reports'} ? 'active'" th:if="${activeTab == 'user-reports'}">
+      <div class="filter-container">
+        <div class="search-filter">
+          <input type="text" placeholder="신고 내용 검색">
+          <button class="search-btn"><i class="fas fa-search"></i></button>
+        </div>
+        <div class="filter-options">
+          <select id="report-status-filter">
+            <option value="all">모든 상태</option>
+            <option value="pending">대기중</option>
+            <option value="resolved">해결됨</option>
+            <option value="rejected">거부됨</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>신고자</th>
+            <th>대상자</th>
+            <th>내용</th>
+            <th>날짜</th>
+            <th>상태</th>
+            <th>액션</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="report : ${reports}">
+            <td th:text="${report.id}">1</td>
+            <td th:text="${report.reporterName}">김철수</td>
+            <td th:text="${report.targetName}">이영희</td>
+            <td th:text="${report.content}">부적절한 언어 사용</td>
+            <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}">2023-06-15
+              14:30
+            </td>
+            <td><span th:class="'status ' + ${report.status}"
+                      th:text="${report.statusText}">대기중</span></td>
+            <td>
+              <button class="action-btn view" th:data-id="${report.id}"><i class="fas fa-eye"></i>
+              </button>
+              <button th:if="${report.status == 'pending'}" class="action-btn resolve"
+                      th:data-id="${report.id}"><i class="fas fa-check"></i></button>
+              <button th:if="${report.status == 'pending'}" class="action-btn reject"
+                      th:data-id="${report.id}"><i class="fas fa-times"></i></button>
+            </td>
+          </tr>
+          <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
+          <tr th:if="${reports == null || reports.isEmpty()}">
+            <td>1</td>
+            <td>김철수</td>
+            <td>이영희</td>
+            <td>부적절한 언어 사용</td>
+            <td>2023-06-15 14:30</td>
+            <td><span class="status pending">대기중</span></td>
+            <td>
+              <button class="action-btn view"><i class="fas fa-eye"></i></button>
+              <button class="action-btn resolve"><i class="fas fa-check"></i></button>
+              <button class="action-btn reject"><i class="fas fa-times"></i></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 사용자 상태 수정 모달 -->
+  <div class="modal" id="userEditModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>사용자 상태 수정</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="userEditForm">
+          <input type="hidden" id="edit-user-id">
+          <div class="form-group">
+            <label for="edit-user-name">아이디</label>
+            <input type="text" id="edit-user-name" disabled>
           </div>
-          <div class="filter-options">
-            <select id="report-status-filter">
-              <option value="all">모든 상태</option>
-              <option value="pending">대기중</option>
-              <option value="resolved">해결됨</option>
-              <option value="rejected">거부됨</option>
+          <div class="form-group">
+            <label for="edit-user-nickname">닉네임</label>
+            <input type="text" id="edit-user-nickname" disabled>
+          </div>
+          <div class="form-group">
+            <label for="edit-user-email">이메일</label>
+            <input type="email" id="edit-user-email" disabled>
+          </div>
+          <div class="form-group">
+            <label for="edit-user-status">상태</label>
+            <select id="edit-user-status">
+              <option value="ACTIVE">정상</option>
+              <option value="SUSPENDED">정지</option>
+              <option value="BANNED">영구 정지</option>
             </select>
           </div>
-        </div>
-
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-            <tr>
-              <th>ID</th>
-              <th>신고자</th>
-              <th>대상자</th>
-              <th>내용</th>
-              <th>날짜</th>
-              <th>상태</th>
-              <th>액션</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="report : ${reports}">
-              <td th:text="${report.id}">1</td>
-              <td th:text="${report.reporterName}">김철수</td>
-              <td th:text="${report.targetName}">이영희</td>
-              <td th:text="${report.content}">부적절한 언어 사용</td>
-              <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}">2023-06-15
-                14:30
-              </td>
-              <td><span th:class="'status ' + ${report.status}"
-                        th:text="${report.statusText}">대기중</span></td>
-              <td>
-                <button class="action-btn view" th:data-id="${report.id}"><i class="fas fa-eye"></i>
-                </button>
-                <button th:if="${report.status == 'pending'}" class="action-btn resolve"
-                        th:data-id="${report.id}"><i class="fas fa-check"></i></button>
-                <button th:if="${report.status == 'pending'}" class="action-btn reject"
-                        th:data-id="${report.id}"><i class="fas fa-times"></i></button>
-              </td>
-            </tr>
-            <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-            <tr th:if="${reports == null || reports.isEmpty()}">
-              <td>1</td>
-              <td>김철수</td>
-              <td>이영희</td>
-              <td>부적절한 언어 사용</td>
-              <td>2023-06-15 14:30</td>
-              <td><span class="status pending">대기중</span></td>
-              <td>
-                <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                <button class="action-btn resolve"><i class="fas fa-check"></i></button>
-                <button class="action-btn reject"><i class="fas fa-times"></i></button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- 사용자 상태 수정 모달 -->
-    <div class="modal" id="userEditModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>사용자 상태 수정</h2>
-          <span class="close-modal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="userEditForm">
-            <input type="hidden" id="edit-user-id">
+          <div id="suspend-options" style="display: none;">
             <div class="form-group">
-              <label for="edit-user-name">아이디</label>
-              <input type="text" id="edit-user-name" disabled>
-            </div>
-            <div class="form-group">
-              <label for="edit-user-nickname">닉네임</label>
-              <input type="text" id="edit-user-nickname" disabled>
-            </div>
-            <div class="form-group">
-              <label for="edit-user-email">이메일</label>
-              <input type="email" id="edit-user-email" disabled>
-            </div>
-            <div class="form-group">
-              <label for="edit-user-status">상태</label>
-              <select id="edit-user-status">
-                <option value="ACTIVE">정상</option>
-                <option value="SUSPENDED">정지</option>
-                <option value="BANNED">영구 정지</option>
-              </select>
-            </div>
-            <div id="suspend-options" style="display: none;">
-              <div class="form-group">
-                <label for="edit-suspend-duration">정지 기간</label>
-                <select id="edit-suspend-duration">
-                  <option value="1">1일</option>
-                  <option value="3">3일</option>
-                  <option value="7">7일</option>
-                  <option value="15">15일</option>
-                  <option value="30">30일</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="edit-suspend-reason">정지 사유</label>
-                <textarea id="edit-suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button class="secondary-btn cancel-btn">취소</button>
-          <button class="primary-btn save-btn">저장</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 신고 상세 모달 (정지 기한 설정 기능 추가) -->
-    <div class="modal" id="reportViewModal">
-      <div class="modal-content large-modal">
-        <div class="modal-header">
-          <h2>신고 상세 정보</h2>
-          <span class="close-modal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <div class="report-details">
-            <div class="detail-section">
-              <h3>신고 정보</h3>
-              <div class="detail-item">
-                <span class="detail-label">신고 ID:</span>
-                <span class="detail-value" id="report-id">1</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">신고자:</span>
-                <span class="detail-value" id="report-reporter">김철수 (kim@example.com)</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">대상자:</span>
-                <span class="detail-value" id="report-target">이영희 (lee@example.com)</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">신고 내용:</span>
-                <span class="detail-value" id="report-content">부적절한 언어 사용</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">신고일:</span>
-                <span class="detail-value" id="report-date">2023-06-15 14:30</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">상태:</span>
-                <span class="detail-value status pending" id="report-status">대기중</span>
-              </div>
-            </div>
-
-            <div class="detail-section">
-              <h3>대상자 활동 내역</h3>
-              <div class="user-history">
-                <div class="history-tabs">
-                  <div class="history-tab active" data-tab="chat-history">채팅 내역</div>
-                  <div class="history-tab" data-tab="post-history">게시글 내역</div>
-                </div>
-
-                <div class="history-content active" id="chat-history">
-                  <!-- 채팅 내역이 여기에 동적으로 로드됩니다 -->
-                  <div class="chat-message">
-                    <div class="message-header">
-                      <span class="message-sender">이영희</span>
-                      <span class="message-time">2023-06-15 14:25</span>
-                    </div>
-                    <div class="message-content">
-                      <p>부적절한 채팅 내용 예시</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="history-content" id="post-history">
-                  <!-- 게시글 내역이 여기에 동적으로 로드됩니다 -->
-                  <div class="post-item">
-                    <div class="post-header">
-                      <span class="post-title">게시글 제목</span>
-                      <span class="post-time">2023-06-14 20:30</span>
-                    </div>
-                    <div class="post-content">
-                      <p>게시글 내용 예시</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <div class="action-buttons">
-            <button class="secondary-btn reject-btn">거부</button>
-            <button class="warning-btn suspend-btn" id="show-suspend-options">사용자 정지</button>
-            <button class="primary-btn resolve-btn">해결 처리</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 사용자 정지 모달 (새로 추가) -->
-    <div class="modal" id="suspendUserModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>사용자 정지 설정</h2>
-          <span class="close-modal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="suspendUserForm">
-            <input type="hidden" id="suspend-user-id">
-            <input type="hidden" id="suspend-report-id">
-
-            <div class="form-group">
-              <label for="suspend-user-name">대상 사용자</label>
-              <input type="text" id="suspend-user-name" readonly>
-            </div>
-
-            <div class="form-group">
-              <label for="suspend-duration">정지 기간</label>
-              <select id="suspend-duration">
+              <label for="edit-suspend-duration">정지 기간</label>
+              <select id="edit-suspend-duration">
                 <option value="1">1일</option>
                 <option value="3">3일</option>
-                <option value="7" selected>7일</option>
+                <option value="7">7일</option>
                 <option value="15">15일</option>
                 <option value="30">30일</option>
-                <option value="permanent">영구 정지</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label for="suspend-reason">정지 사유</label>
-              <textarea id="suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
+              <label for="edit-suspend-reason">정지 사유</label>
+              <textarea id="edit-suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
             </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-btn">취소</button>
+        <button class="primary-btn save-btn">저장</button>
+      </div>
+    </div>
+  </div>
 
-            <div class="form-group">
-              <label for="suspend-notify">사용자에게 알림</label>
-              <div class="checkbox-item">
-                <input type="checkbox" id="suspend-notify" checked>
-                <label for="suspend-notify">정지 사유와 기간을 사용자에게 이메일로 알림</label>
+  <!-- 신고 상세 모달 (정지 기한 설정 기능 추가) -->
+  <div class="modal" id="reportViewModal">
+    <div class="modal-content large-modal">
+      <div class="modal-header">
+        <h2>신고 상세 정보</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="report-details">
+          <div class="detail-section">
+            <h3>신고 정보</h3>
+            <div class="detail-item">
+              <span class="detail-label">신고 ID:</span>
+              <span class="detail-value" id="report-id">1</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">신고자:</span>
+              <span class="detail-value" id="report-reporter">김철수 (kim@example.com)</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">대상자:</span>
+              <span class="detail-value" id="report-target">이영희 (lee@example.com)</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">신고 내용:</span>
+              <span class="detail-value" id="report-content">부적절한 언어 사용</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">신고일:</span>
+              <span class="detail-value" id="report-date">2023-06-15 14:30</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">상태:</span>
+              <span class="detail-value status pending" id="report-status">대기중</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>대상자 활동 내역</h3>
+            <div class="user-history">
+              <div class="history-tabs">
+                <div class="history-tab active" data-tab="chat-history">채팅 내역</div>
+                <div class="history-tab" data-tab="post-history">게시글 내역</div>
+              </div>
+
+              <div class="history-content active" id="chat-history">
+                <!-- 채팅 내역이 여기에 동적으로 로드됩니다 -->
+                <div class="chat-message">
+                  <div class="message-header">
+                    <span class="message-sender">이영희</span>
+                    <span class="message-time">2023-06-15 14:25</span>
+                  </div>
+                  <div class="message-content">
+                    <p>부적절한 채팅 내용 예시</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="history-content" id="post-history">
+                <!-- 게시글 내역이 여기에 동적으로 로드됩니다 -->
+                <div class="post-item">
+                  <div class="post-header">
+                    <span class="post-title">게시글 제목</span>
+                    <span class="post-time">2023-06-14 20:30</span>
+                  </div>
+                  <div class="post-content">
+                    <p>게시글 내용 예시</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </form>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button class="secondary-btn cancel-btn">취소</button>
-          <button class="danger-btn" id="confirm-suspend-btn">정지 적용</button>
+      </div>
+      <div class="modal-footer">
+        <div class="action-buttons">
+          <button class="secondary-btn reject-btn">거부</button>
+          <button class="warning-btn suspend-btn" id="show-suspend-options">사용자 정지</button>
+          <button class="primary-btn resolve-btn">해결 처리</button>
         </div>
       </div>
     </div>
   </div>
 
-  <th:block layout:fragment="script">
-    <script th:src="@{/js/user-management.js}"></script>
-  </th:block>
+  <!-- 사용자 정지 모달 (새로 추가) -->
+  <div class="modal" id="suspendUserModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>사용자 정지 설정</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="suspendUserForm">
+          <input type="hidden" id="suspend-user-id">
+          <input type="hidden" id="suspend-report-id">
+
+          <div class="form-group">
+            <label for="suspend-user-name">대상 사용자</label>
+            <input type="text" id="suspend-user-name" readonly>
+          </div>
+
+          <div class="form-group">
+            <label for="suspend-duration">정지 기간</label>
+            <select id="suspend-duration">
+              <option value="1">1일</option>
+              <option value="3">3일</option>
+              <option value="7" selected>7일</option>
+              <option value="15">15일</option>
+              <option value="30">30일</option>
+              <option value="permanent">영구 정지</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="suspend-reason">정지 사유</label>
+            <textarea id="suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="suspend-notify">사용자에게 알림</label>
+            <div class="checkbox-item">
+              <input type="checkbox" id="suspend-notify" checked>
+              <label for="suspend-notify">정지 사유와 기간을 사용자에게 이메일로 알림</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-btn">취소</button>
+        <button class="danger-btn" id="confirm-suspend-btn">정지 적용</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<th:block layout:fragment="script">
+  <script th:src="@{/js/user-management.js}"></script>
+</th:block>
 </body>
 </html>

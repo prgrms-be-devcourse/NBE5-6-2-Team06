@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserApiController {
     private final UserService userService;
 
-    @PatchMapping("/{userId}")
+    @PatchMapping("/list/{userId}")
     public ResponseEntity<?> updateUserStatus(@PathVariable String userId,
         @RequestBody UserStatusRequest request) {
 
@@ -40,7 +40,7 @@ public class AdminUserApiController {
         return ResponseEntity.ok("사용자 상태가 수정되었습니다.");
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/list/{userId}")
     public ResponseEntity<?> unActivatedUser(@PathVariable String userId) {
         userService.unActivatedById(userId);
         return ResponseEntity.ok("사용자가 비활성화되었습니다.");
