@@ -1,13 +1,11 @@
 package com.grepp.matnam.app.controller.api.admin.payload;
 
-import com.grepp.matnam.app.controller.api.admin.annotation.AtLeastOneMoodSelected;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-@AtLeastOneMoodSelected
 public class RestaurantRequest {
 
     @NotBlank

@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.controller.api.admin.validator.RestaurantRequestValidator;
 import com.grepp.matnam.app.model.restaurant.RestaurantService;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
@@ -13,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +30,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminRestaurantApiController {
+
     private final RestaurantService restaurantService;
+
+    @InitBinder("restaurantRequest")
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(new RestaurantRequestValidator());
+    }
 
     @GetMapping("/{restaurantId}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurant(@PathVariable Long restaurantId) {
@@ -60,7 +69,8 @@ public class AdminRestaurantApiController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request,
+        BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();

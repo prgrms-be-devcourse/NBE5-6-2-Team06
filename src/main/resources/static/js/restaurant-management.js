@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // 폼 초기화
             document.getElementById('restaurantForm').reset();
             document.getElementById('restaurant-id').value = '';
-            document.querySelector('#error-mood').textContent = "";
 
             // 모달 표시
             document.getElementById('restaurantModal').style.display = 'block';
@@ -73,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         checkbox.checked = false;
                     }
                 });
-                document.querySelector('#error-mood').textContent = "";
 
                 // 모달 표시
                 document.getElementById('restaurantModal').style.display = 'block';
@@ -89,8 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 새 식당 추가 - 저장 버튼 클릭 이벤트
     document.getElementById('save-button').addEventListener('click', function () {
         const restaurantId = document.getElementById('restaurant-id').value;
-
-        const moodValues = Array.from(document.querySelectorAll('input[name="restaurant-mood"]:checked'));
 
         const payload = {
             name: document.getElementById('restaurant-name').value,
@@ -142,9 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
                 document.querySelector('#error-naver-rating').textContent = errorMessages.naverRating;
                 document.querySelector('#error-kakao-rating').textContent = errorMessages.kakaoRating;
-                if (moodValues.length < 1) {
-                    document.querySelector('#error-mood').textContent = "최소 1개 이상의 분위기를 선택해주세요.";
-                }
                 alert('필수 항목을 모두 입력해주세요.');
             }
         })
