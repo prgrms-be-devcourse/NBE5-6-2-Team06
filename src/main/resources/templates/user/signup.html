@@ -160,14 +160,14 @@
     <div class="logo">맛남</div>
     <nav>
       <a th:href="@{/}">홈</a>
-      <a th:href="@{/meetings}">모임 찾기</a>
-      <a th:href="@{/restaurants}">맛집 탐색</a>
+      <a th:href="@{/team/teamSearch.html}">모임 찾기</a>
+      <a th:href="@{restaurants/restaurant.html}">맛집 탐색</a>
     </nav>
   </div>
   <div class="header-right">
     <span title="알림">🔔</span>
     <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/meeting/create} + '\''">모임 만들기</button>
+    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
   </div>
 </header>
 

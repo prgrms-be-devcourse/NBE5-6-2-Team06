@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("api/team")
+@RequestMapping("/team")
 @RequiredArgsConstructor
 @Slf4j
 public class TeamController {
@@ -48,11 +48,11 @@ public class TeamController {
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);
 
-        return "redirect:/team";
+        return "redirect:/team/search";
     }
 
     // 모임 상세 조회
-    @GetMapping("/{teamId}")
+    @GetMapping("/detail/{teamId}")
     public String getTeamDetail(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamById(teamId);
         model.addAttribute("team", team);
@@ -60,25 +60,25 @@ public class TeamController {
     }
 
     // 모임 수정
-    @PatchMapping("/{teamId}")
+    @PatchMapping("/detail/{teamId}")
     public String updateTeam(@PathVariable Long teamId, @ModelAttribute Team team) {
         team.setTeamId(teamId);
         teamService.saveTeam(team);
-        return "redirect:/teamPage/" + teamId;
+        return "redirect:/team/{teamId}/detail" + teamId;
     }
 
     // 모임 삭제
-    @DeleteMapping("/{teamId}")
+    @DeleteMapping("/detail/{teamId}")
     public String deleteTeam(@PathVariable Long teamId) {
         teamService.deleteTeam(teamId);
-        return "redirect:/teamSearch";
+        return "redirect:/team/search";
     }
 
     // 모임 상태 변경
     @PatchMapping("/{teamId}/status")
     public String changeTeamStatus(@PathVariable Long teamId, @RequestParam Status status) {
         teamService.changeTeamStatus(teamId, status);
-        return "redirect:/teamPage/" + teamId;
+        return "redirect:/team/{teamId}/detail" + teamId;
     }
 
 
@@ -87,7 +87,7 @@ public class TeamController {
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = teamService.getUserById(userId);
         teamService.addParticipant(teamId, user);
-        return "redirect:/teamDetail/" + teamId;
+        return "redirect:/team/{teamId}/detail" + teamId;
     }
 
 
@@ -118,7 +118,7 @@ public class TeamController {
     public String changeParticipantStatus(@PathVariable Long participantId, @RequestParam
     ParticipantStatus status) {
         teamService.changeParticipantStatus(participantId, status);
-        return "redirect:/team/" + participantId;
+        return "redirect:/team/{teamId}/detail" + participantId;
     }
 
     // 전체 모임 조회
