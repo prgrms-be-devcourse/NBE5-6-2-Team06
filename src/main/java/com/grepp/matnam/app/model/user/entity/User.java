@@ -12,10 +12,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@ToString(exclude = {"preference", "maps", "participants"})
 public class User extends BaseEntity {
 
     @Id

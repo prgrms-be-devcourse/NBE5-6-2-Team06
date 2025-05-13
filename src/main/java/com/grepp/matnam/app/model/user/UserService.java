@@ -1,17 +1,28 @@
 package com.grepp.matnam.app.model.user;
 
-import com.grepp.matnam.app.model.auth.code.Role;
-import com.grepp.matnam.app.model.user.code.Status;
+import com.grepp.matnam.app.model.user.dto.UserDto;
 import com.grepp.matnam.app.model.user.entity.User;
+import com.grepp.matnam.app.model.user.code.Status;
+import com.grepp.matnam.app.model.auth.code.Role;
+import java.util.List;
+import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+import org.springframework.util.StringUtils;
+
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     @Autowired
@@ -19,6 +30,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private final ModelMapper mapper;
+
 
     public User signup(User user) {
         log.info("회원가입 시도: " + user.getUserId() + ", 이메일: " + user.getEmail());
@@ -121,5 +135,21 @@ public class UserService {
         log.info("비밀번호 변경 완료: " + updatedUser.getUserId());
 
         return updatedUser;
+    }
+
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream().map(e-> mapper.map(e, UserDto.class)).toList();
+    }
+
+    public Page<UserDto> findByFilter(String status, String keyword, Pageable pageable) {
+        if (!status.isBlank() && StringUtils.hasText(keyword)) {
+            return userRepository.findByStatusAndKeywordContaining(status, keyword, pageable);
+        } else if (!status.isBlank()) {
+            return userRepository.findByStatus(status, pageable);
+        } else if (StringUtils.hasText(keyword)) {
+            return userRepository.findByKeywordContaining(keyword, pageable);
+        } else {
+            return userRepository.findAllUsers(pageable);
+        }
     }
 }
