@@ -12,6 +12,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -31,6 +33,9 @@ public class TeamReview extends BaseEntity {
     @Column(nullable = false)
     private String reviewee;
 
-
     private Double rating;
+
+    public LocalDateTime createdAt() {
+        return this.createdAt;
+    }
 }
