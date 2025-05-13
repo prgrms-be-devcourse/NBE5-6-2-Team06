@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
+<head>
+    <title>대시보드</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h1>대시보드</h1>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>총 회원 수</h3>
+                    <p class="stat-number" th:text="${totalUsers ?: 1245}">1,245</p>
+                    <p class="stat-change positive" th:text="${userGrowth ?: '+12%'}">+12% <i class="fas fa-arrow-up"></i></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>오늘 이용 회원</h3>
+                    <p class="stat-number" th:text="${todayActiveUsers ?: 87}">87</p>
+                    <p class="stat-change positive" th:text="${activeUserGrowth ?: '+5%'}">+5% <i class="fas fa-arrow-up"></i></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>오늘 이용 비회원</h3>
+                    <p class="stat-number" th:text="${todayGuestUsers ?: 32}">32</p>
+                    <p class="stat-change negative" th:text="${guestUserGrowth ?: '-2%'}">-2% <i class="fas fa-arrow-down"></i></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>활성 모임</h3>
+                    <p class="stat-number" th:text="${activeMeetings ?: 56}">56</p>
+                    <p class="stat-change positive" th:text="${meetingGrowth ?: '+8%'}">+8% <i class="fas fa-arrow-up"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart">
+                <h3>사용자 활동 추이</h3>
+                <canvas id="userActivityChart"></canvas>
+            </div>
+            <div class="chart">
+                <h3>모임 성공률</h3>
+                <canvas id="meetingSuccessChart"></canvas>
+            </div>
+        </div>
+
+        <div class="recent-activities">
+            <h3>최근 활동</h3>
+            <div class="activity-list">
+                <div class="activity-item" th:each="activity : ${recentActivities}">
+                    <div class="activity-icon">
+                        <i th:class="${activity.icon ?: 'fas fa-user-plus'}"></i>
+                    </div>
+                    <div class="activity-details">
+                        <p th:utext="${activity.description ?: '새로운 회원 가입: <strong>김철수</strong>'}">새로운 회원 가입: <strong>김철수</strong></p>
+                        <span class="activity-time" th:text="${activity.time ?: '10분 전'}">10분 전</span>
+                    </div>
+                </div>
+                <!-- 기본 활동 데이터 (서버에서 데이터가 없을 경우) -->
+                <div class="activity-item" th:if="${recentActivities == null || recentActivities.isEmpty()}">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-details">
+                        <p>새로운 회원 가입: <strong>김철수</strong></p>
+                        <span class="activity-time">10분 전</span>
+                    </div>
+                </div>
+                <div class="activity-item" th:if="${recentActivities == null || recentActivities.isEmpty()}">
+                    <div class="activity-icon">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <div class="activity-details">
+                        <p>신고 접수: <strong>부적절한 채팅</strong></p>
+                        <span class="activity-time">30분 전</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/dashboard.js}"></script>
+    </th:block>
+</body>
+</html>

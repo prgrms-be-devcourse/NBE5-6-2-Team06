@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <header th:fragment="header" class="header">
+        <div class="search-bar">
+            <input type="text" placeholder="검색...">
+            <i class="fas fa-search"></i>
+        </div>
+        <div class="admin-profile">
+            <div class="notification">
+                <i class="fas fa-flag"></i>
+                <span class="badge" th:text="${reportCount ?: 0}">3</span>
+            </div>
+            <div class="notification">
+                <i class="fas fa-bell"></i>
+                <span class="badge" th:text="${notificationCount ?: 0}">5</span>
+            </div>
+            <div class="profile">
+                <img th:src="${adminProfile ?: '/images/default-profile.png'}" alt="Admin Profile">
+                <span th:text="${adminName ?: '관리자'}">관리자</span>
+            </div>
+        </div>
+    </header>
+</body>
+</html>

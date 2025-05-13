@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+</head>
+<body>
+<div th:fragment="pagination" class="pagination">
+  <a class="page-btn prev" th:disabled="${currentPage == 1}"
+     th:href="@{${page.url()}(page=${page.prevPage()})}"><i class="fas fa-chevron-left"></i></a>
+  <th:block th:each="num : ${#numbers.sequence(page.startNumber(), page.endNumber())}">
+    <a class="page-btn" th:href="@{${page.url()}(page=${num})}" th:text="${num}">1</a>
+  </th:block>
+  <a class="page-btn next" th:disabled="${currentPage == totalPages}"
+     th:href="@{${page.url()}(page=${page.nextPage()})}"><i class="fas fa-chevron-right"></i></a>
+</div>
+</body>
+</html>

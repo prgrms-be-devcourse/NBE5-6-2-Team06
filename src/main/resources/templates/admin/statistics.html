@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
+<head>
+    <title>통계 및 분석</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h1>통계 및 분석</h1>
+        <div class="tab-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="user-stats">사용자 통계</div>
+                <div class="tab" data-tab="success-rate">성공률 분석</div>
+            </div>
+            
+            <div class="tab-content active" id="user-stats">
+                <div class="filter-container">
+                    <div class="date-filter">
+                        <label>기간:</label>
+                        <select id="period-filter">
+                            <option value="7days">최근 7일</option>
+                            <option value="30days">최근 30일</option>
+                            <option value="90days">최근 90일</option>
+                            <option value="1year">최근 1년</option>
+                            <option value="custom">직접 설정</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="chart-container">
+                        <h3>연령대별 사용자 분포</h3>
+                        <canvas id="ageDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>성별 사용자 분포</h3>
+                        <canvas id="genderDistributionChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>일일 활성 사용자</h3>
+                        <canvas id="dailyActiveUsersChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>신규 가입자 추이</h3>
+                        <canvas id="newUsersChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3>사용자 통계 요약</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>구분</th>
+                                <th>총 회원 수</th>
+                                <th>활성 회원</th>
+                                <th>신규 가입자 (30일)</th>
+                                <th>평균 접속 시간</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>전체</td>
+                                <td th:text="${totalUsers ?: 1245}">1,245</td>
+                                <td th:text="${activeUsers ?: 980}">980</td>
+                                <td th:text="${newUsers ?: 120}">120</td>
+                                <td th:text="${avgSessionTime ?: '25분'}">25분</td>
+                            </tr>
+                            <tr>
+                                <td>남성</td>
+                                <td th:text="${totalMaleUsers ?: 685}">685</td>
+                                <td th:text="${activeMaleUsers ?: 540}">540</td>
+                                <td th:text="${newMaleUsers ?: 65}">65</td>
+                                <td th:text="${avgMaleSessionTime ?: '28분'}">28분</td>
+                            </tr>
+                            <tr>
+                                <td>여성</td>
+                                <td th:text="${totalFemaleUsers ?: 560}">560</td>
+                                <td th:text="${activeFemaleUsers ?: 440}">440</td>
+                                <td th:text="${newFemaleUsers ?: 55}">55</td>
+                                <td th:text="${avgFemaleSessionTime ?: '22분'}">22분</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="success-rate">
+                <div class="filter-container">
+                    <div class="date-filter">
+                        <label>기간:</label>
+                        <select id="success-period-filter">
+                            <option value="30days">최근 30일</option>
+                            <option value="90days">최근 90일</option>
+                            <option value="1year">최근 1년</option>
+                            <option value="custom">직접 설정</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="chart-container large">
+                        <h3>모임 성공률 추이</h3>
+                        <canvas id="meetingSuccessRateChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>카테고리별 성공률</h3>
+                        <canvas id="categorySuccessRateChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>인원수별 성공률</h3>
+                        <canvas id="memberCountSuccessRateChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3>성공률 상위 모임 주최자</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>순위</th>
+                                <th>사용자</th>
+                                <th>모임 수</th>
+                                <th>성공 모임</th>
+                                <th>성공률</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="host, stat : ${topHosts}">
+                                <td th:text="${stat.count}">1</td>
+                                <td th:text="${host.name}">김철수</td>
+                                <td th:text="${host.totalMeetings}">15</td>
+                                <td th:text="${host.successfulMeetings}">14</td>
+                                <td th:text="${host.successRate + '%'}">93.3%</td>
+                            </tr>
+                            <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
+                            <tr th:if="${topHosts == null || topHosts.isEmpty()}">
+                                <td>1</td>
+                                <td>김철수</td>
+                                <td>15</td>
+                                <td>14</td>
+                                <td>93.3%</td>
+                            </tr>
+                            <tr th:if="${topHosts == null || topHosts.isEmpty()}">
+                                <td>2</td>
+                                <td>박지민</td>
+                                <td>12</td>
+                                <td>11</td>
+                                <td>91.7%</td>
+                            </tr>
+                            <tr th:if="${topHosts == null || topHosts.isEmpty()}">
+                                <td>3</td>
+                                <td>이영희</td>
+                                <td>10</td>
+                                <td>9</td>
+                                <td>90.0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="script">
+        <script th:src="@{/js/statistics.js}"></script>
+    </th:block>
+</body>
+</html>

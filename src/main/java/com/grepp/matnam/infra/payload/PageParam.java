@@ -8,5 +8,5 @@ public class PageParam{
     @Min(1)
     private int page = 1;
     @Min(1)
-    private int size = 2;
+    private int size = 5;
 }
