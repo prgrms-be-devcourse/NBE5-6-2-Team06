@@ -104,7 +104,7 @@ public class TeamService {
 
     // 참여자로서의 팀 조회
     public List<Team> getTeamsByParticipant(String userId) {
-        return teamRepository.findTeamsByParticipants_User_UserId(userId);  // 수정된 메서드 사용
+        return teamRepository.findTeamsByParticipants_User_UserId(userId);
     }
 
     // 특정 사용자와 팀 ID로 참여자 조회

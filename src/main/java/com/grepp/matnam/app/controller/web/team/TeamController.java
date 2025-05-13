@@ -71,7 +71,6 @@ public class TeamController {
 
         String userNickname = user.getNickname();
 
-        // 팀 정보와 사용자 정보를 모델에 추가
         model.addAttribute("teamId", teamId);
         model.addAttribute("userId", userId);
         model.addAttribute("userNickname", userNickname);
