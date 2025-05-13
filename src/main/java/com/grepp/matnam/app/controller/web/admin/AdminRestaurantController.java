@@ -31,7 +31,7 @@ public class AdminRestaurantController {
 
     @GetMapping
     public String restaurantManagement(@RequestParam(required = false) Category category,
-        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false, defaultValue = "") String keyword,
         @RequestParam(required = false, defaultValue = "newest") String sort,
         @Valid PageParam param, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
