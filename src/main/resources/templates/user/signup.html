@@ -249,12 +249,6 @@
 </footer>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof window.auth === 'undefined') {
-      console.error('auth.js가 로드되지 않았습니다. 페이지에 auth.js를 포함해주세요.');
-    }
-  });
-
   document.getElementById('signupForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -293,28 +287,18 @@
       if (response.ok) {
         alert('회원가입이 완료되었습니다!');
 
-        if (result.data && result.data.token) {
-          localStorage.setItem('jwtToken', result.data.token);
-          localStorage.setItem('userId', result.data.userId);
-          localStorage.setItem('userRole', result.data.role);
-          console.log('저장된 토큰:', result.data.token);
-        } else {
-          console.error('토큰이 응답에 없습니다:', result);
-        }
-
         window.location.href = '/user/preference';
       } else {
-        if (result.message.includes('이메일')) {
+        if (result.message && result.message.includes('이메일')) {
           document.getElementById('emailError').textContent = result.message;
-        } else if (result.message.includes('아이디')) {
+        } else if (result.message && result.message.includes('아이디')) {
           document.getElementById('userIdError').textContent = result.message;
         } else {
           alert(result.message || '회원가입 중 오류가 발생했습니다.');
         }
       }
     } catch (error) {
-      console.error('Error during signup:', error);
-      alert('서버와 통신 중 오류가 발생했습니다.');
+      alert('서버와 통신 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   });
 </script>

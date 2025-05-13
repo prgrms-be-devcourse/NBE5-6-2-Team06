@@ -38,7 +38,27 @@ public class UserController {
     }
 
     @GetMapping("/preference")
-    public String preference() {
+    public String preference(HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || "anonymousUser".equals(authentication.getName())) {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                boolean hasJwtToken = false;
+                for (Cookie cookie : cookies) {
+                    if ("jwtToken".equals(cookie.getName())) {
+                        hasJwtToken = true;
+                        break;
+                    }
+                }
+                if (!hasJwtToken) {
+                    return "redirect:/user/signin";
+                }
+            } else {
+                return "redirect:/user/signin";
+            }
+        }
+
         return "user/preference";
     }
 
