@@ -108,19 +108,19 @@
 <header>
   <div><a href="/" style="text-decoration:none; color:black; font-weight:bold;">맛남</a></div>
   <nav>
-    <a th:href="@{/home}">홈</a>
-    <a th:href="@{/meetings}">모임 찾기</a>
-    <a th:href="@{/restaurants}">맛집 탐색</a>
-    <a th:href="@{/profile}">마이페이지</a>
+    <a th:href="@{/}">홈</a>
+    <a th:href="@{/teamSearch.html}">모임 찾기</a>
+    <a th:href="@{/restaurants/restaurant.html}">맛집 탐색</a>
+    <a th:href="@{/user/mypage.html}">마이페이지</a>
   </nav>
   <div class="header-buttons">
-    <button th:onclick="'location.href=\\'' + @{/meeting/create} + '\\''">모임 만들기</button>
+    <button th:onclick="'location.href=\'' + @{/team/teamCreate} + '\''">모임 만들기</button>
   </div>
 </header>
 
 <div class="container">
   <h1>모임 만들기</h1>
-  <form th:action="@{/meetings/create}" method="post" enctype="multipart/form-data">
+  <form th:action="@{/teamCreate.html}" method="post" enctype="multipart/form-data">
     <div class="section">
       <label>모임 제목</label>
       <input type="text" name="title" placeholder="모임 제목을 입력하세요" required>
