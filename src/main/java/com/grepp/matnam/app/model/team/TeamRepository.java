@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
 
     // 참여자가 userId인 팀 조회
     List<Team> findTeamsByParticipants_User_UserId(String userId);
+
 
 }

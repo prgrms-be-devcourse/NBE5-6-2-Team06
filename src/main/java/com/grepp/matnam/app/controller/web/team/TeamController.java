@@ -3,12 +3,15 @@ package com.grepp.matnam.app.controller.web.team;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
+import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class TeamController {
 
     private final TeamService teamService;
+    private final UserService userService;
 
     @GetMapping("/search")
     public String search() {
@@ -51,27 +55,47 @@ public class TeamController {
         return "redirect:/team/search";
     }
 
+    // 팀 페이지 조회
+    @GetMapping("/teamPage/{teamId}")
+    public String getTeamPage(@PathVariable Long teamId, Model model) {
+        Team team = teamService.getTeamById(teamId);
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String userNickname = team.getUser().getNickname();
+
+        model.addAttribute("team", team);
+        model.addAttribute("teamId", teamId);
+        model.addAttribute("userId", userId);
+        model.addAttribute("userNickname", userNickname);
+
+        return "team/teamPage";
+    }
+
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
     public String getTeamDetail(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamById(teamId);
+
         model.addAttribute("team", team);
+
         return "team/teamDetail";
     }
+
+
 
     // 모임 수정
     @PatchMapping("/detail/{teamId}")
     public String updateTeam(@PathVariable Long teamId, @ModelAttribute Team team) {
         team.setTeamId(teamId);
         teamService.saveTeam(team);
-        return "redirect:/team/{teamId}/detail" + teamId;
+        return "redirect:/team/" + teamId + "/detail";
     }
 
     // 모임 삭제
     @DeleteMapping("/detail/{teamId}")
     public String deleteTeam(@PathVariable Long teamId) {
         teamService.deleteTeam(teamId);
-        return "redirect:/team/search";
+        return "redirect:/team/" + teamId + "/detail";
     }
 
     // 모임 상태 변경
@@ -106,20 +130,25 @@ public class TeamController {
     }
 
     // 참여자 목록 조회(팀 페이지?)
-    @GetMapping("/{teamId}/participants")
-    public String getParticipants(@PathVariable Long teamId, Model model) {
-        Team team = teamService.getTeamById(teamId);
-        model.addAttribute("participants", team.getParticipants());
+    @GetMapping("/{teamId}/{userId}/participants")
+    public String getParticipants(@PathVariable Long teamId, @PathVariable String userId, Model model) {
+        Participant participant = teamService.getParticipant(userId, teamId);
+        model.addAttribute("teamId", teamId);
+        model.addAttribute("participants", participant.getTeam().getParticipants());
         return "team/teamPage";
     }
 
     // 참여자 상태 변경
     @PatchMapping("/{participantId}/participantStatus")
-    public String changeParticipantStatus(@PathVariable Long participantId, @RequestParam
-    ParticipantStatus status) {
+    public String changeParticipantStatus(@PathVariable Long participantId, @RequestParam ParticipantStatus status) {
         teamService.changeParticipantStatus(participantId, status);
-        return "redirect:/team/{teamId}/detail" + participantId;
+
+        Participant participant = teamService.getParticipantById(participantId);
+        Long teamId = participant.getTeam().getTeamId();
+
+        return "redirect:/team/" + teamId + "/detail";
     }
+
 
     // 전체 모임 조회
     @GetMapping("/all/{userId}")

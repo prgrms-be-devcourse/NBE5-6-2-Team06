@@ -82,10 +82,6 @@ public class TeamService {
 
     }
 
-    public Team getTeamById(Long teamId) {
-        return null;
-    }
-
 
     // userId로 속한 팀 목록 조회
     public List<Team> getUserTeams(String userId) {
@@ -104,7 +100,8 @@ public class TeamService {
 
     // 특정 사용자와 팀 ID로 참여자 조회
     public Participant getParticipant(String userId, Long teamId) {
-        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+        // teamRepository를 사용하여 Participant를 조회
+        return participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);  // participantRepository로 수정
     }
 
     // 사용자 정보 조회
@@ -113,5 +110,13 @@ public class TeamService {
             .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+
+    public Team getTeamById(Long teamId) {
+        return null;
+    }
+
+    public Participant getParticipantById(Long participantId) {
+        return participantRepository.findById(participantId).orElse(null);
+    }
 
 }
