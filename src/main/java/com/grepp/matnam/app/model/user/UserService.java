@@ -1,15 +1,13 @@
 package com.grepp.matnam.app.model.user;
 
-import com.grepp.matnam.app.model.user.entity.User;
-import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.auth.code.Role;
+import com.grepp.matnam.app.model.user.code.Status;
+import com.grepp.matnam.app.model.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -51,14 +49,6 @@ public class UserService {
 
     public User signin(String userId, String password) {
         log.info("로그인 시도: " + userId);
-        log.info("UserId 타입: " + userId.getClass().getName());
-
-        Optional<User> userOptional = userRepository.findByUserId(userId);
-        if (userOptional.isPresent()) {
-            log.info("사용자 발견: " + userOptional.get().getUserId());
-        } else {
-            log.info("사용자를 찾을 수 없음: " + userId);
-        }
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> {
@@ -66,9 +56,9 @@ public class UserService {
                     return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
                 });
 
-        if (user.getStatus() != Status.ACTIVE) {
+        if (user.getStatus() != Status.ACTIVE || !user.isActivated()) {
             log.info("로그인 실패: 비활성화된 계정 - " + userId + ", 상태=" + user.getStatus());
-            throw new IllegalArgumentException("비활성화된 계정입니다.");
+            throw new IllegalArgumentException("비활성화(탈퇴) 계정입니다.");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -78,5 +68,58 @@ public class UserService {
 
         log.info("로그인 성공: " + userId);
         return user;
+    }
+
+    public User deactivateAccount(String userId, String password) {
+        log.info("회원 탈퇴 시도: " + userId);
+
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    log.info("회원 탈퇴 실패: 사용자 없음 - " + userId);
+                    return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+                });
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            log.info("회원 탈퇴 실패: 비밀번호 불일치 - " + userId);
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        user.unActivated();
+
+        User updatedUser = userRepository.save(user);
+        log.info("회원 탈퇴 완료: " + updatedUser.getUserId());
+
+        return updatedUser;
+    }
+
+    public User getUserById(String userId) {
+        log.info("사용자 정보 조회: " + userId);
+        return userRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    log.info("사용자 정보 조회 실패: 사용자 없음 - " + userId);
+                    return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+                });
+    }
+
+    public User changePassword(String userId, String currentPassword, String newPassword) {
+        log.info("비밀번호 변경 시도: " + userId);
+
+        User user = userRepository.findByUserId(userId)
+                .orElseThrow(() -> {
+                    log.info("비밀번호 변경 실패: 사용자 없음 - " + userId);
+                    return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
+                });
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            log.info("비밀번호 변경 실패: 현재 비밀번호 불일치 - " + userId);
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        User updatedUser = userRepository.save(user);
+        log.info("비밀번호 변경 완료: " + updatedUser.getUserId());
+
+        return updatedUser;
     }
 }

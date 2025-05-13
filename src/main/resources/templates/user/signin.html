@@ -140,6 +140,7 @@
       margin-bottom: 1rem;
     }
   </style>
+  <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 
@@ -207,6 +208,7 @@
     };
 
     try {
+      console.log('로그인 시도:', loginData);
       const response = await fetch('/api/user/signin', {
         method: 'POST',
         headers: {
@@ -215,13 +217,14 @@
         body: JSON.stringify(loginData)
       });
 
+      console.log('응답 상태:', response.status);
       const result = await response.json();
+      console.log('응답 데이터:', result);
 
       if (response.ok) {
         if (result.data && result.data.token) {
-          localStorage.setItem('jwtToken', result.data.token);
-          localStorage.setItem('userId', result.data.userId);
-          localStorage.setItem('userRole', result.data.role);
+          auth.setCookie('userId', result.data.userId);
+          auth.setCookie('userRole', result.data.role);
         }
 
         alert('로그인에 성공했습니다!');
@@ -240,7 +243,7 @@
         }
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error('로그인 오류 상세:', error);
       document.getElementById('userIdError').textContent = '서버와 통신 중 오류가 발생했습니다.';
     }
   });
