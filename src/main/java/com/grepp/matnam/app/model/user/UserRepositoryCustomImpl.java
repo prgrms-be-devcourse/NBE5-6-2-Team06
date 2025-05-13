@@ -31,6 +31,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         List<User> content = queryFactory
             .select(user)
             .from(user)
+            .where(user.activated)
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -38,6 +39,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         JPAQuery<Long> countQuery = queryFactory
             .select(user.count())
+            .where(user.activated)
             .from(user);
 
         List<UserDto> result = content.stream().map(e -> mapper.map(e, UserDto.class)).toList();
@@ -61,6 +63,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         List<User> content = queryFactory
             .select(user)
             .from(user)
+            .where(user.activated)
             .where(builder.and(user.status.eq(Status.valueOf(status))))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -69,6 +72,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         JPAQuery<Long> countQuery = queryFactory
             .select(user.count())
+            .where(user.activated)
             .where(builder.and(user.status.eq(Status.valueOf(status))))
             .from(user);
 
@@ -83,6 +87,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         List<User> content = queryFactory
             .select(user)
             .from(user)
+            .where(user.activated)
             .where(user.status.eq(Status.valueOf(status)))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -91,6 +96,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         JPAQuery<Long> countQuery = queryFactory
             .select(user.count())
+            .where(user.activated)
             .where(user.status.eq(Status.valueOf(status)))
             .from(user);
 
@@ -114,6 +120,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
         List<User> content = queryFactory
             .select(user)
             .from(user)
+            .where(user.activated)
             .where(builder)
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -122,6 +129,7 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
         JPAQuery<Long> countQuery = queryFactory
             .select(user.count())
+            .where(user.activated)
             .where(builder)
             .from(user);
 

@@ -104,6 +104,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 사용자 비활성화(삭제) 버튼 클릭 이벤트
+    document.querySelectorAll('.action-btn.delete').forEach(button => {
+        button.addEventListener('click', function () {
+            const userId = this.getAttribute('data-id');
+
+            if (!confirm('정말로 이 사용자를 비활성화하시겠습니까?')) {
+                return;
+            }
+
+            fetch(`/api/admin/user/${userId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    response.text().then(text => { alert(text)});
+                    window.location.reload(); // 페이지 새로고침
+                } else {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('사용자 비활성화 중 문제가 발생했습니다.');
+            });
+        });
+    });
+
     // 신고 상세 보기 버튼 클릭 이벤트
     const viewReportButtons = document.querySelectorAll('.action-btn.view');
     viewReportButtons.forEach(button => {

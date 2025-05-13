@@ -173,4 +173,12 @@ public class UserService {
 
         userRepository.save(user);
     }
+
+    public void unActivatedById(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.unActivated();
+        userRepository.save(user);
+    }
 }

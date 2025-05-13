@@ -41,9 +41,9 @@ public class AdminUserApiController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
-//        restaurantService.deleteById(restaurantId);
-        return ResponseEntity.ok("사용자가 삭제되었습니다.");
+    public ResponseEntity<?> unActivatedUser(@PathVariable String userId) {
+        userService.unActivatedById(userId);
+        return ResponseEntity.ok("사용자가 비활성화되었습니다.");
     }
 
 }
