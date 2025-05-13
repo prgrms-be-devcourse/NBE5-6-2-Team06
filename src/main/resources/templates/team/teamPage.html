@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>맛남 | 팀 페이지</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    nav a {
+      margin-right: 1rem;
+      text-decoration: none;
+      color: #333;
+      font-size: 0.9rem;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .section h2 {
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+    .participant-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .participant {
+      flex: 1 1 200px;
+      background: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .chat-box, .recommendation-box {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .input-group {
+      display: flex;
+      margin-top: 1rem;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .input-group button {
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <h1>맛남</h1>
+  </div>
+  <nav>
+    <a href="/mypage">마이페이지</a>
+    <a href="/logout">로그아웃</a>
+  </nav>
+</header>
+<div class="container">
+  <div class="section">
+    <h2>방장 정보</h2>
+    <div class="participant-list">
+      <div class="participant">방장</div>
+    </div>
+  </div>
+  <div class="section">
+    <h2>참여자 정보</h2>
+    <div class="participant-list">
+      <div class="participant">참여자 1</div>
+      <div class="participant">참여자 2</div>
+      <div class="participant">참여자 3</div>
+      <a th:href="@{/team/{teamId}/participants(teamId=${team.id})}">참여자 목록 보기</a>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>채팅</h2>
+    <div class="chat-box" id="chat-box">
+      <!-- 채팅 메시지 표시 영역 -->
+    </div>
+    <div class="input-group">
+      <input type="text" id="chat-input" placeholder="메시지를 입력하세요...">
+      <button type="button" onclick="sendMessage()">전송</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>추천 받기</h2>
+    <div class="recommendation-box">
+      <!-- 추천 내용 표시 -->
+      <p>추천 결과가 여기에 표시됩니다.</p>
+    </div>
+    <div class="input-group">
+      <input type="text" placeholder="추천 키워드를 입력하세요...">
+      <button type="button">추천 요청</button>
+    </div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const teamId = [[${teamId}]]; // 테스트용 팀 ID (백엔드와 맞춰서 수정)
+  const senderId = [[${userId}]]; // 로그인된 사용자 ID
+  const senderNickname = [[${userNickName}]]; // 로그인된 사용자 닉네임
+
+  let stompClient = null;
+
+  function connect() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function (frame) {
+      console.log('Connected: ' + frame);
+
+      // 팀 채팅방 구독 ex) 하드코딩으로 /room/1 에 대한 채팅방 구독
+      stompClient.subscribe('/room/' + teamId, function (chat) {
+        const message = JSON.parse(chat.body);
+        showMessage(message.senderNickname + ': ' + message.message);
+      });
+    });
+  }
+
+  //실질적인 메시지 전송 (팀id, 보내는 사람 id, 보내는 사람 닉네임, 보내는 내용)
+  function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const messageContent = input.value.trim();
+    if (messageContent && stompClient) {
+      const chatMessage = {
+        teamId: teamId,
+        senderId: senderId,
+        senderNickname: senderNickname,
+        message: messageContent
+      };
+      stompClient.send('/send/message', {}, JSON.stringify(chatMessage));
+      input.value = '';
+    }
+  }
+
+  // 보낸 내용을 채팅방에 보여줌 ( 자동스크롤 방식)
+  function showMessage(message) {
+    const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    chatBox.appendChild(messageElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  // 페이지 로드 후 연결
+  connect();
+
+  loadChatHistory();
+
+  // 채팅 이력 불러오기 db에 restapi 를 통해 db에 저장된 값을 가져와서 기록 유지
+  function loadChatHistory() {
+    console.log("채팅 이력 불러오기 시도...");
+    fetch(`/api/chat/history/${teamId}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('채팅 이력을 불러오는데 실패했습니다.');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("불러온 채팅 이력:", data);
+      const chatBox = document.getElementById('chat-box');
+      chatBox.innerHTML = ''; // 기존 내용 초기화
+
+      // 채팅 (닉네임 : 메시지 ) 형태
+      data.forEach(message => {
+        showMessage(message.senderNickname + ': ' + message.message);
+      });
+    })
+    .catch(error => {
+      console.error("채팅 이력 로딩 오류:", error);
+    });
+  }
+</script>
+</body>
+</html>
+</body>
+</html>

@@ -133,7 +133,14 @@
       padding: 1rem 0;
       border-top: 1px solid #eee;
     }
+    .error-message {
+      color: #ff4444;
+      font-size: 0.8rem;
+      margin-top: -0.7rem;
+      margin-bottom: 1rem;
+    }
   </style>
+  <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 
@@ -143,15 +150,14 @@
     <div class="logo">맛남</div>
     <nav>
       <a th:href="@{/}">홈</a>
-      <a th:href="@{/meetings}">모임 찾기</a>
-      <a th:href="@{/restaurants}">맛집 탐색</a>
-      <a th:href="@{/profile}">마이페이지</a>
+      <a th:href="@{/team/teamSearch.html}">모임 찾기</a>
+      <a th:href="@{restaurants/restaurant.html}">맛집 탐색</a>
     </nav>
   </div>
   <div class="header-right">
     <span title="알림">🔔</span>
     <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/meeting/create} + '\''">모임 만들기</button>
+    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
   </div>
 </header>
 
@@ -161,23 +167,25 @@
     <h2>로그인</h2>
     <p>맛남에 오신 것을 환영합니다! 계정에 로그인하세요.</p>
     <div class="tab-buttons">
-      <button class="active">이메일</button>
+      <button class="active">아이디</button>
       <button>소셜 로그인</button>
     </div>
-    <form class="login-form" th:action="@{/login}" method="post">
-      <label for="email">이메일</label>
-      <input type="email" id="email" name="email" placeholder="name@example.com" required>
+    <form class="login-form" id="loginForm">
+      <label for="userId">아이디</label>
+      <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요" required>
+      <div class="error-message" id="userIdError"></div>
 
       <label for="password">비밀번호</label>
       <div class="actions">
         <a href="#" style="text-decoration: underline; color: #333;">비밀번호 찾기</a>
       </div>
       <input type="password" id="password" name="password" placeholder="********" required>
+      <div class="error-message" id="passwordError"></div>
 
       <button type="submit">로그인</button>
     </form>
     <div class="login-footer">
-      계정이 없으신가요? <a th:href="@{/signup}" style="text-decoration: underline;">회원가입</a>
+      계정이 없으신가요? <a th:href="@{/user/signup}" style="text-decoration: underline;">회원가입</a>
     </div>
   </div>
 </main>
@@ -186,6 +194,60 @@
 <footer>
   © 2025 맛남. 모든 권리 보유.
 </footer>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+    const formData = new FormData(this);
+    const loginData = {
+      userId: formData.get('userId'),
+      password: formData.get('password')
+    };
+
+    try {
+      console.log('로그인 시도:', loginData);
+      const response = await fetch('/api/user/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(loginData)
+      });
+
+      console.log('응답 상태:', response.status);
+      const result = await response.json();
+      console.log('응답 데이터:', result);
+
+      if (response.ok) {
+        if (result.data && result.data.token) {
+          auth.setCookie('userId', result.data.userId);
+          auth.setCookie('userRole', result.data.role);
+        }
+
+        alert('로그인에 성공했습니다!');
+        window.location.href = '/';
+      } else {
+        if (result.data) {
+          if (result.data.includes('아이디')) {
+            document.getElementById('userIdError').textContent = result.data;
+          } else if (result.data.includes('비밀번호')) {
+            document.getElementById('passwordError').textContent = result.data;
+          } else {
+            document.getElementById('userIdError').textContent = result.data;
+          }
+        } else if (result.message) {
+          document.getElementById('userIdError').textContent = result.message;
+        }
+      }
+    } catch (error) {
+      console.error('로그인 오류 상세:', error);
+      document.getElementById('userIdError').textContent = '서버와 통신 중 오류가 발생했습니다.';
+    }
+  });
+</script>
 
 </body>
 </html>

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모임 서비스</title>
+    <script src="/js/auth.js"></script>
+    <script src="/js/header.js"></script>
     <style>
         * {
             margin: 0;
@@ -167,19 +169,30 @@
     <div style="display: flex; align-items: center; gap: 2rem;">
         <div class="logo">맛남</div>
         <nav>
-            <a th:href="@{/}">홈</a>
-            <a th:href="@{/team/search}">모임찾기</a>
-            <a th:href="@{/member/restaurant}">맛집찾기</a>
-            <a th:href="@{/member/mypage}">내 페이지</a>
-            <a th:href="@{/member/signin}">로그인</a>
+            <a th:href="@{/}">홈</a> <!-- 홈 페이지 -->
+            <a th:href="@{/team/search}">모임찾기</a> <!-- 모임 찾기 페이지 -->
+            <a th:href="@{/team/create}">모임만들기</a> <!-- 모임 만들기 페이지 -->
+            <a th:href="@{/user/signin}">로그인</a>
         </nav>
     </div>
     <div class="header-buttons">
         <span style="font-size: 1.2rem; cursor: pointer;">🔔</span>
         <span style="font-size: 1.2rem; cursor: pointer;">👤</span>
-        <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/meeting/create} + '\''">맛남 모임 만들기</button>
+        <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button> <!-- 모임 만들기 버튼 -->
     </div>
 </header>
+
+<message>
+<div id="messageBox" style="display: none;
+                           background-color: #4CAF50;
+                           color: white;
+                           text-align: center;
+                           padding: 15px;
+                           margin-bottom: 20px;
+                           border-radius: 4px;">
+    회원 탈퇴가 완료되었습니다.
+</div>
+</message>
 
 <!-- 메인 배너 -->
 <section class="main-banner" style="display: flex; align-items: center; justify-content: space-between;">
@@ -187,8 +200,8 @@
         <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">맛있는 식사와 새로운 만남</h1>
         <p style="color: #666; margin-bottom: 1.5rem;">맛남에서 다양한 사람들과 함께 맛있는 식사를 즐기세요. 새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
         <div class="banner-buttons" style="display: flex; gap: 0.5rem;">
-            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/search} + '\''">모임 찾기</button>
-            <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/member/signup} + '\''">회원가입</button>
+            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button><!-- 모임 찾기 버튼 -->
+            <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
         </div>
     </div>
     <div style="width: 45%; height: 250px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
@@ -201,7 +214,7 @@
     <h2>원하는 모임을 찾아보세요</h2>
     <p>관심 있는 모임을 검색해보세요</p>
     <div class="search-button">
-        <button class="btn btn-primary" style="width: 100%;" th:onclick="'location.href=\'' + @{/team/search} + '\''">모임 검색하기</button>
+        <button class="btn btn-primary" style="width: 100%;" th:onclick="'location.href=\'' + @{/team/search} + '\''">모임 검색하기</button> <!-- 모임 검색하기 버튼 -->
     </div>
 </section>
 
@@ -219,7 +232,7 @@
                 <div class="meeting-title">강남 맛집 탐방 모임</div>
                 <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
                 <div class="meeting-location">📍 서울 강남구</div>
-                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/1} + '\''">자세히 보기</button>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/1} + '\''">자세히 보기</button>
             </div>
         </div>
 
@@ -232,7 +245,7 @@
                 <div class="meeting-title">강남 맛집 탐방 모임</div>
                 <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
                 <div class="meeting-location">📍 서울 강남구</div>
-                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/2} + '\''">자세히 보기</button>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/2} + '\''">자세히 보기</button>
             </div>
         </div>
 
@@ -245,7 +258,7 @@
                 <div class="meeting-title">강남 맛집 탐방 모임</div>
                 <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
                 <div class="meeting-location">📍 서울 강남구</div>
-                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/meeting/detail/3} + '\''">자세히 보기</button>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/3} + '\''">자세히 보기</button>
             </div>
         </div>
     </div>
@@ -282,5 +295,26 @@
 <footer>
     <p>© 2023 맛남 | 이용약관 | 개인정보처리방침</p>
 </footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const message = urlParams.get('message');
+
+        if (message === 'account_deactivated') {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.style.display = 'block';
+
+            setTimeout(function() {
+                messageBox.style.display = 'none';
+
+                const url = new URL(window.location);
+                url.searchParams.delete('message');
+                window.history.replaceState({}, document.title, url);
+            }, 5000);
+        }
+    });
+</script>
+
 </body>
 </html>
