@@ -59,14 +59,18 @@ public class TeamController {
     public String getTeamPage(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        System.out.println("!!!!!!!!!!!!!!!!!!"+ userId);
+
         User user = userService.getUserById(userId);
 
-        String userNickname = user.getNickname();
+        String userNickName = user.getNickname();
+
+        System.out.println("!!!!!!!!!!!!!!!!!!"+userNickName);
 
         // 팀 정보와 사용자 정보를 모델에 추가
         model.addAttribute("teamId", teamId);
         model.addAttribute("userId", userId);
-        model.addAttribute("userNickname", userNickname);
+        model.addAttribute("userNickName", userNickName);
 
         return "team/teamPage";
     }
