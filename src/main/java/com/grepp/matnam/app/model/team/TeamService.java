@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -173,4 +174,19 @@ public class TeamService {
         }
     }
 
+    public List<Team> findAll() {
+        return teamRepository.findAll();
+    }
+
+    public Page<Team> findByFilter(String status, String keyword, Pageable pageable) {
+        if (!status.isBlank() && StringUtils.hasText(keyword)) {
+            return teamRepository.findByStatusAndKeywordContaining(status, keyword, pageable);
+        } else if (!status.isBlank()) {
+            return teamRepository.findByStatus(status, pageable);
+        } else if (StringUtils.hasText(keyword)) {
+            return teamRepository.findByKeywordContaining(keyword, pageable);
+        } else {
+            return teamRepository.findAllUsers(pageable);
+        }
+    }
 }

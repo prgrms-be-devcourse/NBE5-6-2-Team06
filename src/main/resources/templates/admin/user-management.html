@@ -17,7 +17,7 @@
     </div>
 
     <div class="tab-content" id="user-list" th:classappend="${activeTab == 'user-list'} ? 'active'" th:if="${activeTab == 'user-list'}">
-      <form method="get" action="/admin/user">
+      <form method="get" action="/admin/user/list">
         <div class="filter-container">
           <div class="search-filter">
             <input name="keyword" type="text" id="user-search" placeholder="아이디, 닉네임, 이메일로 검색"

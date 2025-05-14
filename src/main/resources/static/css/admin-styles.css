@@ -1324,22 +1324,22 @@ h1 {
 }
 
 /* 상태 스타일 추가 */
-.status.recruiting {
+.status.RECRUITING {
     background-color: #e3f2fd;
     color: #0d47a1;
 }
 
-.status.closed {
+.status.FULL {
     background-color: #fff3cd;
     color: #856404;
 }
 
-.status.completed {
+.status.COMPLETED {
     background-color: #e3fcef;
     color: var(--success-color);
 }
 
-.status.cancelled {
+.status.CANCELED {
     background-color: #ffebee;
     color: var(--danger-color);
 }
