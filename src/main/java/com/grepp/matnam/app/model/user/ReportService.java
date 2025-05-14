@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.model.user.dto.ReportDto;
+import com.grepp.matnam.app.model.user.entity.Report;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,5 +28,11 @@ public class ReportService {
         } else {
             return reportRepository.findAllReports(pageable);
         }
+    }
+
+    public void unActivatedById(Long reportId) {
+        Report report = reportRepository.findById(reportId)
+            .orElseThrow(() -> new IllegalArgumentException("신고 내역을 찾을 수 없습니다."));
+        report.unActivated();
     }
 }
