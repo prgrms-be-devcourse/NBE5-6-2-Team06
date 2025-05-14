@@ -147,8 +147,14 @@ public class TeamController {
     // 사용자 전체 모임 조회
     @GetMapping("/mypage")
     public String mypageTeam(Model model) {
+        // 현재 로그인된 사용자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
+
+        User user = userService.getUserById(userId);
+        String userNickname = user.getNickname();
+        model.addAttribute("userId", userId);
+        model.addAttribute("userNickname", userNickname);
 
         // 주최한 모임 조회
         List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
@@ -164,6 +170,7 @@ public class TeamController {
 
         return "user/mypage";
     }
+
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시

@@ -260,30 +260,26 @@
       margin-top: 2rem;
     }
 
-    .review-alert {
-      margin-bottom: 1.5rem;
-      color: #555;
+    .review-item {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.2rem;
+      margin: 1rem 0;
     }
 
-    .badge {
-      display: inline-block;
-      background-color: #f0f0f0;
-      color: #333;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      margin-left: 0.5rem;
+    .review-item .restaurant {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
 
-    .meeting-item {
-      position: relative;
-      padding-bottom: 2.5rem;
+    .review-item .rating {
+      color: #000;
+      margin-bottom: 0.5rem;
     }
 
-    .review-btn {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
+    .review-text {
+      color: #666;
+      margin-bottom: 0.5rem;
     }
 
     .modal {
@@ -608,22 +604,29 @@
     </div>
 
     <!-- 모임 리뷰 -->
-    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview)}">
-      <h2>리뷰 작성이 필요한 모임</h2>
+    <div class="main-section reviews-section">
+      <h2>내 리뷰</h2>
 
-      <div class="review-alert">
-        <p>완료된 모임에 대해 다른 참여자들의 매너 온도를 매겨주세요!</p>
-      </div>
+      <div id="reviews-container">
+        <!-- 리뷰가 없을 때 표시할 내용 -->
+        <div th:if="${#lists.isEmpty(userReviews)}" class="empty-state">
+          <p>아직 작성한 리뷰가 없습니다.</p>
+          <p>모임에 참여하여 리뷰를 남겨보세요!</p>
+        </div>
 
-      <div th:each="team : ${teamsWithoutReview}" class="meeting-item" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
-        <h4>
-          <span th:text="${team.teamTitle}">모임 제목</span>
-          <span class="badge">완료됨</span>
-        </h4>
-        <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
-        <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-        <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-        <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>
+        <!-- 리뷰 목록 -->
+        <div th:each="review : ${userReviews}" class="review-item">
+          <div class="restaurant" th:text="${review.team.restaurantName}">맛집 이름</div>
+          <div class="rating">
+            <span
+                th:text="${'★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)}">★★★★☆</span>
+            <span th:text="${review.rating}">4.0</span>
+          </div>
+          <div class="review-text" th:text="${review.content}">리뷰 내용</div>
+          <p>📅 <span
+              th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')}">2023년 6월 19일</span>
+          </p>
+        </div>
       </div>
     </div>
   </div>
@@ -687,48 +690,36 @@
   });
 
   // 모임 목록 탭 전환
-  function switchTab(tabName) {
-    // 탭 버튼 활성화 상태 변경
-    const tabButtons = document.querySelectorAll('.tabs button:not(.create-meeting)');
-    tabButtons.forEach(button => {
-      button.classList.remove('active');
-    });
-    event.target.classList.add('active');
+  function switchTab(tabId) {
+    const allMeetings = document.getElementById('all-meetings');
+    const hostingMeetings = document.getElementById('hosting-meetings');
+    const participatingMeetings = document.getElementById('participating-meetings');
+    const allTab = document.getElementById('all-tab');
+    const hostingTab = document.getElementById('hosting-tab');
+    const participatingTab = document.getElementById('participating-tab');
 
-    // 모임 아이템 필터링
-    const meetingItems = document.querySelectorAll('#meetings-container .meeting-item');
-    const emptyState = document.querySelector('#meetings-container .empty-state');
+    allMeetings.style.display = 'none';
+    hostingMeetings.style.display = 'none';
+    participatingMeetings.style.display = 'none';
+    allTab.classList.remove('active');
+    hostingTab.classList.remove('active');
+    participatingTab.classList.remove('active');
 
-    let visibleCount = 0;
-
-    meetingItems.forEach(item => {
-      const statusBadge = item.querySelector('.status-badge');
-      const isHosting = statusBadge && statusBadge.textContent.includes('주최중');
-      const isParticipating = statusBadge && statusBadge.textContent.includes('참여중');
-      const isCompleted = statusBadge && statusBadge.textContent.includes('완료');
-
-      if (tabName === 'all') {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'hosting' && isHosting) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'participating' && isParticipating) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'completed' && isCompleted) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else {
-        item.style.display = 'none';
-      }
-    });
-
-    // 표시할 항목이 없으면 empty state 표시
-    if (emptyState) {
-      emptyState.style.display = visibleCount > 0 ? 'none' : 'block';
+    if (tabId === 'all') {
+      allMeetings.style.display = 'block';
+      allTab.classList.add('active');
+    } else if (tabId === 'hosting') {
+      hostingMeetings.style.display = 'block';
+      hostingTab.classList.add('active');
+    } else if (tabId === 'participating') {
+      participatingMeetings.style.display = 'block';
+      participatingTab.classList.add('active');
     }
   }
+
+  // 페이지 로드시 '전체' 탭 활성화 (선택 사항)
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   switchTab('all');
 
   document.addEventListener('DOMContentLoaded', function () {
     if (!auth.isLoggedIn()) {
