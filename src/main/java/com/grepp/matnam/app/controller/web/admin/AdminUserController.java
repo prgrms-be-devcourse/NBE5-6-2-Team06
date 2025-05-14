@@ -73,10 +73,14 @@ public class AdminUserController {
     }
 
     @GetMapping("/report")
-    public String userReports(@RequestParam(required = false) Boolean status,
+    public String userReports(@RequestParam(required = false) String status,
         @RequestParam(required = false, defaultValue = "") String keyword,
         @RequestParam(required = false, defaultValue = "newest") String sort,
         @Valid PageParam param, BindingResult bindingResult, Model model) {
+        Boolean activated = null;
+        if ("true".equals(status)) activated = true;
+        else if ("false".equals(status)) activated = false;
+
         Sort sortOption;
         switch (sort) {
             case "oldest":
@@ -88,7 +92,7 @@ public class AdminUserController {
 
         Pageable pageable = PageRequest.of(param.getPage() - 1, param.getSize(), sortOption);
 
-        Page<ReportDto> page = reportService.findByFilter(status, keyword, pageable);
+        Page<ReportDto> page = reportService.findByFilter(activated, keyword, pageable);
 
         if (param.getPage() != 1 && page.getContent().isEmpty()) {
             throw new CommonException(ResponseCode.BAD_REQUEST);
@@ -99,7 +103,7 @@ public class AdminUserController {
         model.addAttribute("pageTitle", "사용자 관리");
         model.addAttribute("currentPage", "user-management");
         model.addAttribute("page", response);
-        model.addAttribute("status", status);
+        model.addAttribute("status", activated);
         model.addAttribute("sort", sort);
 
         return "admin/user-management";
