@@ -82,6 +82,7 @@ public class TeamController {
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
+
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
         return "team/teamDetail";
