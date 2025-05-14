@@ -67,6 +67,11 @@ public class UserService {
                     return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
                 });
 
+        if (user.getStatus() == Status.SUSPENDED || user.getStatus() == Status.BANNED) {
+            log.info("로그인 실패: 정지된 계정 - " + userId + ", 상태=" + user.getStatus());
+            throw new IllegalArgumentException("정지된 계정입니다.");
+        }
+
         if (user.getStatus() != Status.ACTIVE || !user.isActivated()) {
             log.info("로그인 실패: 비활성화된 계정 - " + userId + ", 상태=" + user.getStatus());
             throw new IllegalArgumentException("비활성화(탈퇴) 계정입니다.");
