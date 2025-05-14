@@ -25,6 +25,8 @@ public class TeamService {
 
     private final ParticipantRepository participantRepository;
 
+    private final UserRepository userRepository;
+
     // 모임 생성
     public void saveTeam(Team team) {
         teamRepository.save(team);
