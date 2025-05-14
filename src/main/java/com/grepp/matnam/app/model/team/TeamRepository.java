@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.entity.Team;
 import java.util.List;
 import java.util.Optional;
@@ -16,15 +17,19 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     // 사용자 ID로 팀 조회 (주최자)
     List<Team> findTeamsByUser_UserId(String userId);
 
+    @Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId AND p.participantStatus = :status")
+    List<Team> findTeamsByParticipantUserIdAndParticipantStatus(String userId, ParticipantStatus participantStatus);
 
     // 사용자 모임 조회
-    @Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId")
-    List<Team> findTeamsByParticipantUserId(@Param("userId") String userId);
+    //@Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId")
+
+    //List<Team> findTeamsByParticipantUserId(@Param("userId") String userId);
 
 
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants ORDER BY t.createdAt DESC")
     Page<Team> findAllWithParticipants(Pageable pageable);
 
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.teamId = :teamId")
-    Optional<Team> findByIdWithParticipants(Long teamId);
+    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user WHERE t.teamId = :teamId")
+    Optional<Team> findByIdWithParticipantsAndUser(@Param("teamId") Long teamId);
+
 }
