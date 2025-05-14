@@ -7,6 +7,7 @@ import com.grepp.matnam.app.model.team.TeamReviewService;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -48,6 +50,16 @@ public class TeamController {
     public String create() {
         return "team/teamCreate";
     }
+
+    // 모임 수정
+//    @GetMapping("/edit/{teamId}")
+//    public String getTeamEditPage(@PathVariable Long teamId, Model model) {
+//        TeamDto teamDto = teamService.getTeamDetails(teamId);
+//        model.addAttribute("teamDto", teamDto);
+//        return "team/teamCreate";
+//    }
+
+
 
     // 모임 생성
     @PostMapping("/create")

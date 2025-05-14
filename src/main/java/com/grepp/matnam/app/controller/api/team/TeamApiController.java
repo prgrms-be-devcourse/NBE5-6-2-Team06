@@ -3,9 +3,11 @@ package com.grepp.matnam.app.controller.api.team;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Team;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,25 +39,26 @@ public class TeamApiController {
     }
 
     // 모임 수정
-    @PatchMapping("/detail/{teamId}")
-    public ResponseEntity<?> updateTeam(@PathVariable Long teamId, @RequestBody Team team) {
-        Team existingTeam = teamService.getTeamById(teamId);
-        if (existingTeam == null) {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/update/{teamId}")
+    public ResponseEntity<String> updateTeam(@PathVariable Long teamId, @RequestBody TeamDto teamDto) {
+        try {
+            teamService.updateTeam(teamId, teamDto);
+            return ResponseEntity.ok("모임 수정 성공");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("모임 수정 실패");
         }
-        team.setTeamId(teamId);
-        team.setUser(existingTeam.getUser());
-
-        teamService.saveTeam(team);
-        return ResponseEntity.ok().build();
     }
 
-    // 모임 삭제
-    @DeleteMapping("/detail/{teamId}")
-    public ResponseEntity<?> deleteTeam(@PathVariable Long teamId) {
-        teamService.deleteTeam(teamId);
-        return ResponseEntity.noContent().build();
-    }
+//    // 모임 삭제
+//    @DeleteMapping("/delete/{teamId}")
+//    public ResponseEntity<String> deleteTeam(@PathVariable Long teamId) {
+//        try {
+//            teamService.deleteTeam(teamId);
+//            return ResponseEntity.ok("모임 삭제 성공");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("모임 삭제 실패");
+//        }
+//    }
 
     // 모임 상태 변경
     @PatchMapping("/{teamId}/status")

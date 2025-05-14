@@ -3,6 +3,7 @@ package com.grepp.matnam.app.model.team;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
@@ -53,6 +54,34 @@ public class TeamService {
 
         participantRepository.save(participant);
     }
+
+    public void updateTeam(Long teamId, TeamDto teamDto) {
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("Team not found"));
+
+        // 수정할 필드들 업데이트
+        team.setTeamTitle(teamDto.getTeamTitle());
+        team.setMeetDate(teamDto.getMeetDate());
+        team.setRestaurantName(teamDto.getRestaurantName());
+        team.setMaxPeople(teamDto.getMaxPeople());
+        team.setNowPeople(teamDto.getNowPeople());
+
+        // 팀 정보 저장
+        teamRepository.save(team);
+    }
+
+//    public void deleteTeam(Long teamId) {
+//        Team team = teamRepository.findById(teamId)
+//            .orElseThrow(() -> new RuntimeException("Team not found"));
+//
+//        // 관련된 참가자 정보 삭제
+//        participantRepository.deleteByTeam_TeamId(teamId);
+//
+//        // 팀 정보 삭제
+//        teamRepository.delete(team);
+//    }
+
+
 
 
     // 참여자 상태 변경
@@ -223,4 +252,7 @@ public class TeamService {
         log.info("team {}", team);
         team.unActivated();
     }
+    // 모임 수정
+//    public TeamDto getTeamDetails(Long teamId) {
+//    }
 }

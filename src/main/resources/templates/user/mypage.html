@@ -524,7 +524,18 @@
 
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
-          <button type="button" onclick="showApplicationInfo(${teamId})">신청 정보</button>
+
+          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
+
+          <!-- 모임 수정 버튼 -->
+          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
+            모임 수정
+          </button>
+
+          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
+            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          </form>
 
 
           <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
@@ -545,6 +556,8 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+          </form>
+
         </div>
       </div>
 
@@ -565,7 +578,19 @@
 
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a><br>
-          <button type="button" onclick="showApplicationInfo(${teamId})">신청 정보</button>
+
+          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
+
+          <!-- 모임 수정 버튼 -->
+          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
+            모임 수정
+          </button>
+
+          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
+            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          </form>
+
 
 
           <div id="application-info-${teamId}" class="application-info" style="display: none;">
@@ -594,6 +619,7 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+
         </div>
       </div>
     </div>
@@ -737,7 +763,9 @@
     }
   }
 
-  // 신청 정보 표시/숨기기
+
+
+  // 신청 정보 표시/숨기기 및 신청자 목록 로드
   function showApplicationInfo(teamId) {
     const applicationInfo = document.getElementById(`application-info-${teamId}`);
     const currentDisplay = applicationInfo.style.display;
@@ -745,11 +773,48 @@
     // 신청 정보 토글 (보이게/숨기게)
     if (currentDisplay === 'none' || currentDisplay === '') {
       applicationInfo.style.display = 'block';
-      // 여기에서 AJAX를 통해 신청자 목록을 가져오고, #applicant-list-${teamId}에 추가할 수 있습니다.
+      loadApplicants(teamId);
     } else {
       applicationInfo.style.display = 'none';
     }
   }
+
+  // 신청자 목록 로드
+  function loadApplicants(teamId) {
+    fetch(`/team/${teamId}/applicants`)
+    .then(response => response.json())
+    .then(participants => {
+      const applicantList = document.getElementById(`applicant-list-${teamId}`);
+      applicantList.innerHTML = '';
+
+      if (participants.length === 0) {
+        const emptyMessage = document.createElement('li');
+        emptyMessage.textContent = '신청자가 없습니다.';
+        applicantList.appendChild(emptyMessage);
+      } else {
+        participants.forEach(participant => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('applicant-item');
+
+          // 참가자의 User 정보를 사용
+          listItem.innerHTML = `
+            <span><strong>닉네임:</strong> ${participant.user.nickname}</span><br>
+            <span><strong>매너 온도:</strong> ${participant.user.temperature} °C</span><br>
+            <span><strong>상태:</strong> ${participant.participantStatus}</span>
+          `;
+
+          applicantList.appendChild(listItem);
+        });
+      }
+    })
+    .catch(error => console.error('신청자 목록을 가져오는 중 오류 발생:', error));
+  }
+
+  // 모임 수정 요청
+
+
+
+
 
   document.addEventListener('DOMContentLoaded', function () {
     if (!auth.isLoggedIn()) {
@@ -759,3 +824,5 @@
     switchTab('all'); // 초기 로딩 시 "전체" 탭 활성화
   });
 </script>
+</body>
+</html>
