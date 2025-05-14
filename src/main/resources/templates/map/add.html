@@ -45,13 +45,24 @@
             border-bottom: 2px solid #000;
         }
 
-        .btn-primary {
+        .btn-primary,
+        .option button,
+        form button[type="submit"] {
             background: #000;
             color: #fff;
-            padding: 6px 14px;
             border: none;
+            padding: 8px 14px;
+            font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-primary:hover,
+        .option button:hover,
+        form button[type="submit"]:hover {
+            background: #333;
+            transform: translateY(-1px);
         }
 
         #main-container {
@@ -82,37 +93,30 @@
 
         .option input {
             flex: 1;
-            padding: 8px;
+            font-family: 'Noto Sans KR', sans-serif;
             font-size: 14px;
-        }
-
-        .option button {
-            padding: 8px 12px;
-            background: #000;
-            color: #fff;
-            border: none;
+            padding: 8px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-            cursor: pointer;
+            box-sizing: border-box;
+            outline: none;
         }
 
-        form input, form textarea {
+        form input,
+        form textarea {
             width: 100%;
             padding: 8px;
             font-size: 14px;
+            font-family: 'Noto Sans KR', sans-serif;
             border: 1px solid #ccc;
             border-radius: 4px;
             margin-bottom: 10px;
+            box-sizing: border-box;
+            outline: none;
         }
 
-        form button[type="submit"] {
-            width: 100%;
-            background: #000;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
+        textarea {
+            resize: vertical;
         }
 
         #placesList li {
@@ -158,6 +162,7 @@
             color: #888;
         }
     </style>
+
 </head>
 
 <body>
@@ -244,19 +249,6 @@
 
             moveMapTo(latlng);
 
-            const info = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;font-size:13px;"><b>사용자 지정 위치</b></div>`
-            });
-            info.open(map, clickedMarker);
-            activeInfoWindow = info;
-
-            kakao.maps.event.addListener(clickedMarker, 'click', () => {
-                moveMapTo(latlng);
-                if (activeInfoWindow) activeInfoWindow.close();
-                info.open(map, clickedMarker);
-                activeInfoWindow = info;
-            });
-
             document.getElementById('latitude').value = latlng.getLat();
             document.getElementById('longitude').value = latlng.getLng();
 
@@ -264,12 +256,44 @@
                 if (status === kakao.maps.services.Status.OK) {
                     const roadAddr = result[0].road_address?.address_name;
                     const jibunAddr = result[0].address?.address_name;
-                    const buildingName = result[0].road_address?.building_name;
-
                     document.getElementById('roadAddress').value = roadAddr || jibunAddr;
-                    document.getElementById('placeName').value = buildingName || '사용자 지정 위치';
                 }
             });
+
+            const categories = ['FD6', 'CE7', 'PO3'];
+            let found = false;
+
+            function searchByCategory(index) {
+                if (index >= categories.length) {
+                    document.getElementById('placeName').value = '사용자 지정 위치';
+                    const info = new kakao.maps.InfoWindow({
+                        content: `<div style="padding:5px;font-size:13px;"><b>사용자 지정 위치</b></div>`
+                    });
+                    info.open(map, clickedMarker);
+                    activeInfoWindow = info;
+                    return;
+                }
+
+                ps.categorySearch(categories[index], function(data, status) {
+                    if (status === kakao.maps.services.Status.OK && data.length > 0) {
+                        found = true;
+                        const placeName = data[0].place_name;
+                        document.getElementById('placeName').value = placeName;
+                        const info = new kakao.maps.InfoWindow({
+                            content: `<div style="padding:5px;font-size:13px;"><b>${placeName}</b></div>`
+                        });
+                        info.open(map, clickedMarker);
+                        activeInfoWindow = info;
+                    } else {
+                        searchByCategory(index + 1);
+                    }
+                }, {
+                    location: latlng,
+                    radius: 30
+                });
+            }
+
+            searchByCategory(0);
         });
 
         loadMyPinnedPlaces();
@@ -389,10 +413,13 @@
                 myPlaceMarkers.forEach(m => m.setMap(null));
                 myPlaceMarkers = [];
 
+                const bounds = new kakao.maps.LatLngBounds();
+
                 data.forEach(place => {
                     if (!place.activated) return;
 
                     const position = new kakao.maps.LatLng(place.latitude, place.longitude);
+                    bounds.extend(position);
 
                     const marker = new kakao.maps.Marker({
                         map: map,
@@ -413,6 +440,11 @@
 
                     myPlaceMarkers.push(marker);
                 });
+
+                // 저장된 장소가 하나 이상일 경우 해당 영역으로 지도 확대 및 이동
+                if (!bounds.isEmpty()) {
+                    map.setBounds(bounds);
+                }
             });
     }
 
