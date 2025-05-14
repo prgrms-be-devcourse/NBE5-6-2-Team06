@@ -8,14 +8,17 @@ import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.infra.entity.BaseEntity;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
 @Setter
+@ToString(exclude = {"preference", "maps", "participants"})
 public class User extends BaseEntity {
 
     @Id
@@ -55,8 +58,6 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status = Status.ACTIVE;
 
-    private LocalDateTime dueDate;
-
     public boolean isActivated() {
         return this.activated;
     }
@@ -64,4 +65,10 @@ public class User extends BaseEntity {
     public LocalDateTime createdAt() {
         return this.createdAt;
     }
+
+    private LocalDate dueDate;
+
+    private Integer suspendDuration;
+
+    private String dueReason;
 }

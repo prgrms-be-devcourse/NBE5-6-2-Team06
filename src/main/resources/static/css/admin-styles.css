@@ -536,19 +536,19 @@ h1 {
     font-weight: 600;
 }
 
-.status.active {
+.status.ACTIVE {
     background-color: #e3fcef;
     color: var(--success-color);
 }
 
-.status.suspended {
+.status.SUSPENDED {
     background-color: #fff3cd;
     color: #856404;
 }
 
-.status.inactive {
-    background-color: #f8f9fa;
-    color: var(--gray-color);
+.status.BANNED {
+    background-color: rgba(255, 0, 0, 0.32);
+    color: var(--danger-color);
 }
 
 .status.pending {

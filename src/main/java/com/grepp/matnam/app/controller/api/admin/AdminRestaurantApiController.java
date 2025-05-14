@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.controller.api.admin.validator.RestaurantRequestValidator;
 import com.grepp.matnam.app.model.restaurant.RestaurantService;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
@@ -13,8 +14,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,13 +26,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/restaurant")
 @Slf4j
 @RequiredArgsConstructor
-public class AdminApiController {
+public class AdminRestaurantApiController {
+
     private final RestaurantService restaurantService;
 
-    @GetMapping("/restaurant/{restaurantId}")
+    @InitBinder("restaurantRequest")
+    protected void initBinder(WebDataBinder binder) {
+        binder.addValidators(new RestaurantRequestValidator());
+    }
+
+    @GetMapping("/{restaurantId}")
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.findById(restaurantId)
             .orElseThrow(() -> new CommonException(ResponseCode.BAD_REQUEST));
@@ -37,7 +46,7 @@ public class AdminApiController {
         return ResponseEntity.ok(ApiResponse.success(restaurant));
     }
 
-    @PatchMapping("/restaurant/{restaurantId}")
+    @PatchMapping("/{restaurantId}")
     public ResponseEntity<?> updateRestaurant(@PathVariable Long restaurantId,
         @RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
 
@@ -53,14 +62,15 @@ public class AdminApiController {
         return ResponseEntity.ok("식당이 수정되었습니다.");
     }
 
-    @DeleteMapping("/restaurant/{restaurantId}")
+    @DeleteMapping("/{restaurantId}")
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
         restaurantService.deleteById(restaurantId);
         return ResponseEntity.ok("식당이 삭제되었습니다.");
     }
 
-    @PostMapping("/restaurant")
-    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
+    @PostMapping
+    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request,
+        BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
