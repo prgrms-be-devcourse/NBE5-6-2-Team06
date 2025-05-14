@@ -84,9 +84,15 @@ public class TeamController {
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
+        // 현재 로그인한 사용자 정보 가져오기
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
 
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
+
+        boolean isAlreadyApplied = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId);
+        model.addAttribute("isAlreadyApplied", isAlreadyApplied);
+
         return "team/teamDetail";
     }
 
@@ -133,7 +139,8 @@ public class TeamController {
         }
 
         teamService.addParticipant(teamId, user);
-        return "redirect:/team/" + teamId + "/page";
+//        return "redirect:/team/" + teamId + "/page";
+        return "redirect:/team/detail/" + teamId;
     }
 
     // 모임 참여 수락 (주최자가 호출)

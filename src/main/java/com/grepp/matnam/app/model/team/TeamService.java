@@ -35,6 +35,7 @@ public class TeamService {
     }
 
     // 참여자 추가
+    @Transactional
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
