@@ -20,9 +20,11 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     List<Participant> findByTeam_TeamId(Long teamId);
 
+    // 특정 팀에 참여한 사용자 조회
+    List<Participant> findByUser_UserId(String userId);
+
     @Query("SELECT p FROM Participant p JOIN FETCH p.user WHERE p.team.teamId = :teamId")
     List<Participant> findParticipantsWithUserByTeamId(@Param("teamId") Long teamId);
 
-    // 모든 팀과 그 participants를 페이징 처리하여 로딩 (Fetch Join)
-
+    void deleteByTeam_TeamId(Long teamId);
 }
