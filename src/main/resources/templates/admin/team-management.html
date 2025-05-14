@@ -15,7 +15,8 @@
       <form method="get" action="/admin/team">
         <div class="filter-container">
           <div class="search-filter">
-            <input name="keyword" type="text" placeholder="모임명, 주최자 아이디로 검색" th:value="${param.keyword}">
+            <input name="keyword" type="text" placeholder="모임명, 주최자 아이디로 검색"
+                   th:value="${param.keyword}">
             <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
           </div>
           <div class="filter-options">
@@ -90,39 +91,37 @@
               <img id="team-image" src="/images/team-placeholder.jpg" alt="모임 이미지">
             </div>
             <div class="team-info">
-              <h3 id="team-title">강남 맛집 탐방</h3>
+              <h3 id="team-title"></h3>
               <div class="team-meta">
                 <div class="meta-item">
                   <i class="fas fa-user"></i>
-                  <span id="team-organizer">주최자: 김철수</span>
+                  <span>주최자: </span>
+                  <span id="team-organizer"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-users"></i>
-                  <span id="team-members">인원: 6/8</span>
+                  <span>인원: </span>
+                  <span id="team-members"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-calendar"></i>
-                  <span id="team-date">날짜: 2023-06-20</span>
+                  <span>날짜: </span>
+                  <span id="team-date"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-clock"></i>
-                  <span id="team-time">시간: 18:30</span>
+                  <span>시간: </span>
+                  <span id="team-time"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-map-marker-alt"></i>
-                  <span id="team-location">장소: 서울 강남구</span>
-                </div>
-                <div class="meta-item">
-                  <i class="fas fa-utensils"></i>
-                  <span id="team-restaurant">식당: 맛있는 치킨</span>
-                </div>
-                <div class="meta-item">
-                  <i class="fas fa-tag"></i>
-                  <span id="team-category">카테고리: 한식</span>
+                  <span>장소: </span>
+                  <span id="team-location"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-flag"></i>
-                  <span id="team-status" th:class="'status ' + 'RECRUITING'">상태: 모집 중</span>
+                  <span>상태: </span>
+                  <span id="team-status" th:class="'status ' + 'RECRUITING'"></span>
                 </div>
               </div>
             </div>
@@ -130,45 +129,104 @@
 
           <div class="team-description">
             <h4>모임 설명</h4>
-            <p id="team-description-text">강남 맛집을 함께 탐방하는 모임입니다. 맛있는 음식을 좋아하는 분들과 함께 즐거운 시간을 보내고
-              싶습니다. 많은 참여 부탁드립니다.</p>
+            <p id="team-description-text"></p>
           </div>
 
           <div class="detail-section">
             <h4>참가자 목록</h4>
-            <div class="table-container">
-              <table class="data-table">
-                <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>이름</th>
-                  <th>이메일</th>
-                  <th>참가일</th>
-                </tr>
-                </thead>
-                <tbody id="team-members-list">
-                <!-- 참가자 목록이 여기에 동적으로 로드됩니다 -->
-                <tr>
-                  <td>1</td>
-                  <td>김철수</td>
-                  <td>kim@example.com</td>
-                  <td>2023-06-15</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>이영희</td>
-                  <td>lee@example.com</td>
-                  <td>2023-06-16</td>
-                </tr>
-                </tbody>
-              </table>
+
+            <!-- 주최자 섹션 -->
+            <div class="member-section organizer-list-header">
+              <div class="section-header">
+                <h5>주최자</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="organizer-list">
+                  <!-- 주최자 정보가 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 팀원 섹션 -->
+            <div class="member-section member-list-header">
+              <div class="section-header">
+                <h5>팀원</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="member-list">
+                  <!-- 팀원 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 참가 신청 섹션 -->
+            <div class="member-section pending-list-header">
+              <div class="section-header">
+                <h5>참가 신청</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="pending-list">
+                  <!-- 참가 신청 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 참가 거절 섹션 -->
+            <div class="member-section rejected-list-header">
+              <div class="section-header">
+                <h5>참가 거절</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="rejected-list">
+                  <!-- 참가 거절 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="secondary-btn cancel-btn">닫기</button>
-        <button class="warning-btn" id="edit-team-status-btn">상태 변경</button>
       </div>
     </div>
   </div>

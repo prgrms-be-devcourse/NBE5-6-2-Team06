@@ -1362,3 +1362,67 @@ h1 {
     font-size: 0.8rem;
     margin-top: 0.3rem;
 }
+
+/* 기존 CSS에 추가할 스타일 */
+
+/* 참가자 섹션 스타일 */
+.member-section {
+    margin-bottom: 2rem;
+}
+
+.member-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    background-color: var(--gray-light);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: 0;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--gray-dark);
+}
+
+.member-section .table-container {
+    margin-bottom: 0;
+}
+
+.member-section .data-table {
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* 빈 테이블 메시지 */
+.empty-table-message {
+    padding: 1rem;
+    text-align: center;
+    color: var(--gray-color);
+    font-style: italic;
+}
+
+/*!* 주최자 헤더 *!*/
+/*.organizer-list-header .section-header, .organizer-list-header th {*/
+/*    background-color: #e0f3ff;*/
+/*    color: #003f5c;*/
+/*}*/
+
+/*!* 팀원 헤더 *!*/
+/*.member-list-header .section-header, .member-list-header th {*/
+/*    background-color: #e4fbe0;*/
+/*    color: #22543d;*/
+/*}*/
+
+/*!* 참가 신청 헤더 *!*/
+/*.pending-list-header .section-header, .pending-list-header th {*/
+/*    background-color: #fff9e0;*/
+/*    color: #7a4c00;*/
+/*}*/
+
+/*!* 거절 헤더 *!*/
+/*.rejected-list-header .section-header, .rejected-list-header th  {*/
+/*    background-color: #ffe0e0;*/
+/*    color: #8b0000;*/
+/*}*/

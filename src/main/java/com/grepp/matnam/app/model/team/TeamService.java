@@ -189,4 +189,8 @@ public class TeamService {
             return teamRepository.findAllUsers(pageable);
         }
     }
+
+    public List<Participant> findAllWithUserByTeamId(Long teamId) {
+        return participantRepository.findParticipantsWithUserByTeamId(teamId);
+    }
 }
