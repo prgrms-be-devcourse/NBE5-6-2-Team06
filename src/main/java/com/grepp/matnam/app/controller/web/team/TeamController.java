@@ -2,6 +2,8 @@ package com.grepp.matnam.app.controller.web.team;
 
 import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamReviewRepository;
+import com.grepp.matnam.app.controller.api.team.payload.TeamRequest;
+import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -10,8 +12,14 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -40,53 +48,59 @@ public class TeamController {
     private final TeamReviewRepository teamReviewRepository;
     private final ParticipantRepository participantRepository;
 
-    @GetMapping("/search")
-    public String search() {
-        return "team/teamSearch";
-    }
 
+    // 모임 생성 페이지
     @GetMapping("/create")
     public String create() {
         return "team/teamCreate";
     }
 
     // 모임 생성
-    @PostMapping
-    public String createTeam(@ModelAttribute Team team, @RequestParam("userId") String userId) {
-        User user = userService.getUserById(userId);
+    @PostMapping("/create")
+    public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
+        User user = userService.getUserById(teamRequest.getUserId());
+        Team team = teamRequest.getTeam();
         team.setUser(user);
 
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);
 
-        return "redirect:/team/search";
+        model.addAttribute("team", team);
+        return "redirect:/" + team.getTeamId() + "/detail";
     }
 
-    // 팀 페이지 조회
-    @GetMapping("/teamPage/{teamId}")
-    public String getTeamPage(@PathVariable Long teamId, Model model) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        User user = userService.getUserById(userId);
-
-        String userNickname = user.getNickname();
-
-        // 팀 정보와 사용자 정보를 모델에 추가
-        model.addAttribute("teamId", teamId);
-        model.addAttribute("userId", userId);
-        model.addAttribute("userNickname", userNickname);
-
-        return "team/teamPage";
+    // 모임 검색 페이지
+    @GetMapping("/search")
+    public String searchTeams(@PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+        Page<Team> teamPage = teamService.getAllTeams(pageable);
+        model.addAttribute("teams", teamPage.getContent());
+        model.addAttribute("page", teamPage);
+        return "team/teamSearch";
     }
 
 
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
-    public String getTeamDetail(@PathVariable Long teamId, Model model) {
-        Team team = teamService.getTeamById(teamId);
+    public String teamDetail(@PathVariable Long teamId, Model model) {
+
+        Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
         return "team/teamDetail";
     }
+
+
+    // 팀 페이지 조회
+    @GetMapping("/page/{teamId}")
+    public String getTeamPage(@PathVariable Long teamId, Model model) {
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userService.getUserById(userId);
+        String userNickname = user.getNickname();
+        model.addAttribute("teamId", teamId);
+        model.addAttribute("userId", userId);
+        model.addAttribute("userNickname", userNickname);
+        return "team/teamPage";
+    }
+
 
     // 모임 수정
     @PatchMapping("/detail/{teamId}")
@@ -114,8 +128,14 @@ public class TeamController {
     @PostMapping("/{teamId}/apply")
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = userService.getUserById(userId);
+
+        // 이미 신청한 참여자인지 확인
+        if (participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId)) {
+            return "redirect:/team/" + teamId + "/page?error=이미 신청한 모임입니다.";
+        }
+
         teamService.addParticipant(teamId, user);
-        return "redirect:/team/" + teamId + "/detail";
+        return "redirect:/team/" + teamId + "/page";
     }
 
     // 모임 참여 수락 (주최자가 호출)
@@ -129,47 +149,40 @@ public class TeamController {
         }
     }
 
-    // 참여자 목록 조회(팀 페이지)
-    @GetMapping("/{teamId}/{userId}/participants")
-    public String getParticipants(@PathVariable Long teamId, @PathVariable String userId, Model model) {
-        Participant participant = teamService.getParticipant(userId, teamId);
+    // 참여자 조회(팀 페이지)
+    @GetMapping("/{teamId}/participants")
+    public String getParticipants(@PathVariable Long teamId, Model model) {
+        List<Participant> participants = teamService.getParticipant(teamId);
         model.addAttribute("teamId", teamId);
-        model.addAttribute("participants", participant.getTeam().getParticipants());
+        model.addAttribute("participants", participants);
         return "team/teamPage";
     }
+
 
     // 참여자 상태 변경
     @PatchMapping("/{participantId}/participantStatus")
     public String changeParticipantStatus(@PathVariable Long participantId, @RequestParam ParticipantStatus status) {
         teamService.changeParticipantStatus(participantId, status);
-
         Participant participant = teamService.getParticipantById(participantId);
         Long teamId = participant.getTeam().getTeamId();
-
         return "redirect:/team/" + teamId + "/detail";
     }
 
-    // 전체 모임 조회
-    @GetMapping("/all/{userId}")
-    public String getAllTeams(@PathVariable String userId, @RequestParam(value = "status", required = false) String status, Model model) {
-        Iterable<Team> teams;
+    // 사용자 전체 모임 조회
+    @GetMapping("/mypage")
+    public String mypageTeam(Model model) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = authentication.getName();
 
-        // 주최 중인 모임 조회
-        if ("LEADER".equals(status)) {
-            teams = teamService.getTeamsByLeader(userId);
-        }
-        // 참여 중인 모임 조회
-        else if ("MEMBER".equals(status)) {
-            teams = teamService.getTeamsByParticipant(userId);
-        }
-        // 전체 모임 조회
-        else {
-            teams = teamService.getUserTeams(userId);
-        }
+        List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
+        model.addAttribute("hostingTeams", hostingTeams);
 
-        model.addAttribute("teams", teams);
+        List<Team> participatingTeams = teamService.getTeamsByParticipant(userId);
+        model.addAttribute("participatingTeams", participatingTeams);
+
         return "user/mypage";
     }
+
 
     // 모임 완료 후 리뷰 작성 페이지 표시
     @GetMapping("/{teamId}/reviews")
