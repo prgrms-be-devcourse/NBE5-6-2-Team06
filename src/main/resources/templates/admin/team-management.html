@@ -64,7 +64,7 @@
             <td>
               <button class="action-btn view" th:data-id="${team.teamId}"><i class="fas fa-eye"></i>
               </button>
-              <button class="action-btn edit" th:data-id="${team.teamId}"
+              <button class="action-btn edit" th:data-id="${team.teamId}" th:data-status="${team.status.name()}" th:data-title="${team.teamTitle}"
                       th:if="${team.status.name() != 'COMPLETED'}"><i class="fas fa-edit"></i>
               </button>
               <button class="action-btn delete" th:data-id="${team.teamId}"><i
@@ -237,6 +237,8 @@
       <div class="modal-header">
         <h2>모임 상태 변경</h2>
         <span class="close-modal">&times;</span>
+        <input type="text" hidden id="team-id">
+        <input type="text" hidden id="team-prev-status">
       </div>
       <div class="modal-body">
         <form id="teamStatusForm">
@@ -260,14 +262,6 @@
           <div class="form-group">
             <label for="status-change-reason">변경 사유 (선택사항)</label>
             <textarea id="status-change-reason" rows="3" placeholder="상태 변경 사유를 입력하세요"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="notify-members">참가자에게 알림</label>
-            <div class="checkbox-item">
-              <input type="checkbox" id="notify-members" checked>
-              <label for="notify-members">상태 변경을 참가자에게 알림</label>
-            </div>
           </div>
         </form>
       </div>

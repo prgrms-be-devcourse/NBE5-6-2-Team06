@@ -87,81 +87,81 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   // 모임 상태 변경 버튼 클릭 이벤트
-  const editStatusBtn = document.getElementById('edit-team-status-btn');
-  if (editStatusBtn) {
-    editStatusBtn.addEventListener('click', function () {
-      // 모임 상세 모달에서 정보 가져오기
-      const teamTitle = document.getElementById('team-title').textContent;
-      const teamStatus = document.getElementById(
-          'team-status').textContent.replace('상태: ', '');
+  const editStatusBtn = document.querySelectorAll('.action-btn.edit');
+  editStatusBtn.forEach(button => {
+    button.addEventListener('click', function () {
+      const teamId = this.getAttribute('data-id');
+      const teamStatus = this.getAttribute('data-status');
+      const title = this.getAttribute('data-title');
 
-      // 상태 변경 모달에 정보 설정
-      document.getElementById('team-name-display').value = teamTitle;
+      document.getElementById('team-id').value = teamId;
+      document.getElementById('team-prev-status').value = teamStatus;
+      document.getElementById('team-name-display').value = title;
+
+      document.getElementById('status-change-reason').value = '';
 
       // 현재 상태에 맞게 선택 옵션 설정
       const statusSelect = document.getElementById('team-status-select');
-      if (teamStatus === '모집 중') {
-        statusSelect.value = 'recruiting';
-      } else if (teamStatus === '모집 마감') {
-        statusSelect.value = 'closed';
-      } else if (teamStatus === '완료') {
-        statusSelect.value = 'completed';
-      } else if (teamStatus === '취소') {
-        statusSelect.value = 'cancelled';
+      switch (teamStatus) {
+        case 'RECRUITING':
+          statusSelect.value = 'RECRUITING';
+          break;
+        case 'FULL':
+          statusSelect.value = 'FULL';
+          break;
+        case 'COMPLETED':
+          statusSelect.value = 'COMPLETED';
+          break;
+        case 'CANCELED':
+          statusSelect.value = 'CANCELED';
+          break;
+        default:
+          statusSelect.value = ''; // 또는 기본값
       }
-
-      // 모임 상세 모달 닫기
-      document.getElementById('teamViewModal').style.display = 'none';
 
       // 상태 변경 모달 표시
       document.getElementById('teamStatusModal').style.display = 'block';
     });
-  }
+  })
 
   // 상태 저장 버튼 클릭 이벤트
   const saveStatusBtn = document.getElementById('save-status-btn');
   if (saveStatusBtn) {
     saveStatusBtn.addEventListener('click', function () {
+      const teamId = document.getElementById('team-id').value;
+      const prevTeamStatus = document.getElementById('team-prev-status').value;
+
       // 선택한 상태 가져오기
       const statusSelect = document.getElementById('team-status-select');
       const selectedStatus = statusSelect.value;
       const statusText = statusSelect.options[statusSelect.selectedIndex].text;
 
-      // 알림 여부 확인
-      const notifyMembers = document.getElementById('notify-members').checked;
-
-      // 실제 구현에서는 서버로 데이터 전송
-      // 여기서는 모달 닫기만 수행
-      document.getElementById('teamStatusModal').style.display = 'none';
-
-      // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-      let message = '모임 상태가 "' + statusText + '"(으)로 변경되었습니다.';
-      if (notifyMembers) {
-        message += ' 참가자들에게 알림이 전송되었습니다.';
+      if (prevTeamStatus === selectedStatus) {
+        alert("동일한 상태입니다.");
+        return;
       }
 
-      alert(message);
-
-      // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-      // window.location.reload();
+      fetch(`/api/admin/team/${teamId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(selectedStatus)
+      }).then(response => {
+        if (response.ok) {
+          response.text().then(text => { alert(text)});
+          document.getElementById('teamStatusModal').style.display = 'none';
+          window.location.reload(); // 페이지 새로고침
+        } else {
+          return response.text().then(text => { throw new Error(text) });
+        }
+      })
+      .catch(error => {
+        console.error('에러 발생:', error);
+        alert('모임 상태 변경 중 문제가 발생했습니다.');
+      });
     });
   }
-
-  // 모임 수정 버튼 클릭 이벤트 (상태 변경 모달로 연결)
-  const editButtons = document.querySelectorAll('.action-btn.edit');
-  editButtons.forEach(button => {
-    button.addEventListener('click', function () {
-      const teamId = this.getAttribute('data-id');
-
-      // 실제 구현에서는 서버에서 데이터를 가져와야 함
-      // 여기서는 예시 데이터로 모달 채우기
-      document.getElementById('team-name-display').value = '강남 맛집 탐방';
-      document.getElementById('team-status-select').value = 'recruiting';
-
-      // 상태 변경 모달 표시
-      document.getElementById('teamStatusModal').style.display = 'block';
-    });
-  });
 
   // 모임 삭제 버튼 클릭 이벤트
   const deleteButtons = document.querySelectorAll('.action-btn.delete');

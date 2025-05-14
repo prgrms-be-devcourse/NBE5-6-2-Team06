@@ -193,4 +193,10 @@ public class TeamService {
     public List<Participant> findAllWithUserByTeamId(Long teamId) {
         return participantRepository.findParticipantsWithUserByTeamId(teamId);
     }
+
+    @Transactional
+    public void updateTeamStatus(Long teamId, Status status) {
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        team.setStatus(status);
+    }
 }

@@ -3,6 +3,7 @@ package com.grepp.matnam.app.controller.api.admin;
 import com.grepp.matnam.app.controller.api.admin.payload.ParticipantResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamResponse;
 import com.grepp.matnam.app.model.team.TeamService;
+import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.infra.response.ApiResponse;
@@ -11,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,5 +39,11 @@ public class AdminTeamApiController {
             .map(ParticipantResponse::new)
             .toList();
         return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @PatchMapping("/{teamId}")
+    public ResponseEntity<?> updateTeamStatus(@PathVariable Long teamId, @RequestBody Status status) {
+        teamService.updateTeamStatus(teamId, status);
+        return ResponseEntity.ok("모임 상태가 변경되었습니다.");
     }
 }
