@@ -1,4 +1,4 @@
-package com.grepp.matnam.controller.web;
+package com.grepp.matnam.app.controller.web.mymap;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

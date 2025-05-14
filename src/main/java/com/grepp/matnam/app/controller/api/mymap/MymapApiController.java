@@ -1,4 +1,4 @@
-package com.grepp.matnam.controller.api;
+package com.grepp.matnam.app.controller.api.mymap;
 
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
