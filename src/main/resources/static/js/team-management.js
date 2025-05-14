@@ -169,14 +169,25 @@ document.addEventListener('DOMContentLoaded', function () {
     button.addEventListener('click', function () {
       const teamId = this.getAttribute('data-id');
 
-      if (confirm('정말로 이 모임을 삭제하시겠습니까?')) {
-        // 실제 구현에서는 서버로 삭제 요청을 보내야 함
-        // 여기서는 예시로 알림만 표시
-        alert('모임이 삭제되었습니다.');
-
-        // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-        // window.location.reload();
+      if (!confirm('정말로 이 모임을 비활성화하시겠습니까?')) {
+        return;
       }
+
+      fetch(`/api/admin/team/${teamId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (response.ok) {
+          response.text().then(text => { alert(text)});
+          window.location.reload(); // 페이지 새로고침
+        } else {
+          return response.text().then(text => { throw new Error(text) });
+        }
+      })
+      .catch(error => {
+        console.error('에러 발생:', error);
+        alert('사용자 비활성화 중 문제가 발생했습니다.');
+      });
     });
   });
 });

@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,4 +47,11 @@ public class AdminTeamApiController {
         teamService.updateTeamStatus(teamId, status);
         return ResponseEntity.ok("모임 상태가 변경되었습니다.");
     }
+
+    @DeleteMapping("/{teamId}")
+    public ResponseEntity<?> unActivatedTeam(@PathVariable Long teamId) {
+        teamService.unActivatedById(teamId);
+        return ResponseEntity.ok("모임이 비활성화되었습니다.");
+    }
+
 }

@@ -199,4 +199,11 @@ public class TeamService {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
     }
+
+    @Transactional
+    public void unActivatedById(Long teamId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        log.info("team {}", team);
+        team.unActivated();
+    }
 }
