@@ -981,6 +981,35 @@ h1 {
 .history-content.active {
     display: block;
 }
+/* 신고 유형 통합 */
+.report-item {
+    margin-bottom: 1rem;
+}
+
+.report-item:last-child {
+    margin-bottom: 0;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.report-title {
+    font-weight: 600;
+}
+
+.content-time {
+    font-size: 0.75rem;
+    color: var(--gray-color);
+}
+
+.report-content {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+}
 
 /* 채팅 메시지 */
 .chat-message {
@@ -1426,3 +1455,10 @@ h1 {
 /*    background-color: #ffe0e0;*/
 /*    color: #8b0000;*/
 /*}*/
+
+.detail-btn-div {
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}

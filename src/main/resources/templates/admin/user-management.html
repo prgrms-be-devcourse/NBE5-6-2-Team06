@@ -135,8 +135,17 @@
                     th:text="${report.activated} ? '대기 중' : '처리 완료'"></span>
             </td>
             <td>
-              <button class="action-btn view" th:data-id="${report.reportId}"><i
-                  class="fas fa-eye"></i>
+              <button class="action-btn view"
+                      th:data-id="${report.reportId}"
+                      th:data-user-id="${report.userId}"
+                      th:data-reported-id="${report.reportedId}"
+                      th:data-reason="${report.reason}"
+                      th:data-date="${report.createdAt}"
+                      th:data-activated="${report.activated}"
+                      th:data-type="${report.reportType}"
+                      th:data-chat-id="${report.chatId}"
+                      th:data-post-id="${report.teamId}">
+                <i class="fas fa-eye"></i>
               </button>
               <button th:if="${report.activated == true}" class="action-btn resolve"
                       th:data-id="${report.reportId}"><i class="fas fa-check"></i></button>
@@ -218,27 +227,31 @@
             <h3>신고 정보</h3>
             <div class="detail-item">
               <span class="detail-label">신고 ID:</span>
-              <span class="detail-value" id="report-id">1</span>
+              <span class="detail-value" id="report-id"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고자:</span>
-              <span class="detail-value" id="report-reporter">김철수 (kim@example.com)</span>
+              <span class="detail-value" id="report-reporter"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">대상자:</span>
-              <span class="detail-value" id="report-target">이영희 (lee@example.com)</span>
+              <span class="detail-value" id="report-target"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">신고 유형:</span>
+              <span class="detail-value" id="report-type"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고 내용:</span>
-              <span class="detail-value" id="report-content">부적절한 언어 사용</span>
+              <span class="detail-value" id="report-content"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고일:</span>
-              <span class="detail-value" id="report-date">2023-06-15 14:30</span>
+              <span class="detail-value" id="report-date"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">상태:</span>
-              <span class="detail-value status pending" id="report-status">대기중</span>
+              <span class="detail-value status pending" id="report-status"></span>
             </div>
           </div>
 
@@ -246,19 +259,23 @@
             <h3>대상자 활동 내역</h3>
             <div class="user-history">
               <div class="history-tabs">
-                <div class="history-tab active" data-tab="chat-history">채팅 내역</div>
-                <div class="history-tab" data-tab="post-history">게시글 내역</div>
+                <div class="history-tab active" data-tab="report-history">채팅 내역</div>
+<!--                <div class="history-tab" data-tab="post-history">게시글 내역</div>-->
               </div>
 
-              <div class="history-content active" id="chat-history">
-                <!-- 채팅 내역이 여기에 동적으로 로드됩니다 -->
-                <div class="chat-message">
-                  <div class="message-header">
-                    <span class="message-sender">이영희</span>
-                    <span class="message-time">2023-06-15 14:25</span>
+              <div class="history-content active" id="report-history">
+                <div class="report-item">
+                  <div class="report-header">
+                    <span class="report-title">이영희</span>
+                    <span class="content-time">2023-06-15 14:25</span>
                   </div>
-                  <div class="message-content">
+                  <div class="report-content">
                     <p>부적절한 채팅 내용 예시</p>
+                  </div>
+                  <div class="detail-btn-div">
+                    <div class="action-buttons">
+                      <button class="primary-btn detail-btn">자세히 보기</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -281,7 +298,6 @@
       </div>
       <div class="modal-footer">
         <div class="action-buttons">
-          <button class="secondary-btn reject-btn">거부</button>
           <button class="warning-btn suspend-btn" id="show-suspend-options">사용자 정지</button>
           <button class="primary-btn resolve-btn">해결 처리</button>
         </div>

@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user.dto;
 
+import com.grepp.matnam.app.model.user.code.ReportType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,4 +17,7 @@ public class ReportDto {
     private String reason;
     private LocalDateTime createdAt;
     private Boolean activated;
+    private ReportType reportType;
+    private Long chatId;
+    private Long teamId;
 }

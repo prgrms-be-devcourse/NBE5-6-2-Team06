@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.model.user.code.ReportType;
 import com.grepp.matnam.app.model.user.dto.ReportDto;
 import com.grepp.matnam.app.model.user.entity.QReport;
 import com.querydsl.core.BooleanBuilder;
@@ -31,7 +32,10 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
                 report.reportedId,
                 report.reason,
                 report.createdAt,
-                report.activated
+                report.activated,
+                report.reportType,
+                report.chatId,
+                report.teamId
             ))
             .from(report)
             .orderBy(getOrderSpecifiers(pageable.getSort()))
@@ -65,7 +69,10 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
                 report.reportedId,
                 report.reason,
                 report.createdAt,
-                report.activated
+                report.activated,
+                report.reportType,
+                report.chatId,
+                report.teamId
             ))
             .from(report)
             .where(report.activated.eq(status))
@@ -94,7 +101,10 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
                 report.reportedId,
                 report.reason,
                 report.createdAt,
-                report.activated
+                report.activated,
+                report.reportType,
+                report.chatId,
+                report.teamId
             ))
             .from(report)
             .where(report.activated.eq(status))
@@ -129,7 +139,10 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
                 report.reportedId,
                 report.reason,
                 report.createdAt,
-                report.activated
+                report.activated,
+                report.reportType,
+                report.chatId,
+                report.teamId
             ))
             .from(report)
             .where(builder)

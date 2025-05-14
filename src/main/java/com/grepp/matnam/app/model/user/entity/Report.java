@@ -1,7 +1,10 @@
 package com.grepp.matnam.app.model.user.entity;
 
+import com.grepp.matnam.app.model.user.code.ReportType;
 import com.grepp.matnam.infra.entity.BaseEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,5 +30,10 @@ public class Report extends BaseEntity {
 
     private String reportedId;
     private String reason;
+
+    @Enumerated(EnumType.STRING)
+    private ReportType reportType;
+    private Long chatId;
+    private Long teamId;
 
 }
