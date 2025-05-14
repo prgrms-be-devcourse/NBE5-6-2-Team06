@@ -17,8 +17,8 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     // 사용자 ID로 팀 조회 (주최자)
     List<Team> findTeamsByUser_UserId(String userId);
 
-    @Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId AND p.participantStatus = :status")
-    List<Team> findTeamsByParticipantUserIdAndParticipantStatus(String userId, ParticipantStatus participantStatus);
+    @Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus")
+    List<Team> findTeamsByParticipantUserIdAndParticipantStatus(@Param("userId") String userId, @Param("participantStatus") ParticipantStatus participantStatus);
 
     // 사용자 모임 조회
     //@Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId")

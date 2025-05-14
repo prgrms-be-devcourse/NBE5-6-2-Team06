@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,6 +71,7 @@ public class UserController {
         return "user/preference";
     }
 
+    @Transactional
     @GetMapping("/mypage")
     public String mypage(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -112,8 +114,20 @@ public class UserController {
             model.addAttribute("user", user);
             model.addAttribute("teamsWithoutReview", teamsWithoutReview);
 
+            // 주최한 모임 조회
+            List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
+            model.addAttribute("hostingTeams", hostingTeams);
+
+            // 참여 중인 모임 조회 (승인된 참여자 상태)
+            List<Team> participatingTeams = teamService.getTeamsByParticipant(userId);
+            model.addAttribute("participatingTeams", participatingTeams);
+
+            // 참여한 모든 모임 조회 (승인된 참여자 및 상태 무관)
+            List<Team> allTeamsForUser = teamService.getAllTeamsForUser(userId);
+            model.addAttribute("allTeamsForUser", allTeamsForUser);
+
             // 빈 목록 추가 (실제 구현 전까지 사용)
-            model.addAttribute("allTeams", new ArrayList<>());
+//            model.addAttribute("allTeams", new ArrayList<>());
             model.addAttribute("userMaps", new ArrayList<>());
 
             return "user/mypage";
