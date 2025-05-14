@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>강남 맛집 탐방 모임</title>
+  <title th:text="${team.teamTitle} + ' | 맛남'">강남 맛집 탐방 모임 | 맛남</title>
   <style>
     body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
     header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #eee; }
@@ -23,23 +23,31 @@
     <a href="/">맛남</a>
   </div>
   <nav>
-    <a href="/">홈</a>
-    <a href="/team/search">모임 탐색</a>
-    <a href="/user/mypage">마이페이지</a>
+    <a th:href="@{/}">홈</a>
+    <a th:href="@{/team/search}">모임찾기</a>
+    <a th:href="@{/user/mypage}">마이페이지</a>
   </nav>
 </header>
 <div class="container">
   <div class="main">
     <div class="card">
-      <h2>강남 맛집 탐방 모임 <span style="font-size: 0.8rem; color: gray;">모집중</span></h2>
-      <p>📅 2023년 6월 10일 (토) | 🕖 오후 7시 ~ 8시 | 📍 서울 강남구 테헤란로 123 | 👥 선착순 4/10명</p>
+      <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'CLOSED'}">모집 완료</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FINISHED'}">종료된 모임</span>
+      <p>
+        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
+        📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
+        👥 <span th:text="${team.participants.size()}">4</span>/<span th:text="${team.maxPeople}">10</span>명
+      </p>
       <div class="info-section">
         <h3>모임 소개</h3>
-        <p>강남에서 진행하는 맛집 탐방! 맛있는 음식을 즐기며 즐거운 대화가 함께하는 시간입니다. 혼자를 좋아하던 사람도 부담없이 만남을 즐기는 초보자 환영! 함께 기다립니다.</p>
+        <p th:text="${team.teamDetails}">강남에서 진행하는 맛집 탐방! ...</p>
       </div>
       <div class="info-section">
         <h3>장소 정보</h3>
-        <p>맛남 강남점 식당<br>서울 강남구 테헤란로 123</p>
+        <p th:text="${team.restaurantName} + '<br>' + ${team.restaurantName}">맛남 강남점 식당<br>서울 강남구 테헤란로 123</p>
         <div class="map-placeholder">지도가 표시될 영역</div>
       </div>
     </div>
@@ -47,12 +55,15 @@
   <div class="sidebar">
     <div class="card">
       <h4>모임 참여하기</h4>
-      <p>4/10명 참여중입니다.</p>
-      <button type="button">지금 참여 신청하기</button>
+      <p th:text="${team.participants.size()} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
+      <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
+        <input type="hidden" name="userId" th:value="${#authentication.name}">
+        <button type="submit">지금 참여 신청하기</button>
+      </form>
     </div>
     <div class="card">
       <h4>방장 정보</h4>
-      <p th:text="'🙋‍♂️ ' + ${team.user.username}">방장 이름</p>
+      <p th:text="'🙋‍♂️ ' + ${team.user.nickname}">방장 이름</p>
     </div>
     <div class="card">
       <h4>비슷한 모임</h4>

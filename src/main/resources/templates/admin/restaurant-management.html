@@ -21,7 +21,7 @@
 
             <div class="search-filter">
               <input type="text" name="keyword" placeholder="식당명을 입력하세요"
-                     th:value="${param.keyword}" />
+                     th:value="${param.keyword}"/>
               <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
             </div>
 
@@ -88,163 +88,143 @@
           </tbody>
         </table>
       </div>
-
-      <div class="pagination">
-        <a class="page-btn prev"
-           th:classappend="${currentPage == 1} ? 'disabled'"
-           th:href="@{${page.url()}(page=${page.prevPage()}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}">
-          <i class="fas fa-chevron-left"></i>
-        </a>
-
-        <th:block th:each="num : ${#numbers.sequence(page.startNumber(), page.endNumber())}">
-          <a class="page-btn"
-             th:classappend="${num == currentPage} ? 'active'"
-             th:href="@{${page.url()}(page=${num}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}"
-             th:text="${num}">1</a>
-        </th:block>
-
-        <a class="page-btn next"
-           th:classappend="${currentPage == totalPages} ? 'disabled'"
-           th:href="@{${page.url()}(page=${page.nextPage()}, keyword=${param.keyword}, category=${categoryName}, sort=${sort})}">
-          <i class="fas fa-chevron-right"></i>
-        </a>
-      </div>
-
+      <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
     </div>
+  </div>
 
-    <!-- 식당 추가/수정 모달 (개선) -->
-    <div class="modal" id="restaurantModal">
-      <div class="modal-content large-modal">
-        <div class="modal-header">
-          <h2 id="restaurant-modal-title">식당 추가</h2>
-          <span class="close-modal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="restaurantForm">
-            <input type="hidden" id="restaurant-id">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="restaurant-name">식당명 <span class="required">*</span></label>
-                <input type="text" id="restaurant-name" required>
-                <span id="error-name" class="error-message"></span>
-              </div>
-              <div class="form-group">
-                <label for="restaurant-category">카테고리 <span class="required">*</span></label>
-                <select id="restaurant-category" required>
-                  <option value="">카테고리 선택</option>
-                  <option th:each="category : ${categories}" th:value="${category.koreanName}"
-                          th:text="${category.koreanName}">
-                  </option>
-                </select>
-                <span id="error-category" class="error-message"></span>
-              </div>
+  <!-- 식당 추가/수정 모달 (개선) -->
+  <div class="modal" id="restaurantModal">
+    <div class="modal-content large-modal">
+      <div class="modal-header">
+        <h2 id="restaurant-modal-title">식당 추가</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="restaurantForm">
+          <input type="hidden" id="restaurant-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="restaurant-name">식당명 <span class="required">*</span></label>
+              <input type="text" id="restaurant-name" required>
+              <span id="error-name" class="error-message"></span>
             </div>
             <div class="form-group">
-              <label for="restaurant-address">주소 <span class="required">*</span></label>
-              <input type="text" id="restaurant-address" required>
-              <span id="error-address" class="error-message"></span>
+              <label for="restaurant-category">카테고리 <span class="required">*</span></label>
+              <select id="restaurant-category" required>
+                <option value="">카테고리 선택</option>
+                <option th:each="category : ${categories}" th:value="${category.koreanName}"
+                        th:text="${category.koreanName}">
+                </option>
+              </select>
+              <span id="error-category" class="error-message"></span>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="restaurant-phone">전화번호 <span class="required">*</span></label>
-                <input type="text" id="restaurant-phone">
-                <span id="error-phone" class="error-message"></span>
-              </div>
-              <div class="form-group">
-                <label for="restaurant-hours">영업 시간 <span class="required">*</span></label>
-                <input type="text" id="restaurant-hours"
-                       placeholder="예: 평일 11:00-22:00, 주말 11:00-23:00">
-                <span id="error-hours" class="error-message"></span>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="restaurant-main-menu">대표 메뉴 <span class="required">*</span></label>
-                <input type="text" id="restaurant-main-menu" placeholder="대표 메뉴를 입력하세요">
-                <span id="error-main-menu" class="error-message"></span>
-              </div>
+          </div>
+          <div class="form-group">
+            <label for="restaurant-address">주소 <span class="required">*</span></label>
+            <input type="text" id="restaurant-address" required>
+            <span id="error-address" class="error-message"></span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="restaurant-phone">전화번호 <span class="required">*</span></label>
+              <input type="text" id="restaurant-phone">
+              <span id="error-phone" class="error-message"></span>
             </div>
             <div class="form-group">
-              <label for="restaurant-description">식당 설명 <span class="required">*</span></label>
-              <textarea id="restaurant-description" rows="3"
-                        placeholder="식당에 대한 간략한 설명을 입력하세요"></textarea>
-              <span id="error-description" class="error-message"></span>
+              <label for="restaurant-hours">영업 시간 <span class="required">*</span></label>
+              <input type="text" id="restaurant-hours"
+                     placeholder="예: 평일 11:00-22:00, 주말 11:00-23:00">
+              <span id="error-hours" class="error-message"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="restaurant-main-menu">대표 메뉴 <span class="required">*</span></label>
+              <input type="text" id="restaurant-main-menu" placeholder="대표 메뉴를 입력하세요">
+              <span id="error-main-menu" class="error-message"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="restaurant-description">식당 설명 <span class="required">*</span></label>
+            <textarea id="restaurant-description" rows="3"
+                      placeholder="식당에 대한 간략한 설명을 입력하세요"></textarea>
+            <span id="error-description" class="error-message"></span>
+          </div>
+          <div class="form-group">
+            <label>분위기 (해당하는 항목 최소 1개에서 최대 3개 선택) <span class="required">*</span></label>
+            <span id="error-mood" class="error-message"></span>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="goodTalk" name="restaurant-mood" value="goodTalk">
+                <label for="goodTalk">대화하기 좋은</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="manyDrink" name="restaurant-mood" value="manyDrink">
+                <label for="manyDrink">술이 다양한</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="goodMusic" name="restaurant-mood" value="goodMusic">
+                <label for="goodMusic">음악이 좋은</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="clean" name="restaurant-mood" value="clean">
+                <label for="clean">깨끗한</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="goodView" name="restaurant-mood" value="goodView">
+                <label for="goodView">뷰가 좋은</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="isTerrace" name="restaurant-mood" value="isTerrace">
+                <label for="isTerrace">테라스가 있는</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="goodPicture" name="restaurant-mood" value="goodPicture">
+                <label for="goodPicture">사진이 잘 나오는</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="goodMenu" name="restaurant-mood" value="goodMenu">
+                <label for="goodMenu">메뉴가 다양한</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="longStay" name="restaurant-mood" value="longStay">
+                <label for="longStay">오래 머물 수 있는</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="bigStore" name="restaurant-mood" value="bigStore">
+                <label for="bigStore">매장이 넓은</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="restaurant-google-rating">구글 평점 <span class="required">*</span></label>
+              <input type="text" id="restaurant-google-rating" placeholder="구글 평점을 입력하세요.">
+              <span id="error-google-rating" class="error-message"></span>
             </div>
             <div class="form-group">
-              <label>분위기 (해당하는 항목 최소 1개에서 최대 3개 선택) <span class="required">*</span></label>
-              <span id="error-mood" class="error-message"></span>
-              <div class="checkbox-group">
-                <div class="checkbox-item">
-                  <input type="checkbox" id="goodTalk" name="restaurant-mood" value="대화하기 좋은">
-                  <label for="goodTalk">대화하기 좋은</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="manyDrink" name="restaurant-mood" value="술이 다양한">
-                  <label for="manyDrink">술이 다양한</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="goodMusic" name="restaurant-mood" value="음악이 좋은">
-                  <label for="goodMusic">음악이 좋은</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="clean" name="restaurant-mood" value="깨끗한">
-                  <label for="clean">깨끗한</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="goodView" name="restaurant-mood" value="뷰가 좋은">
-                  <label for="goodView">뷰가 좋은</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="isTerrace" name="restaurant-mood" value="테라스가 있는">
-                  <label for="isTerrace">테라스가 있는</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="goodPicture" name="restaurant-mood" value="사진이 잘 나오는">
-                  <label for="goodPicture">사진이 잘 나오는</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="goodMenu" name="restaurant-mood" value="메뉴가 다양한">
-                  <label for="goodMenu">메뉴가 다양한</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="longStay" name="restaurant-mood" value="오래 머물 수 있는">
-                  <label for="longStay">오래 머물 수 있는</label>
-                </div>
-                <div class="checkbox-item">
-                  <input type="checkbox" id="bigStore" name="restaurant-mood" value="매장이 넓은">
-                  <label for="bigStore">매장이 넓은</label>
-                </div>
-              </div>
+              <label for="restaurant-naver-rating">네이버 평점 <span class="required">*</span></label>
+              <input type="text" id="restaurant-naver-rating" placeholder="네이버 평점을 입력하세요.">
+              <span id="error-naver-rating" class="error-message"></span>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="restaurant-google-rating">구글 평점 <span class="required">*</span></label>
-                <input type="text" id="restaurant-google-rating" placeholder="구글 평점을 입력하세요.">
-                <span id="error-google-rating" class="error-message"></span>
-              </div>
-              <div class="form-group">
-                <label for="restaurant-naver-rating">네이버 평점 <span class="required">*</span></label>
-                <input type="text" id="restaurant-naver-rating" placeholder="네이버 평점을 입력하세요.">
-                <span id="error-naver-rating" class="error-message"></span>
-              </div>
-              <div class="form-group">
-                <label for="restaurant-kakao-rating">카카오 평점 <span class="required">*</span></label>
-                <input type="text" id="restaurant-kakao-rating" placeholder="카카오 평점을 입력하세요.">
-                <span id="error-kakao-rating" class="error-message"></span>
-              </div>
+            <div class="form-group">
+              <label for="restaurant-kakao-rating">카카오 평점 <span class="required">*</span></label>
+              <input type="text" id="restaurant-kakao-rating" placeholder="카카오 평점을 입력하세요.">
+              <span id="error-kakao-rating" class="error-message"></span>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button class="secondary-btn cancel-btn">취소</button>
-          <button class="primary-btn save-btn" id="save-button">저장</button>
-        </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-btn">취소</button>
+        <button class="primary-btn save-btn" id="save-button">저장</button>
       </div>
     </div>
   </div>
-  <th:block layout:fragment="script">
-    <script th:src="@{/js/restaurant-management.js}"></script>
-  </th:block>
 </div>
+
+<th:block layout:fragment="script">
+  <script th:src="@{/js/restaurant-management.js}"></script>
+</th:block>
 </body>
 </html>

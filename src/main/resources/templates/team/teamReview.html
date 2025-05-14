@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맛남 | 모임 리뷰 작성</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .header-left .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .header-left nav a {
+            text-decoration: none;
+            color: #333;
+            margin-right: 1rem;
+            font-weight: 500;
+        }
+        .header-left nav a:hover {
+            color: #000;
+        }
+        .header-left nav a.active {
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 3px;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-right span {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .main-section {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .main-section h2 {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .team-info {
+            margin-bottom: 2rem;
+        }
+        .team-info h3 {
+            margin-bottom: 0.5rem;
+        }
+        .team-info p {
+            margin: 0.3rem 0;
+            color: #666;
+        }
+        .participants-section h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .participant-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .participant-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .participant-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        .participant-info {
+            flex-grow: 1;
+        }
+        .participant-info h4 {
+            margin: 0 0 0.3rem 0;
+        }
+        .participant-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .participant-actions {
+            display: flex;
+            align-items: center;
+        }
+        .review-btn {
+            background-color: #000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .review-btn:hover {
+            background-color: #333;
+        }
+        .review-completed {
+            background-color: #8e8e93;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .temperature-display {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.3rem;
+        }
+        .temperature-high {
+            background-color: #ff5c5c;
+            color: white;
+        }
+        .temperature-good {
+            background-color: #ff9966;
+            color: white;
+        }
+        .temperature-normal {
+            background-color: #5cb85c;
+            color: white;
+        }
+        .temperature-low {
+            background-color: #5bc0de;
+            color: white;
+        }
+        .temperature-bad {
+            background-color: #6c757d;
+            color: white;
+        }
+        .summary-section {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .summary-title {
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .summary-content {
+            display: flex;
+            justify-content: space-between;
+        }
+        .summary-item {
+            text-align: center;
+            flex: 1;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .summary-item h4 {
+            font-size: 1.8rem;
+            margin: 0 0 0.5rem 0;
+        }
+        .summary-item p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .rating-stars {
+            display: flex;
+            gap: 0.3rem;
+            font-size: 1.5rem;
+            color: #ffc107;
+            margin-bottom: 1rem;
+        }
+        .info-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .info-title {
+            font-weight: 500;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        .info-content ul {
+            margin: 0;
+            padding-left: 1.5rem;
+        }
+        .info-content li {
+            margin-bottom: 0.5rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .modal-title {
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .modal-footer button {
+            padding: 0.7rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .modal-footer .cancel {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            color: #333;
+        }
+        .modal-footer .submit {
+            background-color: #000;
+            color: #fff;
+            border: none;
+        }
+        .rating-input {
+            margin-bottom: 1.5rem;
+        }
+        .modal-body .rating-stars {
+            cursor: pointer;
+        }
+        .modal-body .rating-stars i:hover {
+            transform: scale(1.1);
+        }
+        .rating-text {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        footer {
+            margin-top: 5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+            padding: 1rem 0;
+            border-top: 1px solid #eee;
+            background-color: #fff;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+    <script th:src="@{/js/auth.js}"></script>
+</head>
+<body>
+<header>
+    <div class="header-left">
+        <div class="logo">맛남</div>
+        <nav>
+            <a th:href="@{/}">홈</a>
+            <a th:href="@{/team/list}">모임 찾기</a>
+            <a th:href="@{/map}">맛집 탐색</a>
+            <a th:href="@{/user/mypage}">마이페이지</a>
+        </nav>
+    </div>
+    <div class="header-right">
+        <span title="알림">🔔</span>
+        <span title="프로필">👤</span>
+        <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="main-section">
+        <h2>모임 리뷰 작성</h2>
+
+        <div class="team-info">
+            <h3 th:text="${team.teamTitle}">맛있는 이탈리안 요리 모임</h3>
+            <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">2023년 6월 19일 (월) 오후 7:00</span></p>
+            <p>📍 <span th:text="${team.restaurantName}">트라토리아 식당</span></p>
+            <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">5/6</span></p>
+        </div>
+
+        <div class="participants-section">
+            <h3>참여자 리뷰</h3>
+            <p>모임에 참여한 다른 사용자들에게 리뷰를 작성해주세요. 정성껏 작성한 리뷰는 서로의 매너온도에 반영됩니다.</p>
+
+            <div id="participant-list">
+                <div class="participant-item" th:each="participant : ${participants}" th:if="${participant.user.userId != #authentication.name}">
+                    <div class="participant-avatar" th:text="${participant.user.nickname.substring(0, 1)}">M</div>
+                    <div class="participant-info">
+                        <h4 th:text="${participant.user.nickname}">맛있는사람</h4>
+                        <p th:text="${participant.role == 'LEADER' ? '모임장' : '참여자'}">모임장</p>
+                        <div class="temperature-display"
+                             th:classappend="${
+                    participant.user.temperature >= 39.0 ? 'temperature-high' :
+                    participant.user.temperature >= 37.5 ? 'temperature-good' :
+                    participant.user.temperature >= 36.0 ? 'temperature-normal' :
+                    participant.user.temperature >= 34.0 ? 'temperature-low' :
+                    'temperature-bad'
+                 }">
+                            <i class="bi bi-thermometer-half"></i>
+                            <span th:text="${#numbers.formatDecimal(participant.user.temperature, 1, 1)}">36.5</span>°
+                        </div>
+                    </div>
+                    <div class="participant-actions">
+                        <th:block th:with="reviewed=${#lists.contains(myReviews.![reviewee], participant.user.userId)}">
+                            <span th:if="${reviewed}" class="review-completed">리뷰 완료</span>
+                            <button th:unless="${reviewed}" class="review-btn"
+                                    th:data-user-id="${participant.user.userId}"
+                                    th:data-nickname="${participant.user.nickname}"
+                                    onclick="openReviewModalFromButton(this)">리뷰 작성</button>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-section">
+            <div class="summary-title">내 리뷰 현황</div>
+            <div id="review-summary" class="summary-content">
+                <div class="summary-item">
+                    <h4 id="average-rating">0.0</h4>
+                    <p>평균 평점</p>
+                </div>
+                <div class="summary-item">
+                    <h4 id="received-review-count">0</h4>
+                    <p>받은 리뷰 수</p>
+                </div>
+                <div class="summary-item">
+                    <h4 id="temperature-change">+0.0°</h4>
+                    <p>매너온도 변화</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <div class="info-title">매너온도 안내</div>
+            <div class="info-content">
+                <p>매너온도는 모임에서의 활동과 다른 사용자로부터 받은 리뷰를 기반으로 산정되는 사용자의 매너 지수입니다.</p>
+                <h4>매너온도 변화 기준</h4>
+                <ul>
+                    <li>모임 완료 시: <span style="color: #5cb85c;">+0.1°C</span></li>
+                    <li>리뷰 평점 4~5점: <span style="color: #5cb85c;">+0.3°C</span></li>
+                    <li>리뷰 평점 3점대: <span style="color: #5cb85c;">+0.1°C</span></li>
+                    <li>리뷰 평점 1~2점: <span style="color: #ff5c5c;">-0.3°C</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="reviewModal" class="modal">
+    <div class="modal-content">
+        <h3 class="modal-title" id="reviewModalTitle">리뷰 작성</h3>
+        <div class="modal-body">
+            <input type="hidden" id="teamId" th:value="${team.teamId}">
+            <input type="hidden" id="revieweeId" value="">
+            <input type="hidden" id="currentUserId" th:value="${currentUserId}">
+
+            <div class="rating-input">
+                <label>평점</label>
+                <div class="rating-stars">
+                    <i class="bi bi-star" data-rating="1"></i>
+                    <i class="bi bi-star" data-rating="2"></i>
+                    <i class="bi bi-star" data-rating="3"></i>
+                    <i class="bi bi-star" data-rating="4"></i>
+                    <i class="bi bi-star" data-rating="5"></i>
+                </div>
+                <input type="hidden" id="rating" value="0">
+                <div class="rating-text"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="cancel" onclick="closeReviewModal()">취소</button>
+            <button type="button" class="submit" id="submitReview" disabled>리뷰 제출</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    © 2025 맛남. 모든 권리 보유.
+</footer>
+
+<script>
+    let currentUserId = '';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        currentUserId = document.querySelector('meta[name="userId"]')?.content || '';
+
+        loadReviewSummary();
+
+        setupRatingStars();
+
+        document.getElementById('submitReview').addEventListener('click', submitReview);
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('reviewModal');
+            if (event.target === modal) {
+                closeReviewModal();
+            }
+        }
+    });
+
+    function openReviewModal(userId, nickname) {
+        document.getElementById('revieweeId').value = userId;
+        document.getElementById('reviewModalTitle').textContent = nickname + '님에 대한 리뷰 작성';
+
+        document.getElementById('rating').value = '0';
+        document.querySelectorAll('.rating-stars i').forEach(star => {
+            star.className = 'bi bi-star';
+        });
+        document.querySelector('.rating-text').textContent = '';
+        document.getElementById('submitReview').disabled = true;
+
+        document.getElementById('reviewModal').style.display = 'block';
+    }
+
+    function openReviewModalFromButton(button) {
+        const userId = button.getAttribute('data-user-id');
+        const nickname = button.getAttribute('data-nickname');
+        openReviewModal(userId, nickname);
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+    }
+
+    function setupRatingStars() {
+        const ratingStars = document.querySelectorAll('.rating-stars i');
+        const ratingText = document.querySelector('.rating-text');
+        const ratingTexts = [
+            '',
+            '1점 - 별로예요',
+            '2점 - 아쉬워요',
+            '3점 - 보통이에요',
+            '4점 - 좋았어요',
+            '5점 - 최고예요'
+        ];
+
+        ratingStars.forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+
+                ratingStars.forEach((s, index) => {
+                    s.className = index < rating ? 'bi bi-star-fill' : 'bi bi-star';
+                });
+
+                document.getElementById('rating').value = rating;
+
+                ratingText.textContent = ratingTexts[rating];
+
+                document.getElementById('submitReview').disabled = false;
+            });
+
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+
+                ratingStars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.className = 'bi bi-star-fill';
+                    } else {
+                        s.className = 'bi bi-star';
+                    }
+                });
+            });
+        });
+
+        document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
+            const currentRating = parseInt(document.getElementById('rating').value);
+
+            ratingStars.forEach((s, index) => {
+                s.className = index < currentRating ? 'bi bi-star-fill' : 'bi bi-star';
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        currentUserId = document.querySelector('meta[name="userId"]')?.content || document.getElementById('currentUserId')?.value || '';
+
+        console.log("현재 사용자 ID:", currentUserId);
+
+        if (!currentUserId) {
+            console.error("로그인 정보를 가져올 수 없습니다.");
+        }
+
+        loadReviewSummary();
+
+        setupRatingStars();
+
+        document.getElementById('submitReview').addEventListener('click', submitReview);
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('reviewModal');
+            if (event.target === modal) {
+                closeReviewModal();
+            }
+        }
+    });
+
+    function submitReview() {
+        const teamId = document.getElementById('teamId').value;
+        const revieweeId = document.getElementById('revieweeId').value;
+        const rating = document.getElementById('rating').value;
+
+        console.log("현재 사용자 ID:", currentUserId);
+        console.log("팀 ID:", teamId);
+        console.log("대상 사용자 ID:", revieweeId);
+        console.log("평점:", rating);
+
+        if (rating < 1) {
+            alert('평점을 선택해주세요.');
+            return;
+        }
+
+        if (!currentUserId) {
+            alert('로그인 정보를 확인할 수 없습니다.');
+            return;
+        }
+
+        const data = {
+            teamId: parseInt(teamId),
+            reviewerId: currentUserId,
+            revieweeId: revieweeId,
+            rating: parseFloat(rating)
+        };
+
+        fetch('/api/reviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(`${response.status} ${response.statusText}: ${errorData.message || errorData.data || 'Unknown error'}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (result.code === '0000') {
+                    closeReviewModal();
+
+                    alert('리뷰가 성공적으로 등록되었습니다.');
+
+                    location.reload();
+                } else {
+                    alert('리뷰 등록에 실패했습니다: ' + (result.message || result.data));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('오류가 발생했습니다: ' + error.message);
+            });
+    }
+
+    function loadReviewSummary() {
+        const teamId = document.getElementById('teamId').value;
+
+        console.log("리뷰 요약 정보 요청 중... 팀 ID:", teamId);
+
+        fetch(`/api/reviews/summary?teamId=${teamId}`)
+            .then(response => {
+                console.log("응답 상태:", response.status);
+                return response.json();
+            })
+            .then(result => {
+                console.log("리뷰 요약 응답 데이터:", result);
+
+                if (result.code === '0000') {
+                    if (result.data) {
+                        console.log("리뷰 요약 데이터:", result.data);
+                        renderReviewSummary(result.data);
+                    } else {
+                        console.warn("리뷰 요약 데이터가 없습니다:", result);
+                    }
+                } else {
+                    console.warn('리뷰 요약 정보를 불러오는데 실패했습니다:', result.message);
+                }
+            })
+            .catch(error => {
+                console.error('리뷰 요약 정보 로드 중 오류 발생:', error);
+            });
+    }
+
+    function renderReviewSummary(summary) {
+        document.getElementById('average-rating').textContent = summary.averageRating.toFixed(1);
+        document.getElementById('received-review-count').textContent = summary.receivedReviewCount;
+
+        const temperatureChangeEl = document.getElementById('temperature-change');
+        if (summary.temperatureChange > 0) {
+            temperatureChangeEl.textContent = '+' + summary.temperatureChange.toFixed(1) + '°';
+            temperatureChangeEl.style.color = '#5cb85c';
+        } else if (summary.temperatureChange < 0) {
+            temperatureChangeEl.textContent = summary.temperatureChange.toFixed(1) + '°';
+            temperatureChangeEl.style.color = '#ff5c5c';
+        } else {
+            temperatureChangeEl.textContent = '+0.0°';
+            temperatureChangeEl.style.color = '#333';
+        }
+    }
+</script>
+</body>
+</html>

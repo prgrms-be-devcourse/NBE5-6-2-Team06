@@ -13,7 +13,6 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@ToString
 public class Restaurant extends BaseEntity {
 
     @Id
@@ -66,5 +65,5 @@ public class Restaurant extends BaseEntity {
             ", mood='" + mood + '\'' +
             '}';
     }
-}
 
+}

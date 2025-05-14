@@ -1,17 +1,25 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
+import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     @Autowired
@@ -19,6 +27,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private final ModelMapper mapper;
+
 
     public User signup(User user) {
         log.info("회원가입 시도: " + user.getUserId() + ", 이메일: " + user.getEmail());
@@ -55,6 +66,11 @@ public class UserService {
                     log.info("로그인 실패: 사용자 없음 - " + userId);
                     return new IllegalArgumentException("사용자를 찾을 수 없습니다.");
                 });
+
+        if (user.getStatus() == Status.SUSPENDED || user.getStatus() == Status.BANNED) {
+            log.info("로그인 실패: 정지된 계정 - " + userId + ", 상태=" + user.getStatus());
+            throw new IllegalArgumentException("정지된 계정입니다.");
+        }
 
         if (user.getStatus() != Status.ACTIVE || !user.isActivated()) {
             log.info("로그인 실패: 비활성화된 계정 - " + userId + ", 상태=" + user.getStatus());
@@ -121,5 +137,44 @@ public class UserService {
         log.info("비밀번호 변경 완료: " + updatedUser.getUserId());
 
         return updatedUser;
+    }
+
+    public Page<User> findByFilter(String status, String keyword, Pageable pageable) {
+        if (!status.isBlank() && StringUtils.hasText(keyword)) {
+            return userRepository.findByStatusAndKeywordContaining(status, keyword, pageable);
+        } else if (!status.isBlank()) {
+            return userRepository.findByStatus(status, pageable);
+        } else if (StringUtils.hasText(keyword)) {
+            return userRepository.findByKeywordContaining(keyword, pageable);
+        } else {
+            return userRepository.findAllUsers(pageable);
+        }
+    }
+
+    public void updateUserStatus(String userId, UserStatusRequest request) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.setStatus(request.getStatus());
+
+        if (request.getStatus() == Status.SUSPENDED) {
+            user.setSuspendDuration(request.getSuspendDuration());
+            user.setDueDate(LocalDate.now().plusDays(request.getSuspendDuration()));
+            user.setDueReason(request.getDueReason());
+        } else {
+            user.setSuspendDuration(null);
+            user.setDueDate(null);
+            user.setDueReason(null);
+        }
+
+        userRepository.save(user);
+    }
+
+    public void unActivatedById(String userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        user.unActivated();
+        userRepository.save(user);
     }
 }

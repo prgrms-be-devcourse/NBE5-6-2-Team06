@@ -1,11 +1,7 @@
 package com.grepp.matnam.app.model.restaurant;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
-import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
-import com.grepp.matnam.infra.error.exceptions.CommonException;
-import com.grepp.matnam.infra.response.ResponseCode;
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +45,16 @@ public class RestaurantService {
         restaurant.setOpenTime(request.getOpenTime());
         restaurant.setMainFood(request.getMainFood());
         restaurant.setSummary(request.getSummary());
-        restaurant.setMood(request.getMood());
+        restaurant.setGoodTalk(request.isGoodTalk());
+        restaurant.setManyDrink(request.isManyDrink());
+        restaurant.setGoodMusic(request.isGoodMusic());
+        restaurant.setClean(request.isClean());
+        restaurant.setGoodView(request.isGoodView());
+        restaurant.setTerrace(request.isTerrace());
+        restaurant.setGoodPicture(request.isGoodPicture());
+        restaurant.setGoodMenu(request.isGoodMenu());
+        restaurant.setLongStay(request.isLongStay());
+        restaurant.setBigStore(request.isBigStore());
         restaurant.setGoogleRating(request.getGoogleRating());
         restaurant.setNaverRating(request.getNaverRating());
         restaurant.setKakaoRating(request.getKakaoRating());
@@ -67,10 +72,6 @@ public class RestaurantService {
     public void createRestaurant(RestaurantRequest request) {
         restaurantRepository.save(request.toEntity());
     }
-
-//    public Page<Restaurant> findByCategory(String category, Pageable pageable) {
-//        return restaurantRepository.findByCategory(category, pageable);
-//    }
 
     public Page<Restaurant> findByFilter(String category, String keyword, Pageable pageable) {
         if (StringUtils.hasText(category) && StringUtils.hasText(keyword)) {

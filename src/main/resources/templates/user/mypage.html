@@ -12,6 +12,7 @@
       background-color: #f9f9f9;
       color: #333;
     }
+
     header {
       display: flex;
       justify-content: space-between;
@@ -19,40 +20,48 @@
       padding: 1rem 2rem;
       border-bottom: 1px solid #eee;
       background-color: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+
     .header-left {
       display: flex;
       align-items: center;
       gap: 2rem;
     }
+
     .header-left .logo {
       font-size: 1.3rem;
       font-weight: bold;
     }
+
     .header-left nav a {
       text-decoration: none;
       color: #333;
       margin-right: 1rem;
       font-weight: 500;
     }
+
     .header-left nav a:hover {
       color: #000;
     }
+
     .header-left nav a.active {
       color: #000;
       border-bottom: 2px solid #000;
       padding-bottom: 3px;
     }
+
     .header-right {
       display: flex;
       align-items: center;
       gap: 1rem;
     }
+
     .header-right span {
       font-size: 1.2rem;
       cursor: pointer;
     }
+
     .btn-primary {
       background-color: #000;
       color: white;
@@ -62,9 +71,11 @@
       cursor: pointer;
       font-weight: 500;
     }
+
     .btn-primary:hover {
       background-color: #333;
     }
+
     .container {
       display: grid;
       grid-template-columns: 1fr 3fr;
@@ -73,14 +84,16 @@
       margin: 2rem auto;
       padding: 0 1rem;
     }
+
     .profile-section, .stats-section {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       background-color: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+
     .profile-section img {
       width: 100px;
       height: 100px;
@@ -90,20 +103,24 @@
       margin: 0 auto 1rem;
       object-fit: cover;
     }
+
     .profile-section h3 {
       text-align: center;
       margin-bottom: 0.5rem;
     }
+
     .profile-temperature {
       text-align: center;
       font-size: 1.1rem;
       margin-bottom: 1.5rem;
     }
+
     .profile-actions {
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
     }
+
     .profile-actions button {
       padding: 0.7rem 1rem;
       border-radius: 4px;
@@ -113,36 +130,43 @@
       cursor: pointer;
       font-weight: 500;
     }
+
     .profile-actions button:hover {
       background-color: #eee;
     }
+
     .profile-actions button.danger {
       background-color: #fff;
       color: #ff3b30;
       border: 1px solid #ff3b30;
     }
+
     .profile-actions button.danger:hover {
       background-color: #fff0f0;
     }
+
     .main-section {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 1.5rem;
       background-color: #fff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       margin-bottom: 2rem;
     }
+
     .main-section h2 {
       margin-bottom: 1.5rem;
       border-bottom: 1px solid #eee;
       padding-bottom: 0.5rem;
     }
+
     .tabs {
       display: flex;
       margin-bottom: 1.5rem;
       border-bottom: 1px solid #eee;
       padding-bottom: 1rem;
     }
+
     .tabs button {
       padding: 0.5rem 1rem;
       border: 1px solid #ddd;
@@ -151,23 +175,28 @@
       margin-right: 0.5rem;
       border-radius: 4px;
     }
+
     .tabs button.active {
       background-color: #000;
       color: #fff;
       border-color: #000;
     }
+
     .tabs button:hover:not(.active) {
       background-color: #f5f5f5;
     }
+
     .tabs button.create-meeting {
       margin-left: auto;
       background-color: #000;
       color: #fff;
       border-color: #000;
     }
+
     .tabs button.create-meeting:hover {
       background-color: #333;
     }
+
     .meeting-item {
       border: 1px solid #eee;
       border-radius: 8px;
@@ -175,30 +204,36 @@
       margin: 1rem 0;
       transition: transform 0.2s, box-shadow 0.2s;
     }
+
     .meeting-item:hover {
       transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
     .meeting-item h4 {
       margin-bottom: 0.7rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .meeting-item p {
       font-size: 0.9rem;
       color: #666;
       margin-bottom: 0.5rem;
     }
+
     .meeting-item a {
       color: #000;
       text-decoration: none;
       font-size: 0.9rem;
       font-weight: 500;
     }
+
     .meeting-item a:hover {
       text-decoration: underline;
     }
+
     .status-badge {
       background-color: #eee;
       padding: 0.2rem 0.7rem;
@@ -206,38 +241,47 @@
       font-size: 0.8rem;
       font-weight: 500;
     }
+
     .status-badge.active {
       background-color: #000;
       color: #fff;
     }
+
     .status-badge.completed {
       background-color: #8e8e93;
       color: #fff;
     }
+
     .mypage-section {
       margin-bottom: 2rem;
     }
+
     .reviews-section {
       margin-top: 2rem;
     }
+
     .review-item {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 1.2rem;
       margin: 1rem 0;
     }
+
     .review-item .restaurant {
       font-weight: 700;
       margin-bottom: 0.5rem;
     }
+
     .review-item .rating {
       color: #000;
       margin-bottom: 0.5rem;
     }
+
     .review-text {
       color: #666;
       margin-bottom: 0.5rem;
     }
+
     .modal {
       display: none;
       position: fixed;
@@ -246,8 +290,9 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
+
     .modal-content {
       background-color: #fff;
       margin: 15% auto;
@@ -255,15 +300,18 @@
       border-radius: 8px;
       width: 400px;
       max-width: 90%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
+
     .modal-title {
       margin-bottom: 1rem;
       font-weight: 500;
     }
+
     .modal-body {
       margin-bottom: 1.5rem;
     }
+
     .modal-body input {
       width: 100%;
       padding: 0.7rem;
@@ -272,41 +320,49 @@
       border-radius: 4px;
       box-sizing: border-box;
     }
+
     .modal-footer {
       display: flex;
       justify-content: flex-end;
       gap: 0.5rem;
     }
+
     .modal-footer button {
       padding: 0.7rem 1rem;
       border-radius: 4px;
       cursor: pointer;
       font-weight: 500;
     }
+
     .modal-footer .cancel {
       background-color: #f5f5f5;
       border: 1px solid #ddd;
       color: #333;
     }
+
     .modal-footer .confirm {
       background-color: #ff3b30;
       color: #fff;
       border: none;
     }
+
     .info-item {
       margin-bottom: 0.7rem;
     }
+
     .info-item strong {
       display: inline-block;
       width: 120px;
       color: #666;
     }
+
     .preference-items {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
       margin-top: 0.5rem;
     }
+
     .preference-tag {
       display: inline-block;
       background-color: #f5f5f5;
@@ -315,6 +371,7 @@
       font-size: 0.8rem;
       color: #333;
     }
+
     .map-container {
       height: 300px;
       background-color: #f5f5f5;
@@ -325,25 +382,30 @@
       align-items: center;
       color: #888;
     }
+
     .empty-state {
       text-align: center;
       padding: 2rem;
       color: #888;
     }
+
     .preference-section {
       margin-top: 1rem;
     }
+
     .preference-section h4 {
       margin-bottom: 0.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .preference-section h4 a {
       font-size: 0.8rem;
       color: #000;
       text-decoration: none;
     }
+
     footer {
       margin-top: 5rem;
       text-align: center;
@@ -362,7 +424,7 @@
     <div class="logo">맛남</div>
     <nav>
       <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/list}">모임 찾기</a>
+      <a th:href="@{/team/search}">모임 찾기</a>
       <a th:href="@{/map}">맛집 탐색</a>
       <a th:href="@{/user/mypage}" class="active">마이페이지</a>
     </nav>
@@ -370,7 +432,8 @@
   <div class="header-right">
     <span title="알림">🔔</span>
     <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기
+    </button>
   </div>
 </header>
 
@@ -430,35 +493,77 @@
   </div>
 
   <!-- 내 모임 목록 -->
-  <div>
-    <div class="main-section mypage-section">
-      <h2>내 모임 목록</h2>
-      <div class="tabs">
-        <button class="active" onclick="switchTab('all')">전체</button>
-        <button onclick="switchTab('hosting')">주최 중</button>
-        <button onclick="switchTab('participating')">참여 중</button>
-        <button onclick="switchTab('completed')">완료됨</button>
-        <button class="create-meeting" onclick="location.href='/team/create'">모임 만들기</button>
-      </div>
+  <div class="main-section mypage-section">
+    <h2>내 모임 목록</h2>
+    <div class="tabs">
+      <button class="active" id="all-tab" onclick="switchTab('all')">전체</button>
+      <button class="active" id="hosting-tab" onclick="switchTab('hosting')">주최 중</button>
+      <button id="participating-tab" onclick="switchTab('participating')">참여 중</button>
+      <button class="create-meeting" onclick="location.href='/team/create'">모임 만들기</button>
+    </div>
 
-      <div id="meetings-container">
-        <!-- 모임이 없을 때 표시할 내용 -->
-        <div th:if="${#lists.isEmpty(allTeams)}" class="empty-state">
+    <div id="meetings-container">
+      <div id="all-meetings" class="meetings-section">
+        <h3>전체 모임</h3>
+        <div th:if="${#lists.isEmpty(hostingTeams) and #lists.isEmpty(participatingTeams)}" class="empty-state">
           <p>아직 참여하거나 주최한 모임이 없습니다.</p>
           <p>모임을 만들거나 다른 사용자의 모임에 참여해보세요!</p>
         </div>
-
-        <!-- 모임 목록 -->
-        <div th:each="team : ${allTeams}" class="meeting-item">
+        <div th:each="team : ${hostingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
-            <span th:if="${team.user.userId == #authentication.name}" class="status-badge active">주최중</span>
-            <span th:unless="${team.user.userId == #authentication.name}" class="status-badge">참여중</span>
+            <span class="status-badge active">주최중</span>
           </h4>
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+        </div>
+        <div th:each="team : ${participatingTeams}" class="meeting-item">
+          <h4>
+            <span th:text="${team.teamTitle}">모임 제목</span>
+            <span class="status-badge">참여중</span>
+          </h4>
+          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+        </div>
+      </div>
+
+      <div id="hosting-meetings" class="meetings-section" style="display: none;">
+        <h3>주최 중인 모임</h3>
+        <div th:if="${#lists.isEmpty(hostingTeams)}" class="empty-state">
+          <p>아직 주최한 모임이 없습니다.</p>
+          <p>새로운 모임을 만들어보세요!</p>
+        </div>
+        <div th:each="team : ${hostingTeams}" class="meeting-item">
+          <h4>
+            <span th:text="${team.teamTitle}">모임 제목</span>
+            <span class="status-badge active">주최중</span>
+          </h4>
+          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+        </div>
+      </div>
+
+      <div id="participating-meetings" class="meetings-section" style="display: none;">
+        <h3>참여 중인 모임</h3>
+        <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
+          <p>아직 참여한 모임이 없습니다.</p>
+          <p>다른 사용자의 모임에 참여해보세요!</p>
+        </div>
+        <div th:each="team : ${participatingTeams}" class="meeting-item">
+          <h4>
+            <span th:text="${team.teamTitle}">모임 제목</span>
+            <span class="status-badge">참여중</span>
+          </h4>
+          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
         </div>
       </div>
     </div>
@@ -513,11 +618,14 @@
         <div th:each="review : ${userReviews}" class="review-item">
           <div class="restaurant" th:text="${review.team.restaurantName}">맛집 이름</div>
           <div class="rating">
-            <span th:text="${'★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)}">★★★★☆</span>
+            <span
+                th:text="${'★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)}">★★★★☆</span>
             <span th:text="${review.rating}">4.0</span>
           </div>
           <div class="review-text" th:text="${review.content}">리뷰 내용</div>
-          <p>📅 <span th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')}">2023년 6월 19일</span></p>
+          <p>📅 <span
+              th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')}">2023년 6월 19일</span>
+          </p>
         </div>
       </div>
     </div>
@@ -554,9 +662,9 @@
     document.getElementById('deactivateModal').style.display = 'none';
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('deactivateForm').addEventListener('submit', function(e) {
-      if(!confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('deactivateForm').addEventListener('submit', function (e) {
+      if (!confirm('정말로 탈퇴하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
         e.preventDefault();
       }
     });
@@ -567,7 +675,7 @@
       alert('회원 탈퇴 중 오류가 발생했습니다: ' + error);
     }
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const modal = document.getElementById('deactivateModal');
       if (event.target === modal) {
         hideDeactivateModal();
@@ -578,6 +686,7 @@
       window.location.href = '/user/signin';
       return;
     }
+    switchTab('all');
   });
 
   // 모임 목록 탭 전환
@@ -624,13 +733,13 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     if (!auth.isLoggedIn()) {
       window.location.href = '/user/signin';
       return;
     }
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const modal = document.getElementById('deactivateModal');
       if (event.target === modal) {
         hideDeactivateModal();
