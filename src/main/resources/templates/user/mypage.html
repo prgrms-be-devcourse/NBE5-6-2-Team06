@@ -522,10 +522,10 @@
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <button type="button" onclick="showApplicationInfo(${teamId})">신청 정보</button>
 
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
 
           <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
@@ -563,10 +563,10 @@
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a><br>
           <button type="button" onclick="showApplicationInfo(${teamId})">신청 정보</button>
 
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a>
 
           <div id="application-info-${teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
