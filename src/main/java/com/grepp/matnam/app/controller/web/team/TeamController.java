@@ -86,12 +86,16 @@ public class TeamController {
     public String teamDetail(@PathVariable Long teamId, Model model) {
         // 현재 로그인한 사용자 정보 가져오기
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        User user = userService.getUserById(userId);
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
 
-        boolean isAlreadyApplied = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId);
-        model.addAttribute("isAlreadyApplied", isAlreadyApplied);
+        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId);
+
+        model.addAttribute("team", team);
+        model.addAttribute("isParticipant", isParticipant);
+        model.addAttribute("user", user);
+
 
         return "team/teamDetail";
     }
@@ -134,9 +138,9 @@ public class TeamController {
         User user = userService.getUserById(userId);
 
         // 이미 신청한 참여자인지 확인
-        if (participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId)) {
-            return "redirect:/team/" + teamId + "/page?error=이미 신청한 모임입니다.";
-        }
+//        if (participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId)) {
+//            return "redirect:/team/" + teamId + "/page?error=이미 신청한 모임입니다.";
+//        }
 
         teamService.addParticipant(teamId, user);
 //        return "redirect:/team/" + teamId + "/page";
@@ -254,55 +258,6 @@ public class TeamController {
 //            return "redirect:/user/signin?error=profile_load_failed";
 //        }
 //    }
-
-//    @GetMapping("/mypage")
-//    public String mypageTeam(Model model) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentUser = authentication != null ? authentication.getName() : "인증 정보 없음";
-//        log.info("TeamController - 마이페이지 (모임 정보) 접근 - 현재 인증 사용자: {}", currentUser);
-//
-//        if (authentication == null || "anonymousUser".equals(authentication.getName())) {
-//            log.warn("TeamController - 인증되지 않은 사용자의 마이페이지 접근 시도");
-//            return "redirect:/user/signin";
-//        }
-//
-//        try {
-//            String userId = authentication.getName();
-//            log.info("TeamController - 인증된 사용자 ID: {}", userId);
-//
-//            User user = userService.getUserById(userId);
-//            log.info("TeamController - 사용자 정보 조회 성공: {}", user.getUserId());
-//            model.addAttribute("user", user);
-//
-//            // 주최한 모임 조회
-//            List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
-//            model.addAttribute("hostingTeams", hostingTeams);
-//
-//            // 참여 중인 모임 조회 (승인된 참여자 상태)
-//            List<Team> participatingTeams = teamService.getTeamsByParticipant(userId);
-//            model.addAttribute("participatingTeams", participatingTeams);
-//
-//            // 참여한 모든 모임 조회 (승인된 참여자 및 상태 무관)
-//            List<Team> allTeamsForUser = teamService.getAllTeamsForUser(userId);
-//            model.addAttribute("allTeamsForUser", allTeamsForUser);
-//
-//            // stats 정보
-//            model.addAttribute("stats", new HashMap<String, Integer>());
-//
-//            // teamsWithoutReview 정보
-//            model.addAttribute("teamsWithoutReview", new ArrayList<>());
-//
-//            // 맛집 정보
-//            model.addAttribute("userMaps", new ArrayList<>());
-//
-//            return "user/mypage";
-//
-//        } catch (Exception e) {
-//            log.error("TeamController - 마이페이지 (모임 정보) 로딩 중 오류 발생: {}", e.getMessage(), e);
-//            return "redirect:/user/signin?error=profile_load_failed";
-//        }
-//    }
-
 
 
 
