@@ -552,7 +552,7 @@
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+          <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a>
         </div>
       </div>
 

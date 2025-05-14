@@ -95,24 +95,32 @@ public class TeamController {
     @GetMapping("/page/{teamId}")
     public String getTeamPage(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserById(userId);
-        String userNickname = user.getNickname();
-        model.addAttribute("teamId", teamId);
+        User currentUser = userService.getUserById(userId);
         model.addAttribute("userId", userId);
-        model.addAttribute("userNickname", userNickname);
+        model.addAttribute("userNickname", currentUser.getNickname());
+        model.addAttribute("teamId", teamId);
 
         Team team = teamService.getTeamByIdWithParticipants(teamId);
+        model.addAttribute("team", team);
         if (team != null && team.getUser() != null) {
             model.addAttribute("leader", team.getUser());
         }
 
-        List<Participant> participants = teamService.getParticipant(teamId);
-        model.addAttribute("participants", participants.stream()
+        List<Participant> approvedParticipants = team.getParticipants().stream()
             .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
-            .toList());
+            .toList();
+        model.addAttribute("participants", approvedParticipants);
 
         return "team/teamPage";
     }
+
+//    // 팀 페이지 조회 용
+//    @GetMapping("/teamPage/{teamId}")
+//    public String teamPage(@PathVariable Long teamId, Model model) {
+//        Team team = teamService.getTeamByIdWithParticipants(teamId);
+//        model.addAttribute("team", team);
+//        return "team/teamPage";
+//    }
 
     // 모임 참여 신청
     @PostMapping("/{teamId}/apply")
