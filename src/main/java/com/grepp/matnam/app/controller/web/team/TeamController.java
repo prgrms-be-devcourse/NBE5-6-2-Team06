@@ -12,18 +12,13 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -90,12 +85,12 @@ public class TeamController {
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
 
-        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId);
+        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId,
+            teamId);
 
         model.addAttribute("team", team);
         model.addAttribute("isParticipant", isParticipant);
         model.addAttribute("user", user);
-
 
         return "team/teamDetail";
     }
@@ -137,27 +132,22 @@ public class TeamController {
     public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
         User user = userService.getUserById(userId);
 
-        // 이미 신청한 참여자인지 확인
-//        if (participantRepository.existsByUser_UserIdAndTeam_TeamId(userId, teamId)) {
-//            return "redirect:/team/" + teamId + "/page?error=이미 신청한 모임입니다.";
-//        }
-
         teamService.addParticipant(teamId, user);
 //        return "redirect:/team/" + teamId + "/page";
         return "redirect:/team/detail/" + teamId;
     }
 
-    // 모임 참여 수락 (주최자가 호출)
-    @PostMapping("/participants/{teamId}/{userId}")
-    public ResponseEntity<String> acceptParticipant(@PathVariable Long teamId,
-        @PathVariable String userId) {
-        try {
-            teamService.acceptParticipant(teamId, userId);
-            return ResponseEntity.ok("참가자가 수락되었습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("참가자 수락에 실패했습니다.");
-        }
-    }
+//    // 모임 참여 수락 (주최자가 호출)
+//    @PostMapping("/participants/{teamId}/{userId}")
+//    public ResponseEntity<String> acceptParticipant(@PathVariable Long teamId,
+//        @PathVariable String userId) {
+//        try {
+//            teamService.acceptParticipant(teamId, userId);
+//            return ResponseEntity.ok("참가자가 수락되었습니다.");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("참가자 수락에 실패했습니다.");
+//        }
+//    }
 
     // 참여자 조회(팀 페이지)
 //    @GetMapping("/{teamId}/participants")
@@ -258,7 +248,6 @@ public class TeamController {
 //            return "redirect:/user/signin?error=profile_load_failed";
 //        }
 //    }
-
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시

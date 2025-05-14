@@ -38,7 +38,7 @@ public class TeamService {
     @Transactional
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+            .orElseThrow(() -> new RuntimeException("Team not found"));
 
         Participant participant = new Participant();
         participant.setTeam(team);
@@ -58,7 +58,7 @@ public class TeamService {
     // 참여자 상태 변경
     public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
         Participant participant = participantRepository.findById(participantId)
-                .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
+            .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
         participant.setParticipantStatus(status);
         participantRepository.save(participant);
     }
@@ -66,7 +66,7 @@ public class TeamService {
     // 모임 상태 변경
     public void changeTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
+            .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
         Status prevStatus = team.getStatus();
         team.setStatus(status);
         teamRepository.save(team);
@@ -78,24 +78,20 @@ public class TeamService {
     }
 
 
-    // 모임 참여 수락
-    @Transactional
-    public void acceptParticipant(Long teamId, String userId) {
-        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId,
-            teamId);
+//    // 모임 참여 수락
+//    @Transactional
+//    public void acceptParticipant(Long teamId, String userId) {
+//        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+//
+//        if (participant == null) {
+//            throw new RuntimeException("참가자가 존재하지 않거나 팀에 속하지 않습니다.");
+//        }
+//
+//        // 이미 수락된 참가자는 상태 변경을 하지 않음
+//        participant.setParticipantStatus(ParticipantStatus.APPROVED);
+//        participantRepository.save(participant);
+//    }
 
-        if (participant == null) {
-            throw new RuntimeException("참가자가 존재하지 않거나 팀에 속하지 않습니다.");
-        }
-
-        if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
-            throw new RuntimeException("참가자는 이미 수락되었습니다.");
-        }
-
-        participant.setParticipantStatus(ParticipantStatus.APPROVED);
-        participantRepository.save(participant);
-    }
-    
     // 팀 삭제
     @Transactional
     public void deleteTeam(Long teamId) {
@@ -106,7 +102,7 @@ public class TeamService {
         teamRepository.delete(team);
     }
 
-//조회 부분
+    //조회 부분
     // 주최자로서의 팀 조회
     public List<Team> getTeamsByLeader(String userId) {
         return teamRepository.findTeamsByUser_UserId(userId);
@@ -146,7 +142,7 @@ public class TeamService {
 
     public Team getTeamById(Long teamId) {
         return teamRepository.findById(teamId)
-                .orElse(null);
+            .orElse(null);
     }
 
     public Participant getParticipantById(Long participantId) {
@@ -168,7 +164,7 @@ public class TeamService {
     @Transactional
     public void completeTeam(Long teamId) {
         Team team = teamRepository.findById(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
         Status prevStatus = team.getStatus();
 
