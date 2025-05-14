@@ -1,7 +1,9 @@
 package com.grepp.matnam.app.controller.web.admin;
 
+import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.code.Status;
+import com.grepp.matnam.app.model.user.dto.ReportDto;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
 import com.grepp.matnam.infra.payload.PageParam;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminUserController {
 
     private final UserService userService;
+    private final ReportService reportService;
 
     @GetMapping({"", "/", "/list"})
     public String userManagement(@RequestParam(required = false) Status status,
@@ -70,11 +73,34 @@ public class AdminUserController {
     }
 
     @GetMapping("/report")
-    public String userReports(Model model) {
-        // 신고 관리 데이터 조회 등
+    public String userReports(@RequestParam(required = false) Boolean status,
+        @RequestParam(required = false, defaultValue = "") String keyword,
+        @RequestParam(required = false, defaultValue = "newest") String sort,
+        @Valid PageParam param, BindingResult bindingResult, Model model) {
+        Sort sortOption;
+        switch (sort) {
+            case "oldest":
+                sortOption = Sort.by(Sort.Order.asc("createdAt")); // 오래된순
+                break;
+            default:
+                sortOption = Sort.by(Sort.Order.desc("createdAt")); // 최신순
+        }
+
+        Pageable pageable = PageRequest.of(param.getPage() - 1, param.getSize(), sortOption);
+
+        Page<ReportDto> page = reportService.findByFilter(status, keyword, pageable);
+
+        if (param.getPage() != 1 && page.getContent().isEmpty()) {
+            throw new CommonException(ResponseCode.BAD_REQUEST);
+        }
+        PageResponse<ReportDto> response = new PageResponse<>("/admin/user/report?status=" + status + "&keyword=" + keyword + "&sort=" + sort, page, 5);
+
         model.addAttribute("activeTab", "user-reports");
         model.addAttribute("pageTitle", "사용자 관리");
         model.addAttribute("currentPage", "user-management");
+        model.addAttribute("page", response);
+        model.addAttribute("status", status);
+        model.addAttribute("sort", sort);
 
         return "admin/user-management";
     }
