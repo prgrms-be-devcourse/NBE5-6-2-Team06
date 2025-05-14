@@ -20,7 +20,8 @@
             </div>
             <div class="profile">
                 <img th:src="${adminProfile ?: '/images/default-profile.png'}" alt="Admin Profile">
-                <span th:text="${adminName ?: '관리자'}">관리자</span>
+<!--                <span th:text="${adminName ?: '관리자'}">관리자</span>-->
+                <span id="profile-name">관리자</span>
             </div>
         </div>
     </header>
