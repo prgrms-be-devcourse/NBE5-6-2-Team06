@@ -78,12 +78,12 @@ public class TeamService {
             if (team.getUser().equals(user)) {
                 participant.setParticipantStatus(ParticipantStatus.APPROVED);
                 participant.setRole(Role.LEADER);
+                team.setNowPeople(1);
             } else {
                 participant.setParticipantStatus(ParticipantStatus.PENDING);
             }
 
             participantRepository.save(participant);
-            team.setNowPeople(team.getNowPeople() + 1);
         } else {
             throw new IllegalStateException("이미 참여한 사용자입니다.");
         }

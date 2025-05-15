@@ -71,7 +71,9 @@
   <div class="sidebar">
     <div class="card">
       <h4>모임 참여하기</h4>
-      <p th:text="${team.nowPeople} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
+      <p>
+        👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
+      </p>
       <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
         <input type="hidden" name="userId" th:value="${#authentication.name}">
         <button type="submit"
