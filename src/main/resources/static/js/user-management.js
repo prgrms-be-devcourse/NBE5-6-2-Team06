@@ -6,9 +6,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function toggleSuspendOptions() {
         const isSuspended = statusSelect.value === "SUSPENDED";
-        suspendOptions.style.display = isSuspended ? "block" : "none";
+        const isBanned = statusSelect.value === "BANNED";
+        const isActive = statusSelect.value === "ACTIVE";
+        suspendOptions.style.display = isSuspended||isBanned ? "block" : "none";
         durationSelect.disabled = !isSuspended;
-        reasonTextarea.disabled = !isSuspended;
+        reasonTextarea.disabled = isActive;
     }
 
     // 초기 상태 설정
@@ -40,7 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 suspendOptions.style.display = "block";
                 durationSelect.disabled = false;
                 reasonTextarea.disabled = false;
-            } else {
+            } else if (status === 'BANNED') {
+                suspendOptions.style.display = "block";
+                durationSelect.disabled = true;
+                reasonTextarea.disabled = false;
+            }
+            else {
                 suspendOptions.style.display = "none";
                 durationSelect.disabled = true;
                 reasonTextarea.disabled = true;
@@ -67,6 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
             }
+            if (status === 'BANNED') {
+                if (!suspendReason.trim()) {
+                    alert('정지 사유를 입력해야 합니다.');
+                    return;
+                }
+            }
 
             // PATCH 요청을 위한 payload 구성
             const payload = {
@@ -75,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (status === 'SUSPENDED') {
                 payload.suspendDuration = parseInt(suspendDuration); // 숫자로 전송
+                payload.dueReason = suspendReason.trim();
+            }
+
+            if (status === 'BANNED') {
                 payload.dueReason = suspendReason.trim();
             }
 
@@ -138,16 +155,26 @@ document.addEventListener('DOMContentLoaded', function() {
             const reportId = this.getAttribute('data-id');
             const userId = this.getAttribute('data-user-id');
             const reportedId = this.getAttribute('data-reported-id');
+            const nickname = this.getAttribute('data-reported-nickname');
+            const email = this.getAttribute('data-reported-email');
+            const status = this.getAttribute('data-reported-status');
+            const suspendDuration = this.getAttribute('data-reported-suspend-duration');
+            const dueReason = this.getAttribute('data-reported-due-reason');
             const reason = this.getAttribute('data-reason');
             const createdAt = this.getAttribute('data-date');
             const activated = this.getAttribute('data-activated');
             const reportType = this.getAttribute('data-type');
             const chatId = this.getAttribute('data-chat-id');
             const teamId = this.getAttribute('data-post-id');
-            console.log(reportType)
+            console.log(dueReason);
             document.getElementById('report-id').textContent = reportId;
             document.getElementById('report-reporter').textContent = userId;
             document.getElementById('report-target').textContent = reportedId;
+            document.getElementById('report-detail-nickname').value = nickname;
+            document.getElementById('report-detail-email').value = email;
+            document.getElementById('report-detail-status').value = status;
+            document.getElementById('report-detail-suspend-duration').value = suspendDuration;
+            document.getElementById('report-detail-due-reason').value = dueReason;
             document.getElementById('report-type').textContent = reportType==='POST' ? '모임 게시글' : '채팅 메세지';
             document.getElementById('report-content').textContent = reason;
             document.getElementById('report-date').textContent = createdAt;
@@ -175,17 +202,41 @@ document.addEventListener('DOMContentLoaded', function() {
         showSuspendOptionsBtn.addEventListener('click', function() {
             // 신고 상세 모달에서 정보 가져오기
             const reportId = document.getElementById('report-id').textContent;
-            const targetInfo = document.getElementById('report-target').textContent;
+            const reportedId = document.getElementById('report-target').textContent;
+            const nickname = document.getElementById('report-detail-nickname').value;
+            const email = document.getElementById('report-detail-email').value;
+            const status = document.getElementById('report-detail-status').value;
+            const suspendDuration = document.getElementById('report-detail-suspend-duration').value;
+            const dueReason = document.getElementById('report-detail-due-reason').value;
 
-            // 정지 모달에 정보 설정
-            document.getElementById('suspend-report-id').value = reportId;
-            document.getElementById('suspend-user-name').value = targetInfo;
+            document.getElementById('edit-user-id').value = reportedId;
+            document.getElementById('edit-user-name').value = reportedId;
+            document.getElementById('edit-user-nickname').value = nickname;
+            document.getElementById('edit-user-email').value = email;
+            document.getElementById('edit-user-status').value = status;
+            document.getElementById('edit-suspend-duration').value = suspendDuration || "7";
+            document.getElementById('edit-suspend-reason').value = dueReason;
+
+            if (status === 'SUSPENDED') {
+                suspendOptions.style.display = "block";
+                durationSelect.disabled = false;
+                reasonTextarea.disabled = false;
+            } else if (status === 'BANNED') {
+                suspendOptions.style.display = "block";
+                durationSelect.disabled = true;
+                reasonTextarea.disabled = false;
+            }
+            else {
+                suspendOptions.style.display = "none";
+                durationSelect.disabled = true;
+                reasonTextarea.disabled = true;
+            }
 
             // 신고 상세 모달 닫기
             document.getElementById('reportViewModal').style.display = 'none';
 
             // 정지 모달 표시
-            document.getElementById('suspendUserModal').style.display = 'block';
+            document.getElementById('userEditModal').style.display = 'block';
         });
     }
 

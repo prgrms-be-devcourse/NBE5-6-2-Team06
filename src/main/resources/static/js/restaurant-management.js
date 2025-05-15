@@ -59,8 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('restaurant-main-menu').value = result.mainFood;
                 document.getElementById('restaurant-description').value = result.summary;
                 document.getElementById('restaurant-google-rating').value = result.googleRating;
-                document.getElementById('restaurant-naver-rating').value = result.naverRating;
-                document.getElementById('restaurant-kakao-rating').value = result.kakaoRating;
 
 
                 // 분위기 체크박스 설정
@@ -97,8 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
             mainFood: document.getElementById('restaurant-main-menu').value,
             summary: document.getElementById('restaurant-description').value,
             googleRating: parseFloat(document.getElementById('restaurant-google-rating').value),
-            naverRating: parseFloat(document.getElementById('restaurant-naver-rating').value),
-            kakaoRating: parseFloat(document.getElementById('restaurant-kakao-rating').value)
         };
 
         // 분위기 체크박스를 기반으로 각 mood 항목을 boolean으로 추가
@@ -136,8 +132,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#error-description').textContent = errorMessages.summary;
                 document.querySelector('#error-mood').textContent = errorMessages.mood;
                 document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
-                document.querySelector('#error-naver-rating').textContent = errorMessages.naverRating;
-                document.querySelector('#error-kakao-rating').textContent = errorMessages.kakaoRating;
                 alert('필수 항목을 모두 입력해주세요.');
             }
         })

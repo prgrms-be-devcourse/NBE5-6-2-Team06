@@ -26,6 +26,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .orderBy(restaurant.restaurantId.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -33,6 +34,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -43,6 +45,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -50,6 +53,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -61,6 +65,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -69,6 +74,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category))
             .from(restaurant);
 
@@ -81,6 +87,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category).and(restaurant.name.contains(keyword)))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -89,6 +96,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category).and(restaurant.name.contains(keyword)))
             .from(restaurant);
 
@@ -100,6 +108,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.name.contains(keyword))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -108,6 +117,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.name.contains(keyword))
             .from(restaurant);
 
@@ -126,29 +136,10 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
                     specifier = order.isAscending()
                         ? entityPath.getString(property).asc()
                         : entityPath.getString(property).desc();
-                } else if (property.equals("rating")) {
-                    // 평점 3개 중 0인 평점을 제외하고 나누는 숫자 조정
-                    return order.isAscending()
-                        ? Expressions.numberTemplate(Double.class,
-                        "({0} + {1} + {2}) / {3}",
-                        // 평점이 0이 아닌 경우만 포함
-                        Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.googleRating),
-                        Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.naverRating),
-                        Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.kakaoRating),
-                        // 평점이 0이 아닌 경우를 카운트
-                        Expressions.numberTemplate(Double.class,
-                            "case when {0} = 0 then 0 else 1 end + case when {1} = 0 then 0 else 1 end + case when {2} = 0 then 0 else 1 end",
-                            restaurant.googleRating, restaurant.naverRating, restaurant.kakaoRating)
-                    ).asc()
-                        : Expressions.numberTemplate(Double.class,
-                            "({0} + {1} + {2}) / {3}",
-                            Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.googleRating),
-                            Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.naverRating),
-                            Expressions.numberTemplate(Double.class, "coalesce({0}, 0)", restaurant.kakaoRating),
-                            Expressions.numberTemplate(Double.class,
-                                "case when {0} = 0 then 0 else 1 end + case when {1} = 0 then 0 else 1 end + case when {2} = 0 then 0 else 1 end",
-                                restaurant.googleRating, restaurant.naverRating, restaurant.kakaoRating)
-                        ).desc();
+                } else if (property.equals("googleRating")) {
+                    specifier = order.isAscending()
+                        ? entityPath.getString(property).asc()
+                        : entityPath.getString(property).desc();
                 } else if (property.equals("createdAt")) {
                     specifier = order.isAscending()
                         ? entityPath.getDateTime(property, LocalDateTime.class).asc()

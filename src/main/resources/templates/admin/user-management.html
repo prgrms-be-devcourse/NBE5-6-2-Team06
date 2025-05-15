@@ -139,6 +139,11 @@
                       th:data-id="${report.reportId}"
                       th:data-user-id="${report.userId}"
                       th:data-reported-id="${report.reportedId}"
+                      th:data-reported-nickname="${report.nickname}"
+                      th:data-reported-email="${report.email}"
+                      th:data-reported-status="${report.status.name()}"
+                      th:data-reported-suspend-duration="${report.suspendDuration}"
+                      th:data-reported-due-reason="${report.dueReason}"
                       th:data-reason="${report.reason}"
                       th:data-date="${report.createdAt}"
                       th:data-activated="${report.activated}"
@@ -220,6 +225,11 @@
       <div class="modal-header">
         <h2>신고 상세 정보</h2>
         <span class="close-modal">&times;</span>
+        <input type="text" id="report-detail-nickname" hidden>
+        <input type="text" id="report-detail-email" hidden>
+        <input type="text" id="report-detail-status" hidden>
+        <input type="text" id="report-detail-suspend-duration" hidden>
+        <input type="text" id="report-detail-due-reason" hidden>
       </div>
       <div class="modal-body">
         <div class="report-details">

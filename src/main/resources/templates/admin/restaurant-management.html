@@ -57,7 +57,7 @@
             <th>주소</th>
             <th>전화번호</th>
             <th>대표 메뉴</th>
-            <th>평균 평점</th>
+            <th style="text-align: center">평균 평점</th>
             <th>액션</th>
           </tr>
           </thead>
@@ -71,11 +71,12 @@
             <td th:text="${restaurant.mainFood}"></td>
             <td>
               <div class="rating">
-                <span
-                    th:text="${(restaurant.googleRating + restaurant.naverRating +  restaurant.kakaoRating)  > 0
-                    ? #numbers.formatDecimal(
-        (restaurant.googleRating + restaurant.naverRating +  restaurant.kakaoRating) /
-        ((restaurant.googleRating > 0 ? 1 : 0) + (restaurant.naverRating > 0 ? 1 : 0) + (restaurant.kakaoRating > 0 ? 1 : 0)  ), 1, 1) : '평점 없음' }"></span>
+                <div>
+                  <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                    <i th:class="${i <= restaurant.googleRating ? 'fas fa-star' : (i <= restaurant.googleRating + 0.5 ? 'fas fa-star-half-alt' : 'far fa-star')}"></i>
+                  </th:block>
+                </div>
+                <span th:text="${restaurant.googleRating}"></span>
               </div>
             </td>
             <td>
@@ -143,6 +144,11 @@
               <input type="text" id="restaurant-main-menu" placeholder="대표 메뉴를 입력하세요">
               <span id="error-main-menu" class="error-message"></span>
             </div>
+            <div class="form-group">
+              <label for="restaurant-google-rating">구글 평점 <span class="required">*</span></label>
+              <input type="text" id="restaurant-google-rating" placeholder="구글 평점을 입력하세요.">
+              <span id="error-google-rating" class="error-message"></span>
+            </div>
           </div>
           <div class="form-group">
             <label for="restaurant-description">식당 설명 <span class="required">*</span></label>
@@ -194,23 +200,6 @@
                 <input type="checkbox" id="bigStore" name="restaurant-mood" value="bigStore">
                 <label for="bigStore">매장이 넓은</label>
               </div>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="restaurant-google-rating">구글 평점 <span class="required">*</span></label>
-              <input type="text" id="restaurant-google-rating" placeholder="구글 평점을 입력하세요.">
-              <span id="error-google-rating" class="error-message"></span>
-            </div>
-            <div class="form-group">
-              <label for="restaurant-naver-rating">네이버 평점 <span class="required">*</span></label>
-              <input type="text" id="restaurant-naver-rating" placeholder="네이버 평점을 입력하세요.">
-              <span id="error-naver-rating" class="error-message"></span>
-            </div>
-            <div class="form-group">
-              <label for="restaurant-kakao-rating">카카오 평점 <span class="required">*</span></label>
-              <input type="text" id="restaurant-kakao-rating" placeholder="카카오 평점을 입력하세요.">
-              <span id="error-kakao-rating" class="error-message"></span>
             </div>
           </div>
         </form>

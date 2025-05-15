@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.user;
 
 import com.grepp.matnam.app.controller.api.user.payload.*;
+import com.grepp.matnam.app.model.log.UserActivityLogService;
 import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 @Tag(name = "User API", description = "사용자 관리 API")
+@RequiredArgsConstructor
 public class UserApiController {
 
     @Autowired
@@ -31,6 +34,8 @@ public class UserApiController {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    private final UserActivityLogService userActivityLogService;
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
@@ -107,6 +112,8 @@ public class UserApiController {
                     .role(user.getRole().name())
                     .expiration(86400)
                     .build();
+
+            userActivityLogService.logIfFirstToday(user.getUserId());
 
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "로그인 성공", jwtResponse));
 

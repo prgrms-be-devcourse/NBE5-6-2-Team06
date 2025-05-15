@@ -29,7 +29,12 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
             .select(Projections.constructor(ReportDto.class,
                 report.reportId,
                 report.user.userId,
-                report.reportedId,
+                report.reportedUser.userId,
+                report.reportedUser.nickname,
+                report.reportedUser.email,
+                report.reportedUser.status,
+                report.reportedUser.suspendDuration,
+                report.reportedUser.dueReason,
                 report.reason,
                 report.createdAt,
                 report.activated,
@@ -58,7 +63,7 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
         if (StringUtils.hasText(keyword)) {
             builder.and(
                 report.user.userId.containsIgnoreCase(keyword)
-                    .or(report.reportedId.containsIgnoreCase(keyword))
+                    .or(report.reportedUser.userId.containsIgnoreCase(keyword))
             );
         }
 
@@ -66,7 +71,12 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
             .select(Projections.constructor(ReportDto.class,
                 report.reportId,
                 report.user.userId,
-                report.reportedId,
+                report.reportedUser.userId,
+                report.reportedUser.nickname,
+                report.reportedUser.email,
+                report.reportedUser.status,
+                report.reportedUser.suspendDuration,
+                report.reportedUser.dueReason,
                 report.reason,
                 report.createdAt,
                 report.activated,
@@ -98,7 +108,12 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
             .select(Projections.constructor(ReportDto.class,
                 report.reportId,
                 report.user.userId,
-                report.reportedId,
+                report.reportedUser.userId,
+                report.reportedUser.nickname,
+                report.reportedUser.email,
+                report.reportedUser.status,
+                report.reportedUser.suspendDuration,
+                report.reportedUser.dueReason,
                 report.reason,
                 report.createdAt,
                 report.activated,
@@ -128,7 +143,7 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
         if (StringUtils.hasText(keyword)) {
             builder.and(
                 report.user.userId.containsIgnoreCase(keyword)
-                    .or(report.reportedId.containsIgnoreCase(keyword))
+                    .or(report.reportedUser.userId.containsIgnoreCase(keyword))
             );
         }
 
@@ -136,7 +151,12 @@ public class ReportRepositoryCustomImpl implements ReportRepositoryCustom {
             .select(Projections.constructor(ReportDto.class,
                 report.reportId,
                 report.user.userId,
-                report.reportedId,
+                report.reportedUser.userId,
+                report.reportedUser.nickname,
+                report.reportedUser.email,
+                report.reportedUser.status,
+                report.reportedUser.suspendDuration,
+                report.reportedUser.dueReason,
                 report.reason,
                 report.createdAt,
                 report.activated,
