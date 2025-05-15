@@ -1,26 +1,14 @@
 package com.grepp.matnam.app.controller.api.admin;
 
-import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
-import com.grepp.matnam.app.model.restaurant.RestaurantService;
-import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
+import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
-import com.grepp.matnam.app.model.user.code.Status;
-import com.grepp.matnam.infra.error.exceptions.CommonException;
-import com.grepp.matnam.infra.response.ApiResponse;
-import com.grepp.matnam.infra.response.ResponseCode;
-import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminUserApiController {
     private final UserService userService;
+    private final ReportService reportService;
 
     @PatchMapping("/list/{userId}")
     public ResponseEntity<?> updateUserStatus(@PathVariable String userId,
@@ -44,6 +33,12 @@ public class AdminUserApiController {
     public ResponseEntity<?> unActivatedUser(@PathVariable String userId) {
         userService.unActivatedById(userId);
         return ResponseEntity.ok("사용자가 비활성화되었습니다.");
+    }
+
+    @DeleteMapping("/report/{reportId}")
+    public ResponseEntity<?> unActivatedReport(@PathVariable Long reportId) {
+        reportService.unActivatedById(reportId);
+        return ResponseEntity.ok("신고 처리가 완료되었습니다.");
     }
 
 }

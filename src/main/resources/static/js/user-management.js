@@ -136,22 +136,39 @@ document.addEventListener('DOMContentLoaded', function() {
     viewReportButtons.forEach(button => {
         button.addEventListener('click', function() {
             const reportId = this.getAttribute('data-id');
-            
-            // 실제 구현에서는 서버에서 데이터를 가져와야 함
-            // 여기서는 예시 데이터로 모달 채우기
+            const userId = this.getAttribute('data-user-id');
+            const reportedId = this.getAttribute('data-reported-id');
+            const reason = this.getAttribute('data-reason');
+            const createdAt = this.getAttribute('data-date');
+            const activated = this.getAttribute('data-activated');
+            const reportType = this.getAttribute('data-type');
+            const chatId = this.getAttribute('data-chat-id');
+            const teamId = this.getAttribute('data-post-id');
+            console.log(reportType)
             document.getElementById('report-id').textContent = reportId;
-            document.getElementById('report-reporter').textContent = '김철수 (kim@example.com)';
-            document.getElementById('report-target').textContent = '이영희 (lee@example.com)';
-            document.getElementById('report-content').textContent = '부적절한 언어 사용';
-            document.getElementById('report-date').textContent = '2023-06-15 14:30';
-            document.getElementById('report-status').textContent = '대기중';
-            document.getElementById('report-status').className = 'detail-value status pending';
-            
+            document.getElementById('report-reporter').textContent = userId;
+            document.getElementById('report-target').textContent = reportedId;
+            document.getElementById('report-type').textContent = reportType==='POST' ? '모임 게시글' : '채팅 메세지';
+            document.getElementById('report-content').textContent = reason;
+            document.getElementById('report-date').textContent = createdAt;
+            document.getElementById('report-status').textContent = activated ? '대기 중' : '처리 완료';
+            document.getElementById('report-status').className = activated ? 'detail-value status pending' : 'detail-value status completed';
+            document.querySelector('.history-tab.active').textContent = reportType==='POST' ? '게시글 내역' : '채팅 내역';
+
+            if (activated==='false') {
+                document.getElementById('detail-modal-footer').style.display = 'none';
+            } else {
+                document.getElementById('detail-modal-footer').style.display = 'flex';
+            }
+            // TODO : 채팅 신고, 모임 게시글 신고에 따른 랜더링 필요, fetch 를 통해 API 호출 필요
+            //  + 자세히 보기 버튼을 통해 채팅 신고는 팀 페이지로 새 창 이동, 모임 게시글 페이지는 모임 게시글 페이지로 새 창 이동
+
+
             // 모달 표시
             document.getElementById('reportViewModal').style.display = 'block';
         });
     });
-    
+
     // 사용자 정지 버튼 클릭 이벤트 (신고 상세 모달에서)
     const showSuspendOptionsBtn = document.getElementById('show-suspend-options');
     if (showSuspendOptionsBtn) {
@@ -159,87 +176,126 @@ document.addEventListener('DOMContentLoaded', function() {
             // 신고 상세 모달에서 정보 가져오기
             const reportId = document.getElementById('report-id').textContent;
             const targetInfo = document.getElementById('report-target').textContent;
-            
+
             // 정지 모달에 정보 설정
             document.getElementById('suspend-report-id').value = reportId;
             document.getElementById('suspend-user-name').value = targetInfo;
-            
+
             // 신고 상세 모달 닫기
             document.getElementById('reportViewModal').style.display = 'none';
-            
+
             // 정지 모달 표시
             document.getElementById('suspendUserModal').style.display = 'block';
         });
     }
-    
+
     // 정지 적용 버튼 클릭 이벤트
     const confirmSuspendBtn = document.getElementById('confirm-suspend-btn');
     if (confirmSuspendBtn) {
-        confirmSuspendBtn.addEventListener('click', function() {
+        confirmSuspendBtn.addEventListener('click', async function() {
             // 폼 유효성 검사
             const suspendReason = document.getElementById('suspend-reason').value;
-            
-            if (!suspendReason) {
-                alert('정지 사유를 입력해주세요.');
+            const suspendDuration = document.getElementById('suspend-duration').value;
+            const userId = document.getElementById('suspend-user-name').value;
+
+            if (!suspendDuration || !suspendReason.trim()) {
+                alert('정지 기간과 사유를 모두 입력해야 합니다.');
                 return;
             }
-            
-            // 정지 기간 가져오기
-            const suspendDuration = document.getElementById('suspend-duration').value;
-            const notifyUser = document.getElementById('suspend-notify').checked;
-            
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('suspendUserModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            let message = '사용자가 ';
+
+            // PATCH 요청을 위한 payload 구성
+            const payload = {
+            };
+
             if (suspendDuration === 'permanent') {
-                message += '영구 정지되었습니다.';
+                payload.status = 'BANNED'
+                payload.dueReason = suspendReason.trim();
             } else {
-                message += suspendDuration + '일 동안 정지되었습니다.';
+                payload.status = 'SUSPENDED'
+                payload.suspendDuration = parseInt(suspendDuration); // 숫자로 전송
+                payload.dueReason = suspendReason.trim();
             }
-            
-            if (notifyUser) {
-                message += ' 사용자에게 알림이 전송되었습니다.';
+
+            try {
+                const response = await fetch(`/api/admin/user/list/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const error = await response.text();
+                    alert('정지 실패: ' + error);
+                    return;
+                }
+
+                alert('사용자가 정지되었습니다.');
+                document.getElementById('suspendUserModal').style.display = 'none';
+                window.location.reload(); // 새로고침으로 반영
+
+            } catch (error) {
+                console.error('정지 오류:', error);
+                alert('오류가 발생했습니다.');
             }
-            
-            alert(message);
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
+
         });
     }
 
     // 신고 해결 처리 버튼 클릭 이벤트
+    document.querySelectorAll('.action-btn.resolve').forEach(button => {
+        button.addEventListener('click', function () {
+            const reportId = this.getAttribute('data-id');
+
+            if (!confirm('정말로 이 신고를 처리 완료하시겠습니까?')) {
+                return;
+            }
+
+            fetch(`/api/admin/user/report/${reportId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    response.text().then(text => { alert(text)});
+                    window.location.reload(); // 페이지 새로고침
+                } else {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('신고 처리 완료 중 문제가 발생했습니다.');
+            });
+        });
+    });
+
+    // 신고 상세 모달 내 신고 해결 처리 버튼 클릭 이벤트
     const resolveBtn = document.querySelector('.resolve-btn');
     if (resolveBtn) {
         resolveBtn.addEventListener('click', function() {
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('reportViewModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            alert('신고가 해결 처리되었습니다.');
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
-        });
-    }
-    
-    // 신고 거부 버튼 클릭 이벤트
-    const rejectBtn = document.querySelector('.reject-btn');
-    if (rejectBtn) {
-        rejectBtn.addEventListener('click', function() {
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('reportViewModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            alert('신고가 거부 처리되었습니다.');
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
+            const reportId = document.getElementById('report-id').textContent;
+
+            if (!confirm('정말로 이 신고를 처리 완료하시겠습니까?')) {
+                return;
+            }
+
+            fetch(`/api/admin/user/report/${reportId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    response.text().then(text => { alert(text)});
+                    document.getElementById('reportViewModal').style.display = 'none';
+                    window.location.reload(); // 페이지 새로고침
+                } else {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('신고 처리 완료 중 문제가 발생했습니다.');
+            });
         });
     }
 });

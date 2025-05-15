@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('profile-name').textContent = auth.getUserInfo().userId + "님";
     // 탭 처리
     const tabs = document.querySelectorAll('.tab');
     
@@ -43,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     closeButtons.forEach(button => {
         button.addEventListener('click', function() {
             modals.forEach(modal => {
+                modal.scrollTop = 0;
                 modal.style.display = 'none';
             });
         });
@@ -52,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('click', function(event) {
         modals.forEach(modal => {
             if (event.target === modal) {
+                modal.scrollTop = 0;
                 modal.style.display = 'none';
             }
         });

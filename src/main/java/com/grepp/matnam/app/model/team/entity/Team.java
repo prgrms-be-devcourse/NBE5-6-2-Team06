@@ -55,4 +55,12 @@ public class Team extends BaseEntity {
 
     private String restaurantName;
 
+    public boolean isActivated() {
+        return this.activated;
+    }
+
+    public LocalDateTime createdAt() {
+        return this.createdAt;
+    }
+
 }

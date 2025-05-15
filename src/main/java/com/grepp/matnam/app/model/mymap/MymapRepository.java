@@ -10,7 +10,9 @@ import java.util.List;
 @Repository
 public interface MymapRepository extends JpaRepository<Mymap, Long> {
 
-    // 현재 로그인한 유저가 고정한 맛집 리스트
+    // pinned = true
     List<Mymap> findByUserAndPinnedTrue(User user);
 
+    // activated = true
+    List<Mymap> findByUserAndActivatedTrue(User user);
 }

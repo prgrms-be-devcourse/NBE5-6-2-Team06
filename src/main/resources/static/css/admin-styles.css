@@ -981,6 +981,35 @@ h1 {
 .history-content.active {
     display: block;
 }
+/* 신고 유형 통합 */
+.report-item {
+    margin-bottom: 1rem;
+}
+
+.report-item:last-child {
+    margin-bottom: 0;
+}
+
+.report-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.report-title {
+    font-weight: 600;
+}
+
+.content-time {
+    font-size: 0.75rem;
+    color: var(--gray-color);
+}
+
+.report-content {
+    background-color: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+}
 
 /* 채팅 메시지 */
 .chat-message {
@@ -1324,22 +1353,22 @@ h1 {
 }
 
 /* 상태 스타일 추가 */
-.status.recruiting {
+.status.RECRUITING {
     background-color: #e3f2fd;
     color: #0d47a1;
 }
 
-.status.closed {
+.status.FULL {
     background-color: #fff3cd;
     color: #856404;
 }
 
-.status.completed {
+.status.COMPLETED {
     background-color: #e3fcef;
     color: var(--success-color);
 }
 
-.status.cancelled {
+.status.CANCELED {
     background-color: #ffebee;
     color: var(--danger-color);
 }
@@ -1361,4 +1390,75 @@ h1 {
     color: #ff4444;
     font-size: 0.8rem;
     margin-top: 0.3rem;
+}
+
+/* 기존 CSS에 추가할 스타일 */
+
+/* 참가자 섹션 스타일 */
+.member-section {
+    margin-bottom: 2rem;
+}
+
+.member-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    background-color: var(--gray-light);
+    padding: 0.75rem 1rem;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    margin-bottom: 0;
+}
+
+.section-header h5 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--gray-dark);
+}
+
+.member-section .table-container {
+    margin-bottom: 0;
+}
+
+.member-section .data-table {
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+/* 빈 테이블 메시지 */
+.empty-table-message {
+    padding: 1rem;
+    text-align: center;
+    color: var(--gray-color);
+    font-style: italic;
+}
+
+/*!* 주최자 헤더 *!*/
+/*.organizer-list-header .section-header, .organizer-list-header th {*/
+/*    background-color: #e0f3ff;*/
+/*    color: #003f5c;*/
+/*}*/
+
+/*!* 팀원 헤더 *!*/
+/*.member-list-header .section-header, .member-list-header th {*/
+/*    background-color: #e4fbe0;*/
+/*    color: #22543d;*/
+/*}*/
+
+/*!* 참가 신청 헤더 *!*/
+/*.pending-list-header .section-header, .pending-list-header th {*/
+/*    background-color: #fff9e0;*/
+/*    color: #7a4c00;*/
+/*}*/
+
+/*!* 거절 헤더 *!*/
+/*.rejected-list-header .section-header, .rejected-list-header th  {*/
+/*    background-color: #ffe0e0;*/
+/*    color: #8b0000;*/
+/*}*/
+
+.detail-btn-div {
+    padding-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
 }

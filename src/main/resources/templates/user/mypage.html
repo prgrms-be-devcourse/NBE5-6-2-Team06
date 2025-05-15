@@ -260,26 +260,30 @@
       margin-top: 2rem;
     }
 
-    .review-item {
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 1.2rem;
-      margin: 1rem 0;
+    .review-alert {
+      margin-bottom: 1.5rem;
+      color: #555;
     }
 
-    .review-item .restaurant {
-      font-weight: 700;
-      margin-bottom: 0.5rem;
+    .badge {
+      display: inline-block;
+      background-color: #f0f0f0;
+      color: #333;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
     }
 
-    .review-item .rating {
-      color: #000;
-      margin-bottom: 0.5rem;
+    .meeting-item {
+      position: relative;
+      padding-bottom: 2.5rem;
     }
 
-    .review-text {
-      color: #666;
-      margin-bottom: 0.5rem;
+    .review-btn {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
     }
 
     .modal {
@@ -497,7 +501,7 @@
     <h2>내 모임 목록</h2>
     <div class="tabs">
       <button class="active" id="all-tab" onclick="switchTab('all')">전체</button>
-      <button class="active" id="hosting-tab" onclick="switchTab('hosting')">주최 중</button>
+      <button id="hosting-tab" onclick="switchTab('hosting')">주최 중</button>
       <button id="participating-tab" onclick="switchTab('participating')">참여 중</button>
       <button class="create-meeting" onclick="location.href='/team/create'">모임 만들기</button>
     </div>
@@ -517,7 +521,30 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+
+          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
+
+          <!-- 모임 수정 버튼 -->
+          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
+            모임 수정
+          </button>
+
+          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
+            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          </form>
+
+
+          <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
+            <h4>신청자 목록</h4>
+            <!-- 신청자 정보 동적으로 추가될 부분 -->
+            <ul id="applicant-list-${team.teamId}">
+              <!-- 신청자 정보 리스트 -->
+            </ul>
+          </div>
         </div>
         <div th:each="team : ${participatingTeams}" class="meeting-item">
           <h4>
@@ -527,7 +554,10 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+          </form>
+
         </div>
       </div>
 
@@ -545,7 +575,31 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a><br>
+
+          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
+
+          <!-- 모임 수정 버튼 -->
+          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
+            모임 수정
+          </button>
+
+          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
+            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          </form>
+
+
+
+          <div id="application-info-${teamId}" class="application-info" style="display: none;">
+            <h4>신청자 목록</h4>
+            <!-- 신청자 정보 동적으로 추가될 부분 -->
+            <ul id="applicant-list-${teamId}">
+              <!-- 신청자 정보 리스트 -->
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -563,7 +617,9 @@
           <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">자세히 보기</a>
+          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+
         </div>
       </div>
     </div>
@@ -604,29 +660,22 @@
     </div>
 
     <!-- 모임 리뷰 -->
-    <div class="main-section reviews-section">
-      <h2>내 리뷰</h2>
+    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview)}">
+      <h2>리뷰 작성이 필요한 모임</h2>
 
-      <div id="reviews-container">
-        <!-- 리뷰가 없을 때 표시할 내용 -->
-        <div th:if="${#lists.isEmpty(userReviews)}" class="empty-state">
-          <p>아직 작성한 리뷰가 없습니다.</p>
-          <p>모임에 참여하여 리뷰를 남겨보세요!</p>
-        </div>
+      <div class="review-alert">
+        <p>완료된 모임에 대해 다른 참여자들의 매너 온도를 매겨주세요!</p>
+      </div>
 
-        <!-- 리뷰 목록 -->
-        <div th:each="review : ${userReviews}" class="review-item">
-          <div class="restaurant" th:text="${review.team.restaurantName}">맛집 이름</div>
-          <div class="rating">
-            <span
-                th:text="${'★'.repeat(review.rating) + '☆'.repeat(5 - review.rating)}">★★★★☆</span>
-            <span th:text="${review.rating}">4.0</span>
-          </div>
-          <div class="review-text" th:text="${review.content}">리뷰 내용</div>
-          <p>📅 <span
-              th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')}">2023년 6월 19일</span>
-          </p>
-        </div>
+      <div th:each="team : ${teamsWithoutReview}" class="meeting-item" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
+        <h4>
+          <span th:text="${team.teamTitle}">모임 제목</span>
+          <span class="badge">완료됨</span>
+        </h4>
+        <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+        <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+        <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+        <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>
       </div>
     </div>
   </div>
@@ -691,61 +740,89 @@
 
   // 모임 목록 탭 전환
   function switchTab(tabName) {
-    // 탭 버튼 활성화 상태 변경
     const tabButtons = document.querySelectorAll('.tabs button:not(.create-meeting)');
     tabButtons.forEach(button => {
       button.classList.remove('active');
     });
-    event.target.classList.add('active');
+    document.getElementById(tabName + '-tab').classList.add('active');
 
-    // 모임 아이템 필터링
-    const meetingItems = document.querySelectorAll('#meetings-container .meeting-item');
-    const emptyState = document.querySelector('#meetings-container .empty-state');
+    const allMeetingsDiv = document.getElementById('all-meetings');
+    const hostingMeetingsDiv = document.getElementById('hosting-meetings');
+    const participatingMeetingsDiv = document.getElementById('participating-meetings');
 
-    let visibleCount = 0;
+    allMeetingsDiv.style.display = 'none';
+    hostingMeetingsDiv.style.display = 'none';
+    participatingMeetingsDiv.style.display = 'none';
 
-    meetingItems.forEach(item => {
-      const statusBadge = item.querySelector('.status-badge');
-      const isHosting = statusBadge && statusBadge.textContent.includes('주최중');
-      const isParticipating = statusBadge && statusBadge.textContent.includes('참여중');
-      const isCompleted = statusBadge && statusBadge.textContent.includes('완료');
-
-      if (tabName === 'all') {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'hosting' && isHosting) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'participating' && isParticipating) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else if (tabName === 'completed' && isCompleted) {
-        item.style.display = 'block';
-        visibleCount++;
-      } else {
-        item.style.display = 'none';
-      }
-    });
-
-    // 표시할 항목이 없으면 empty state 표시
-    if (emptyState) {
-      emptyState.style.display = visibleCount > 0 ? 'none' : 'block';
+    if (tabName === 'all') {
+      allMeetingsDiv.style.display = 'block';
+    } else if (tabName === 'hosting') {
+      hostingMeetingsDiv.style.display = 'block';
+    } else if (tabName === 'participating') {
+      participatingMeetingsDiv.style.display = 'block';
     }
   }
+
+
+
+  // 신청 정보 표시/숨기기 및 신청자 목록 로드
+  function showApplicationInfo(teamId) {
+    const applicationInfo = document.getElementById(`application-info-${teamId}`);
+    const currentDisplay = applicationInfo.style.display;
+
+    // 신청 정보 토글 (보이게/숨기게)
+    if (currentDisplay === 'none' || currentDisplay === '') {
+      applicationInfo.style.display = 'block';
+      loadApplicants(teamId);
+    } else {
+      applicationInfo.style.display = 'none';
+    }
+  }
+
+  // 신청자 목록 로드
+  function loadApplicants(teamId) {
+    fetch(`/team/${teamId}/applicants`)
+    .then(response => response.json())
+    .then(participants => {
+      const applicantList = document.getElementById(`applicant-list-${teamId}`);
+      applicantList.innerHTML = '';
+
+      if (participants.length === 0) {
+        const emptyMessage = document.createElement('li');
+        emptyMessage.textContent = '신청자가 없습니다.';
+        applicantList.appendChild(emptyMessage);
+      } else {
+        participants.forEach(participant => {
+          const listItem = document.createElement('li');
+          listItem.classList.add('applicant-item');
+
+          // 참가자의 User 정보를 사용
+          listItem.innerHTML = `
+            <span><strong>닉네임:</strong> ${participant.user.nickname}</span><br>
+            <span><strong>매너 온도:</strong> ${participant.user.temperature} °C</span><br>
+            <span><strong>상태:</strong> ${participant.participantStatus}</span>
+          `;
+
+          applicantList.appendChild(listItem);
+        });
+      }
+    })
+    .catch(error => console.error('신청자 목록을 가져오는 중 오류 발생:', error));
+  }
+
+  // 모임 수정 요청
+
+
+
+
 
   document.addEventListener('DOMContentLoaded', function () {
     if (!auth.isLoggedIn()) {
       window.location.href = '/user/signin';
       return;
     }
-
-    window.onclick = function (event) {
-      const modal = document.getElementById('deactivateModal');
-      if (event.target === modal) {
-        hideDeactivateModal();
-      }
-    }
-
-    // 카카오맵 API 초기화
+    switchTab('all'); // 초기 로딩 시 "전체" 탭 활성화
   });
 </script>
+</body>
+</html>

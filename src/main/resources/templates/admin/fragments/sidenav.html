@@ -6,7 +6,7 @@
 <body>
     <div th:fragment="sidenav" class="sidebar">
         <div class="logo">
-            <h2>관리자 패널</h2>
+            <h2>맛남 관리자</h2>
         </div>
         <ul class="nav-links">
             <li class="nav-item" th:classappend="${currentPage == 'dashboard'} ? 'active' : ''">
@@ -47,7 +47,7 @@
             </li>
         </ul>
         <div class="logout">
-            <a th:href="@{/logout}">
+            <a onclick="auth.logout()">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>로그아웃</span>
             </a>

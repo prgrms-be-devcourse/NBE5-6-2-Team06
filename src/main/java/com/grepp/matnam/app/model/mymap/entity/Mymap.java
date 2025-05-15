@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.mymap.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -19,6 +20,7 @@ public class Mymap extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     private String placeName;
@@ -33,5 +35,6 @@ public class Mymap extends BaseEntity {
 
     private Boolean pinned;
 
-    // 향후 카테고리 필요시 enum 필드 등 추가 가능
+    private Boolean activated;
+
 }

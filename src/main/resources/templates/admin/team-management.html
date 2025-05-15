@@ -1,234 +1,280 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
 <head>
-    <title>모임 관리</title>
+  <title>모임 관리</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <h1>모임 관리</h1>
-    <div class="filter-container">
-        <div class="search-filter">
-            <input type="text" placeholder="모임명 검색">
-            <button class="search-btn"><i class="fas fa-search"></i></button>
-        </div>
-        <div class="filter-options">
-            <select id="team-status-filter">
-                <option value="all">모든 상태</option>
-                <option value="recruiting">모집 중</option>
-                <option value="closed">모집 마감</option>
-                <option value="completed">완료</option>
-                <option value="cancelled">취소</option>
-            </select>
-            <select id="team-sort">
-                <option value="newest">최신순</option>
-                <option value="oldest">오래된순</option>
-                <option value="members">인원순</option>
-            </select>
-        </div>
+  <h1>모임 관리</h1>
+  <div class="tab-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="team-list">모임 목록</div>
     </div>
+    <div class="tab-content active" id="team-list">
+      <form method="get" action="/admin/team">
+        <div class="filter-container">
+          <div class="search-filter">
+            <input name="keyword" type="text" placeholder="모임명, 주최자 아이디로 검색"
+                   th:value="${param.keyword}">
+            <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-options">
+            <select name="status" id="team-status-filter" onchange="this.form.submit()">
+              <option value="" th:selected="${status == ''}">모든 상태</option>
+              <option value="RECRUITING" th:selected="${status == 'RECRUITING'}">모집 중</option>
+              <option value="FULL" th:selected="${status == 'FULL'}">모집 마감</option>
+              <option value="COMPLETED" th:selected="${status == 'COMPLETED'}">완료</option>
+              <option value="CANCELED" th:selected="${status == 'CANCELED'}">취소</option>
+            </select>
+            <select name="sort" id="team-sort" onchange="this.form.submit()">
+              <option value="newest" th:selected="${sort == 'newest'}">최신순</option>
+              <option value="oldest" th:selected="${sort == 'oldest'}">오래된순</option>
+            </select>
+          </div>
+        </div>
+      </form>
 
-    <div class="table-container">
+      <div class="table-container">
         <table class="data-table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>모임명</th>
-                <th>주최자</th>
-                <th>인원</th>
-                <th>장소</th>
-                <th>날짜</th>
-                <th>상태</th>
-                <th>액션</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="team : ${teams}">
-                <td th:text="${team.id}">1</td>
-                <td th:text="${team.name}">강남 맛집 탐방</td>
-                <td th:text="${team.organizerName}">김철수</td>
-                <td th:text="${team.currentMembers + '/' + team.maxMembers}">6/8</td>
-                <td th:text="${team.location}">서울 강남구</td>
-                <td th:text="${#temporals.format(team.meetingDate, 'yyyy-MM-dd')}">2023-06-20</td>
-                <td><span th:class="'status ' + ${team.status}" th:text="${team.statusText}">모집 중</span></td>
-                <td>
-                    <button class="action-btn view" th:data-id="${team.id}"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit" th:data-id="${team.id}" th:if="${team.status != 'completed'}"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete" th:data-id="${team.id}"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-            <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-            <tr th:if="${teams == null || teams.isEmpty()}">
-                <td>1</td>
-                <td>강남 맛집 탐방</td>
-                <td>김철수</td>
-                <td>6/8</td>
-                <td>서울 강남구</td>
-                <td>2023-06-20</td>
-                <td><span class="status recruiting">모집 중</span></td>
-                <td>
-                    <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                    <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-                    <button class="action-btn delete"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>
-            </tbody>
+          <thead>
+          <tr>
+            <th>번호</th>
+            <th>모임명</th>
+            <th>주최자 ID</th>
+            <th>인원</th>
+            <th>장소</th>
+            <th>날짜</th>
+            <th>상태</th>
+            <th>액션</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="team, iterStat : ${page.content()}">
+            <!--            + (5 * (page.currentNumber()-1))-->
+            <td th:text="${iterStat.count}"></td>
+            <td th:text="${team.teamTitle}"></td>
+            <td th:text="${team.user.userId}"></td>
+            <td th:text="${team.nowPeople + '/' + team.maxPeople}"></td>
+            <td th:text="${team.restaurantName}"></td>
+            <td th:text="${#temporals.format(team.teamDate, 'yyyy-MM-dd hh:mm')}"></td>
+            <td><span th:class="'status ' + ${team.status.name()}"
+                      th:text="${team.status.koreanName}"></span>
+            </td>
+            <td>
+              <button class="action-btn view" th:data-id="${team.teamId}"><i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit" th:data-id="${team.teamId}" th:data-status="${team.status.name()}" th:data-title="${team.teamTitle}"
+                      th:if="${team.status.name() != 'COMPLETED'}"><i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" th:data-id="${team.teamId}"><i
+                  class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+          </tbody>
         </table>
+      </div>
+      <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
     </div>
-
-    <div class="pagination" th:if="${totalPages > 0}">
-        <button class="page-btn prev" th:disabled="${currentPage == 1}"><i class="fas fa-chevron-left"></i></button>
-        <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-            <button class="page-btn" th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i}">1</button>
-        </th:block>
-        <button class="page-btn next" th:disabled="${currentPage == totalPages}"><i class="fas fa-chevron-right"></i></button>
-    </div>
-
-    <!-- 모임 상세 모달 (개선) -->
-    <div class="modal" id="teamViewModal">
-        <div class="modal-content large-modal">
-            <div class="modal-header">
-                <h2>모임 상세 정보</h2>
-                <span class="close-modal">&times;</span>
+  </div>
+  <!-- 모임 상세 모달 (개선) -->
+  <div class="modal" id="teamViewModal">
+    <div class="modal-content large-modal">
+      <div class="modal-header">
+        <h2>모임 상세 정보</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="team-details">
+          <div class="team-header">
+            <div class="team-image">
+              <img id="team-image" src="/images/team-placeholder.jpg" alt="모임 이미지">
             </div>
-            <div class="modal-body">
-                <div class="team-details">
-                    <div class="team-header">
-                        <div class="team-image">
-                            <img id="team-image" src="/images/team-placeholder.jpg" alt="모임 이미지">
-                        </div>
-                        <div class="team-info">
-                            <h3 id="team-title">강남 맛집 탐방</h3>
-                            <div class="team-meta">
-                                <div class="meta-item">
-                                    <i class="fas fa-user"></i>
-                                    <span id="team-organizer">주최자: 김철수</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-users"></i>
-                                    <span id="team-members">인원: 6/8</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-calendar"></i>
-                                    <span id="team-date">날짜: 2023-06-20</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-clock"></i>
-                                    <span id="team-time">시간: 18:30</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    <span id="team-location">장소: 서울 강남구</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-utensils"></i>
-                                    <span id="team-restaurant">식당: 맛있는 치킨</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-tag"></i>
-                                    <span id="team-category">카테고리: 한식</span>
-                                </div>
-                                <div class="meta-item">
-                                    <i class="fas fa-flag"></i>
-                                    <span id="team-status" class="status recruiting">상태: 모집 중</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="team-description">
-                        <h4>모임 설명</h4>
-                        <p id="team-description-text">강남 맛집을 함께 탐방하는 모임입니다. 맛있는 음식을 좋아하는 분들과 함께 즐거운 시간을 보내고 싶습니다. 많은 참여 부탁드립니다.</p>
-                    </div>
-
-                    <div class="detail-section">
-                        <h4>참가자 목록</h4>
-                        <div class="table-container">
-                            <table class="data-table">
-                                <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>이름</th>
-                                    <th>이메일</th>
-                                    <th>참가일</th>
-                                </tr>
-                                </thead>
-                                <tbody id="team-members-list">
-                                <!-- 참가자 목록이 여기에 동적으로 로드됩니다 -->
-                                <tr>
-                                    <td>1</td>
-                                    <td>김철수</td>
-                                    <td>kim@example.com</td>
-                                    <td>2023-06-15</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>이영희</td>
-                                    <td>lee@example.com</td>
-                                    <td>2023-06-16</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+            <div class="team-info">
+              <h3 id="team-title"></h3>
+              <div class="team-meta">
+                <div class="meta-item">
+                  <i class="fas fa-user"></i>
+                  <span>주최자: </span>
+                  <span id="team-organizer"></span>
                 </div>
+                <div class="meta-item">
+                  <i class="fas fa-users"></i>
+                  <span>인원: </span>
+                  <span id="team-members"></span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-calendar"></i>
+                  <span>날짜: </span>
+                  <span id="team-date"></span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-clock"></i>
+                  <span>시간: </span>
+                  <span id="team-time"></span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>장소: </span>
+                  <span id="team-location"></span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-flag"></i>
+                  <span>상태: </span>
+                  <span id="team-status" th:class="'status ' + 'RECRUITING'"></span>
+                </div>
+              </div>
             </div>
-            <div class="modal-footer">
-                <button class="secondary-btn cancel-btn">닫기</button>
-                <button class="warning-btn" id="edit-team-status-btn">상태 변경</button>
+          </div>
+
+          <div class="team-description">
+            <h4>모임 설명</h4>
+            <p id="team-description-text"></p>
+          </div>
+
+          <div class="detail-section">
+            <h4>참가자 목록</h4>
+
+            <!-- 주최자 섹션 -->
+            <div class="member-section organizer-list-header">
+              <div class="section-header">
+                <h5>주최자</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="organizer-list">
+                  <!-- 주최자 정보가 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
             </div>
+
+            <!-- 팀원 섹션 -->
+            <div class="member-section member-list-header">
+              <div class="section-header">
+                <h5>팀원</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="member-list">
+                  <!-- 팀원 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 참가 신청 섹션 -->
+            <div class="member-section pending-list-header">
+              <div class="section-header">
+                <h5>참가 신청</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="pending-list">
+                  <!-- 참가 신청 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 참가 거절 섹션 -->
+            <div class="member-section rejected-list-header">
+              <div class="section-header">
+                <h5>참가 거절</h5>
+              </div>
+              <div class="table-container">
+                <table class="data-table">
+                  <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>신청일</th>
+                  </tr>
+                  </thead>
+                  <tbody id="rejected-list">
+                  <!-- 참가 거절 목록이 여기에 동적으로 로드됩니다 -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-btn">닫기</button>
+      </div>
     </div>
+  </div>
 
-    <!-- 모임 상태 변경 모달 (새로 추가) -->
-    <div class="modal" id="teamStatusModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>모임 상태 변경</h2>
-                <span class="close-modal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="teamStatusForm">
-                    <input type="hidden" id="status-team-id">
+  <!-- 모임 상태 변경 모달 (새로 추가) -->
+  <div class="modal" id="teamStatusModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>모임 상태 변경</h2>
+        <span class="close-modal">&times;</span>
+        <input type="text" hidden id="team-id">
+        <input type="text" hidden id="team-prev-status">
+      </div>
+      <div class="modal-body">
+        <form id="teamStatusForm">
+          <input type="hidden" id="status-team-id">
 
-                    <div class="form-group">
-                        <label for="team-name-display">모임명</label>
-                        <input type="text" id="team-name-display" readonly>
-                    </div>
+          <div class="form-group">
+            <label for="team-name-display">모임명</label>
+            <input type="text" id="team-name-display" readonly>
+          </div>
 
-                    <div class="form-group">
-                        <label for="team-status-select">상태 선택</label>
-                        <select id="team-status-select">
-                            <option value="recruiting">모집 중</option>
-                            <option value="closed">모집 마감</option>
-                            <option value="completed">완료</option>
-                            <option value="cancelled">취소</option>
-                        </select>
-                    </div>
+          <div class="form-group">
+            <label for="team-status-select">상태 선택</label>
+            <select id="team-status-select">
+              <option value="RECRUITING">모집 중</option>
+              <option value="FULL">모집 마감</option>
+              <option value="COMPLETED">완료</option>
+              <option value="CANCELED">취소</option>
+            </select>
+          </div>
 
-                    <div class="form-group">
-                        <label for="status-change-reason">변경 사유 (선택사항)</label>
-                        <textarea id="status-change-reason" rows="3" placeholder="상태 변경 사유를 입력하세요"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="notify-members">참가자에게 알림</label>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notify-members" checked>
-                            <label for="notify-members">상태 변경을 참가자에게 알림</label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="secondary-btn cancel-btn">취소</button>
-                <button class="primary-btn" id="save-status-btn">저장</button>
-            </div>
-        </div>
+          <div class="form-group">
+            <label for="status-change-reason">변경 사유 (선택사항)</label>
+            <textarea id="status-change-reason" rows="3" placeholder="상태 변경 사유를 입력하세요"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn cancel-btn">취소</button>
+        <button class="primary-btn" id="save-status-btn">저장</button>
+      </div>
     </div>
+  </div>
 </div>
 
 <th:block layout:fragment="script">
-    <script th:src="@{/js/team-management.js}"></script>
+  <script th:src="@{/js/team-management.js}"></script>
 </th:block>
 </body>
 </html>

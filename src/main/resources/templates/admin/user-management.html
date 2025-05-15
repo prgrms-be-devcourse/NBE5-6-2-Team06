@@ -9,15 +9,17 @@
   <h1>사용자 관리</h1>
   <div class="tab-container">
     <div class="tabs">
-      <a th:href="@{/admin/user/list}" class="tab" th:classappend="${activeTab == 'user-list'} ? 'active'"
+      <a th:href="@{/admin/user/list}" class="tab"
+         th:classappend="${activeTab == 'user-list'} ? 'active'"
          data-tab="user-list">회원 목록</a>
       <a th:href="@{/admin/user/report}" class="tab"
          th:classappend="${activeTab == 'user-reports'} ? 'active'" data-tab="user-reports">신고
         관리</a>
     </div>
 
-    <div class="tab-content" id="user-list" th:classappend="${activeTab == 'user-list'} ? 'active'" th:if="${activeTab == 'user-list'}">
-      <form method="get" action="/admin/user">
+    <div class="tab-content" id="user-list" th:classappend="${activeTab == 'user-list'} ? 'active'"
+         th:if="${activeTab == 'user-list'}">
+      <form method="get" action="/admin/user/list">
         <div class="filter-container">
           <div class="search-filter">
             <input name="keyword" type="text" id="user-search" placeholder="아이디, 닉네임, 이메일로 검색"
@@ -86,29 +88,35 @@
     </div>
 
     <!-- 신고 관리 탭 -->
-    <div class="tab-content" id="user-reports" th:classappend="${activeTab == 'user-reports'} ? 'active'" th:if="${activeTab == 'user-reports'}">
-      <div class="filter-container">
-        <div class="search-filter">
-          <input type="text" placeholder="신고 내용 검색">
-          <button class="search-btn"><i class="fas fa-search"></i></button>
+    <div class="tab-content" id="user-reports"
+         th:classappend="${activeTab == 'user-reports'} ? 'active'"
+         th:if="${activeTab == 'user-reports'}">
+      <form method="get" action="/admin/user/report">
+        <div class="filter-container">
+          <div class="search-filter">
+            <input name="keyword" type="text" placeholder="신고자, 대상자 검색" th:value="${param.keyword}">
+            <button class="search-btn"><i class="fas fa-search"></i></button>
+          </div>
+          <div class="filter-options">
+            <select name="status" id="report-status-filter" onchange="this.form.submit()">
+              <option value="" th:selected="${status == null}">모든 상태</option>
+              <option value="true" th:selected="${status == true}">대기 중</option>
+              <option value="false" th:selected="${status == false}">처리 완료</option>
+            </select>
+            <select name="sort" id="report-sort" onchange="this.form.submit()">
+              <option value="newest" th:selected="${sort == 'newest'}">최신순</option>
+              <option value="oldest" th:selected="${sort == 'oldest'}">오래된순</option>
+            </select>
+          </div>
         </div>
-        <div class="filter-options">
-          <select id="report-status-filter">
-            <option value="all">모든 상태</option>
-            <option value="pending">대기중</option>
-            <option value="resolved">해결됨</option>
-            <option value="rejected">거부됨</option>
-          </select>
-        </div>
-      </div>
-
+      </form>
       <div class="table-container">
         <table class="data-table">
           <thead>
           <tr>
-            <th>ID</th>
-            <th>신고자</th>
-            <th>대상자</th>
+            <th>번호</th>
+            <th>신고자 ID</th>
+            <th>대상자 ID</th>
             <th>내용</th>
             <th>날짜</th>
             <th>상태</th>
@@ -116,42 +124,37 @@
           </tr>
           </thead>
           <tbody>
-          <tr th:each="report : ${reports}">
-            <td th:text="${report.id}">1</td>
-            <td th:text="${report.reporterName}">김철수</td>
-            <td th:text="${report.targetName}">이영희</td>
-            <td th:text="${report.content}">부적절한 언어 사용</td>
-            <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}">2023-06-15
-              14:30
-            </td>
-            <td><span th:class="'status ' + ${report.status}"
-                      th:text="${report.statusText}">대기중</span></td>
+          <tr th:each="report, iterStat : ${page.content()}">
+            <td th:text="${iterStat.count}"></td>
+            <td th:text="${report.userId}"></td>
+            <td th:text="${report.reportedId}"></td>
+            <td th:text="${report.reason}"></td>
+            <td th:text="${#temporals.format(report.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
             <td>
-              <button class="action-btn view" th:data-id="${report.id}"><i class="fas fa-eye"></i>
+              <span th:class="'status ' + (${report.activated} ? 'pending' : 'completed')"
+                    th:text="${report.activated} ? '대기 중' : '처리 완료'"></span>
+            </td>
+            <td>
+              <button class="action-btn view"
+                      th:data-id="${report.reportId}"
+                      th:data-user-id="${report.userId}"
+                      th:data-reported-id="${report.reportedId}"
+                      th:data-reason="${report.reason}"
+                      th:data-date="${report.createdAt}"
+                      th:data-activated="${report.activated}"
+                      th:data-type="${report.reportType}"
+                      th:data-chat-id="${report.chatId}"
+                      th:data-post-id="${report.teamId}">
+                <i class="fas fa-eye"></i>
               </button>
-              <button th:if="${report.status == 'pending'}" class="action-btn resolve"
-                      th:data-id="${report.id}"><i class="fas fa-check"></i></button>
-              <button th:if="${report.status == 'pending'}" class="action-btn reject"
-                      th:data-id="${report.id}"><i class="fas fa-times"></i></button>
-            </td>
-          </tr>
-          <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-          <tr th:if="${reports == null || reports.isEmpty()}">
-            <td>1</td>
-            <td>김철수</td>
-            <td>이영희</td>
-            <td>부적절한 언어 사용</td>
-            <td>2023-06-15 14:30</td>
-            <td><span class="status pending">대기중</span></td>
-            <td>
-              <button class="action-btn view"><i class="fas fa-eye"></i></button>
-              <button class="action-btn resolve"><i class="fas fa-check"></i></button>
-              <button class="action-btn reject"><i class="fas fa-times"></i></button>
+              <button th:if="${report.activated == true}" class="action-btn resolve"
+                      th:data-id="${report.reportId}"><i class="fas fa-check"></i></button>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
+      <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
     </div>
   </div>
 
@@ -224,27 +227,31 @@
             <h3>신고 정보</h3>
             <div class="detail-item">
               <span class="detail-label">신고 ID:</span>
-              <span class="detail-value" id="report-id">1</span>
+              <span class="detail-value" id="report-id"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고자:</span>
-              <span class="detail-value" id="report-reporter">김철수 (kim@example.com)</span>
+              <span class="detail-value" id="report-reporter"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">대상자:</span>
-              <span class="detail-value" id="report-target">이영희 (lee@example.com)</span>
+              <span class="detail-value" id="report-target"></span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">신고 유형:</span>
+              <span class="detail-value" id="report-type"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고 내용:</span>
-              <span class="detail-value" id="report-content">부적절한 언어 사용</span>
+              <span class="detail-value" id="report-content"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">신고일:</span>
-              <span class="detail-value" id="report-date">2023-06-15 14:30</span>
+              <span class="detail-value" id="report-date"></span>
             </div>
             <div class="detail-item">
               <span class="detail-label">상태:</span>
-              <span class="detail-value status pending" id="report-status">대기중</span>
+              <span class="detail-value status pending" id="report-status"></span>
             </div>
           </div>
 
@@ -252,19 +259,23 @@
             <h3>대상자 활동 내역</h3>
             <div class="user-history">
               <div class="history-tabs">
-                <div class="history-tab active" data-tab="chat-history">채팅 내역</div>
-                <div class="history-tab" data-tab="post-history">게시글 내역</div>
+                <div class="history-tab active" data-tab="report-history">채팅 내역</div>
+<!--                <div class="history-tab" data-tab="post-history">게시글 내역</div>-->
               </div>
 
-              <div class="history-content active" id="chat-history">
-                <!-- 채팅 내역이 여기에 동적으로 로드됩니다 -->
-                <div class="chat-message">
-                  <div class="message-header">
-                    <span class="message-sender">이영희</span>
-                    <span class="message-time">2023-06-15 14:25</span>
+              <div class="history-content active" id="report-history">
+                <div class="report-item">
+                  <div class="report-header">
+                    <span class="report-title">이영희</span>
+                    <span class="content-time">2023-06-15 14:25</span>
                   </div>
-                  <div class="message-content">
+                  <div class="report-content">
                     <p>부적절한 채팅 내용 예시</p>
+                  </div>
+                  <div class="detail-btn-div">
+                    <div class="action-buttons">
+                      <button class="primary-btn detail-btn">자세히 보기</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -285,9 +296,8 @@
           </div>
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer"  id="detail-modal-footer">
         <div class="action-buttons">
-          <button class="secondary-btn reject-btn">거부</button>
           <button class="warning-btn suspend-btn" id="show-suspend-options">사용자 정지</button>
           <button class="primary-btn resolve-btn">해결 처리</button>
         </div>
@@ -327,14 +337,6 @@
           <div class="form-group">
             <label for="suspend-reason">정지 사유</label>
             <textarea id="suspend-reason" rows="3" placeholder="정지 사유를 입력하세요"></textarea>
-          </div>
-
-          <div class="form-group">
-            <label for="suspend-notify">사용자에게 알림</label>
-            <div class="checkbox-item">
-              <input type="checkbox" id="suspend-notify" checked>
-              <label for="suspend-notify">정지 사유와 기간을 사용자에게 이메일로 알림</label>
-            </div>
           </div>
         </form>
       </div>
