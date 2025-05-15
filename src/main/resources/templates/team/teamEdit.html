@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>맛남 | 모임 수정</title>
+  <style>
+    /* 기존 스타일 그대로 유지 */
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #eee;
+    }
+    nav a {
+      margin-right: 1rem;
+      text-decoration: none;
+      color: #333;
+      font-size: 0.9rem;
+    }
+    .header-buttons button {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      background-color: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 1rem 0 0.5rem;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="time"],
+    textarea,
+    select,
+    .map-placeholder,
+    .image-upload-box {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    .map-placeholder,
+    .image-upload-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      background-color: #fafafa;
+      height: 150px;
+      border: 1px dashed #ccc;
+    }
+    .section {
+      margin-bottom: 2rem;
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+    .btn {
+      padding: 0.6rem 1.5rem;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+    }
+    .btn.cancel {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .btn.submit {
+      background-color: #000;
+      color: #fff;
+    }
+    input[type=\"file\"] {
+      border: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div><a href="/" style="text-decoration:none; color:black; font-weight:bold;">맛남</a></div>
+  <nav>
+    <a th:href="@{/}">홈</a>
+    <a th:href="@{/team/search}">모임 찾기</a>
+    <a th:href="@{/restaurant/restaurants}">맛집 탐색</a>
+    <a th:href="@{/user/mypage}">마이페이지</a>
+  </nav>
+  <div class="header-buttons">
+    <button th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+  </div>
+</header>
+
+<div class="container">
+  <h1>모임 수정</h1>
+  <form th:action="@{|/team/edit/${teamId}}|"] method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" th:value="${team.id}">
+
+    <div class="section">
+      <label>모임 제목</label>
+      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.title}" required>
+
+      <label>모임 설명</label>
+      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.description}" required></textarea>
+
+      <label>날짜</label>
+      <input type="date" name="date" th:value="${#dates.format(team.date, 'yyyy-MM-dd')}" required>
+
+      <label>시간</label>
+      <input type="time" name="time" th:value="${#dates.format(team.time, 'HH:mm')}" required>
+
+      <label>음식 카테고리</label>
+      <select name="category" required>
+        <option value="">카테고리 선택</option>
+        <option value="한식" th:selected="${team.category == '한식'}">한식</option>
+        <option value="일식" th:selected="${team.category == '일식'}">일식</option>
+        <option value="중식" th:selected="${team.category == '중식'}">중식</option>
+        <option value="양식" th:selected="${team.category == '양식'}">양식</option>
+        <option value="분식" th:selected="${team.category == '분식'}">분식</option>
+        <option value="디저트" th:selected="${team.category == '디저트'}">디저트</option>
+      </select>
+
+      <label>최대 인원</label>
+      <select name="capacity" required>
+        <option value="1" th:selected="${team.capacity == 1}">1명</option>
+        <option value="2" th:selected="${team.capacity == 2}">2명</option>
+        <option value="3" th:selected="${team.capacity == 3}">3명</option>
+        <option value="4" th:selected="${team.capacity == 4}">4명</option>
+        <option value="5" th:selected="${team.capacity == 5}">5명</option>
+        <option value="6" th:selected="${team.capacity == 6}">6명</option>
+        <option value="7" th:selected="${team.capacity == 7}">7명</option>
+        <option value="8" th:selected="${team.capacity == 8}">8명</option>
+        <option value="9" th:selected="${team.capacity == 9}">9명</option>
+        <option value="10" th:selected="${team.capacity == 10}">10명</option>
+      </select>
+    </div>
+
+    <div class="section">
+      <h2>식당 정보</h2>
+      <label>식당 이름</label>
+      <input type="text" name="restaurantName" placeholder="식당 이름을 입력하세요" th:value="${team.restaurantName}" required>
+
+      <label>주소</label>
+      <input type="text" name="restaurantAddress" placeholder="식당 주소를 입력하세요" th:value="${team.restaurantAddress}" required>
+
+      <label>위치 선택</label>
+      <div class="map-placeholder">지도에서 위치를 선택해주세요</div>
+    </div>
+
+    <div class="section">
+      <h2>모임 이미지</h2>
+      <div class="image-upload-box">
+        클릭하여 업로드 또는 드래그 앤 드롭 (JPG, PNG, JPEG 파일 / 최대 10MB)
+        <img th:if="${team.imageUrl}" th:src="${team.imageUrl}" style="max-width: 100px; max-height: 100px;">
+      </div>
+      <input type="file" name="image" accept="image/*">
+    </div>
+
+    <div class="btn-row">
+      <button type="button" class="btn cancel" onclick="history.back()">취소</button>
+      <button type="submit" class="btn submit">모임 수정하기</button>
+    </div>
+  </form>
+</div>
+</body>
+</html>

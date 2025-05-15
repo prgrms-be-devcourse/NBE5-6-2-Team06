@@ -56,7 +56,7 @@
         📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
-        👥 <span th:text="${team.participants.size()}">4</span>/<span th:text="${team.maxPeople}">10</span>명
+        👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
       <div class="info-section">
         <h3>모임 소개</h3>
@@ -72,7 +72,7 @@
   <div class="sidebar">
     <div class="card">
       <h4>모임 참여하기</h4>
-      <p th:text="${team.participants.size()} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
+      <p th:text="${team.nowPeople} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
       <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
         <input type="hidden" name="userId" th:value="${#authentication.name}">
         <button type="submit"
