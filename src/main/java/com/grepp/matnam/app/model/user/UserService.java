@@ -163,6 +163,8 @@ public class UserService {
             user.setSuspendDuration(request.getSuspendDuration());
             user.setDueDate(LocalDate.now().plusDays(request.getSuspendDuration()));
             user.setDueReason(request.getDueReason());
+        } else if (request.getStatus() == Status.BANNED){
+            user.setDueReason(request.getDueReason());
         } else {
             user.setSuspendDuration(null);
             user.setDueDate(null);

@@ -28,7 +28,10 @@ public class Report extends BaseEntity {
     @JoinColumn(name = "userId", nullable = false)
     private User user;
 
-    private String reportedId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reportedId", nullable = false)
+    private User reportedUser;
+
     private String reason;
 
     @Enumerated(EnumType.STRING)
