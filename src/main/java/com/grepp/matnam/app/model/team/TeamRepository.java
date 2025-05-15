@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
+import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Team;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,4 +35,8 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     Optional<Team> findByIdWithParticipantsAndUser(@Param("teamId") Long teamId);
 
     long countByCreatedAtBetween(LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
+
+    long countByStatusIn(List<Status> activeStatuses);
+
+    long countAllByActivated(Boolean activated);
 }

@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
@@ -13,6 +14,7 @@ import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -271,6 +273,15 @@ public class TeamService {
         long yesterdayTotalTeamCount = totalTeamCount - newTeams;
         String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
         return new NewTeamResponse(newTeams, userGrowth);
+    }
+
+    public ActiveTeamResponse getActiveTeamStats() {
+
+        List<Status> activeStatuses = List.of(Status.RECRUITING, Status.FULL);
+        long todayActiveTeams = teamRepository.countByStatusIn(activeStatuses);
+        long totalTeamCount = teamRepository.countAllByActivated(true);
+
+        return new ActiveTeamResponse(todayActiveTeams, totalTeamCount);
     }
 
     private String calculateGrowthRate(long today, long yesterday) {
