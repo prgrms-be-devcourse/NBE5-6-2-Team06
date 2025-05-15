@@ -119,17 +119,23 @@ public class TeamController {
     // 모임 상세 조회
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
-        // 현재 로그인한 사용자 정보 가져오기
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserById(userId);
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
 
-        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId,
-            teamId);
+        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
+            userId, teamId, ParticipantStatus.APPROVED);
+        boolean alreadyApplied = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
+            userId, teamId, ParticipantStatus.PENDING);
 
-        model.addAttribute("team", team);
+        List<Participant> approvedParticipants = team.getParticipants().stream()
+            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
+            .toList();
+        model.addAttribute("participants", approvedParticipants);
+
         model.addAttribute("isParticipant", isParticipant);
+        model.addAttribute("alreadyApplied", alreadyApplied);
         model.addAttribute("user", user);
 
         return "team/teamDetail";

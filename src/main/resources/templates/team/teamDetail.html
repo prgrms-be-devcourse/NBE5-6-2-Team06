@@ -27,7 +27,6 @@
       font-size: 0.8rem;
       color: #777;
     }
-    /* 버튼 비활성화 시 회색 배경 */
     button:disabled {
       background: #6c757d;
       cursor: not-allowed;
@@ -50,10 +49,10 @@
     <div class="card">
       <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'CLOSED'}">모집 완료</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FINISHED'}">종료된 모임</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'COMPLETED'}">종료된 모임</span>
       <p>
-        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
@@ -85,6 +84,23 @@
     <div class="card">
       <h4>방장 정보</h4>
       <p th:text="'🙋‍♂️ ' + ${team.user.nickname}">방장 이름</p>
+    </div>
+    <div class="card">
+      <h4>참여자 정보</h4>
+      <div class="participant-list">
+        <div class="participant" th:each="participant : ${participants}">
+          <div class="participant-info" th:if="${participant.user != null}"> <div class="info-item">
+            <strong>👤:</strong>
+            <span th:text="${participant.user.nickname}">참여자 닉네임</span>
+          </div>
+          </div>
+          <div class="participant-info" th:unless="${participant.user != null}">
+            <span>탈퇴한 사용자</span> </div>
+        </div>
+        <div class="participant" th:if="${#lists.isEmpty(participants)}">
+          <span>현재 참여자가 없습니다.</span>
+        </div>
+      </div>
     </div>
     <div class="card">
       <h4>비슷한 모임</h4>
