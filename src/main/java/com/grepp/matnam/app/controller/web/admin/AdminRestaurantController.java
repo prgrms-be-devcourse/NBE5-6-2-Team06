@@ -44,7 +44,7 @@ public class AdminRestaurantController {
                 sortOption = Sort.by("name").ascending();
                 break;
             case "rating":
-                sortOption = Sort.by(Sort.Order.desc("rating")); // 서비스에서 평균 계산 필드 필요
+                sortOption = Sort.by(Sort.Order.desc("googleRating"));
                 break;
             default:
                 sortOption = Sort.by(Sort.Order.desc("createdAt")); // 최신순

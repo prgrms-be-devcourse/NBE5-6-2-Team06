@@ -39,10 +39,6 @@ public class Restaurant extends BaseEntity {
 
     private Float googleRating;
 
-    private Float naverRating;
-
-    private Float kakaoRating;
-
     // 각 식당 대표 분위기 추가
     private boolean goodTalk;
     private boolean manyDrink;

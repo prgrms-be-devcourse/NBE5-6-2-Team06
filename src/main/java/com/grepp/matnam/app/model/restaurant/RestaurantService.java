@@ -56,8 +56,6 @@ public class RestaurantService {
         restaurant.setLongStay(request.isLongStay());
         restaurant.setBigStore(request.isBigStore());
         restaurant.setGoogleRating(request.getGoogleRating());
-        restaurant.setNaverRating(request.getNaverRating());
-        restaurant.setKakaoRating(request.getKakaoRating());
     }
 
     @Transactional

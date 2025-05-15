@@ -1271,13 +1271,14 @@ h1 {
 /* 테이블 내 평점 스타일 */
 .data-table .rating {
     display: flex;
+    flex-direction: column;
     align-items: center;
     color: #ffc107;
 }
 
 .data-table .rating i {
     font-size: 0.875rem;
-    margin-right: 0.125rem;
+    margin-right: 0;
 }
 
 .data-table .rating span {

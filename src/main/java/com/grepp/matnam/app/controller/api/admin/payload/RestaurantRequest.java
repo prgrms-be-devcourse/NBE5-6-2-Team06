@@ -34,12 +34,6 @@ public class RestaurantRequest {
     @NotNull(message = "평점을 입력해주세요.")
     private Float googleRating;
 
-    @NotNull(message = "평점을 입력해주세요.")
-    private Float naverRating;
-
-    @NotNull(message = "평점을 입력해주세요.")
-    private Float kakaoRating;
-
     private boolean goodTalk;
     private boolean manyDrink;
     private boolean goodMusic;
@@ -72,8 +66,6 @@ public class RestaurantRequest {
         restaurant.setLongStay(longStay);
         restaurant.setBigStore(bigStore);
         restaurant.setGoogleRating(googleRating);
-        restaurant.setNaverRating(naverRating);
-        restaurant.setKakaoRating(kakaoRating);
         restaurant.setRecommendedCount(0);
 
         return restaurant;
