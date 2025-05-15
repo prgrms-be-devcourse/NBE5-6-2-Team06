@@ -37,6 +37,12 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // mypage 내에 맵 띄우기 위해 x-frame 옵션 설정을 추가했습니다.
+                .headers(headers->headers
+                        .frameOptions(frameOptions -> frameOptions
+                                .sameOrigin()
+                        )
+                )
                 // #TODO: 접근 제한 추가
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()

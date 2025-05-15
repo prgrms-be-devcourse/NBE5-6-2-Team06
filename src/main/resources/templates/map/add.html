@@ -206,7 +206,6 @@
         <div id="pagination"></div>
     </div>
 </div>
-
 <footer>© 2025 맛남. 모든 권리 보유.</footer>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f&libraries=services"></script>
 <script>
@@ -217,19 +216,25 @@
 
     const yellowMarkerImage = new kakao.maps.MarkerImage(
         '/img/map-marker-yellow.png',
-        new kakao.maps.Size(40, 42),
-        { offset: new kakao.maps.Point(20, 42) }
+        new kakao.maps.Size(38, 40),
+        { offset: new kakao.maps.Point(19, 40) }
     );
 
     const blueMarkerImage = new kakao.maps.MarkerImage(
         '/img/map-marker-blue.png',
+        new kakao.maps.Size(38, 40),
+        { offset: new kakao.maps.Point(19, 40) }
+    );
+
+    const redMarkerImage = new kakao.maps.MarkerImage(
+        '/img/map-marker-red.png',
         new kakao.maps.Size(40, 42),
         { offset: new kakao.maps.Point(20, 42) }
     );
 
     function initMap() {
         const container = document.getElementById('map');
-        const options = { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 3, minLevel: 1 };
+        const options = { center: new kakao.maps.LatLng(37.48453710546348, 127.01083175248992), level: 1, minLevel: 1 };
         map = new kakao.maps.Map(container, options);
 
         kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
@@ -244,7 +249,7 @@
             clickedMarker = new kakao.maps.Marker({
                 position: latlng,
                 map: map,
-                image: blueMarkerImage
+                image: redMarkerImage
             });
 
             moveMapTo(latlng);
@@ -376,7 +381,7 @@
 
         if (clickedMarker) clickedMarker.setMap(null);
         const pos = new kakao.maps.LatLng(place.y, place.x);
-        clickedMarker = new kakao.maps.Marker({ map, position: pos, image: blueMarkerImage });
+        clickedMarker = new kakao.maps.Marker({ map, position: pos, image: redMarkerImage });
 
         kakao.maps.event.addListener(clickedMarker, 'click', () => {
             fillFormWithPlace(place);
@@ -441,7 +446,7 @@
                     myPlaceMarkers.push(marker);
                 });
 
-                // 저장된 장소가 하나 이상일 경우 해당 영역으로 지도 확대 및 이동
+                // 저장된 장소가 하나 이상일 경우 해당 영역 중심으로 지도 확대 및 이동
                 if (!bounds.isEmpty()) {
                     map.setBounds(bounds);
                 }

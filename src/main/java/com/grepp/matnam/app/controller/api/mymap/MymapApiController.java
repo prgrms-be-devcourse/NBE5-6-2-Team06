@@ -5,8 +5,11 @@ import com.grepp.matnam.app.model.mymap.MymapRepository;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -42,4 +45,22 @@ public class MymapApiController {
         mymapRepository.save(mymap);
         return "저장 완료";
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<String> updatePlace(@PathVariable Long id, @RequestBody Mymap request) {
+        Mymap existing = mymapRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 장소를 찾을 수 없습니다."));
+
+        if (request.getPinned() != null) {
+            existing.setPinned(request.getPinned());
+        }
+
+        if (request.getActivated() != null) {
+            existing.setActivated(request.getActivated());
+        }
+
+        mymapRepository.save(existing);
+        return ResponseEntity.ok("업데이트 완료");
+    }
+
 }
