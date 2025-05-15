@@ -13,6 +13,7 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,20 @@ public class TeamController {
 
 
     // 모임 생성
+//    @PostMapping("/create")
+//    public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String userId = authentication.getName(); // 현재 로그인한 사용자 ID 가져오기
+//        User user = userService.getUserById(userId);
+//        Team team = teamRequest.toDto(user);
+//        team.setUser(user);
+//
+//        teamService.saveTeam(team);
+//        teamService.addParticipant(team.getTeamId(), user);
+//
+//        return "redirect:/team/detail/" + team.getTeamId();
+//    }
+
     @PostMapping("/create")
     public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -69,6 +84,19 @@ public class TeamController {
         User user = userService.getUserById(userId);
         Team team = teamRequest.toDto(user);
         team.setUser(user);
+
+        if (teamRequest.getDate() != null && teamRequest.getTime() != null) {
+            String dateTimeString = teamRequest.getDate() + "T" + teamRequest.getTime() + ":00";
+            try {
+                team.setMeetDate(LocalDateTime.parse(dateTimeString));
+            } catch (Exception e) {
+                team.setMeetDate(LocalDateTime.now());
+            }
+        } else {
+            team.setMeetDate(LocalDateTime.now());
+        }
+
+        team.setTeamDate(LocalDateTime.now());
 
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);

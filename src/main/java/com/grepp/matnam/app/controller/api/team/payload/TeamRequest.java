@@ -28,8 +28,8 @@ public class TeamRequest {
         team.setUser(user);
         team.setTeamTitle(this.title);
         team.setTeamDetails(this.description);
-        team.setMeetDate(LocalDateTime.now());
-        team.setTeamDate(LocalDateTime.now());
+//        team.setMeetDate(LocalDateTime.now());
+//        team.setTeamDate(LocalDateTime.now());
         team.setMaxPeople(this.capacity);
         team.setNowPeople(1);
         team.setStatus(Status.RECRUITING);
