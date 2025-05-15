@@ -185,3 +185,12 @@ VALUES
 
 # INSERT INTO chat_room (team_id,name) values (1,'팀1채팅방');
 # INSERT INTO chat_room (team_id,name) values (2,'팀2채팅방');
+
+#채팅 테스트 데이터
+-- 참가자(participant) 데이터
+INSERT INTO participant (activated, created_at, modified_at, team_id, user_id, participant_status, role)
+VALUES
+-- 팀 1의 참가자들
+(1, '2024-05-05 11:00:00', '2024-05-05 16:00:00', 1, 'test2', 'APPROVED', 'MEMBER'),
+(1, '2024-05-05 11:00:00', '2024-05-05 16:00:00', 1, 'test3', 'APPROVED', 'MEMBER'),
+(1, '2024-05-05 11:00:00', '2024-05-05 16:00:00', 2, 'test4', 'APPROVED', 'MEMBER');

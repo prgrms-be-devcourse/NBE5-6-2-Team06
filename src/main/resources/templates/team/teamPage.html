@@ -290,42 +290,57 @@
 </div>
 
 <script th:inline="javascript">
+  let stompClient;
+
   const teamId = [[${teamId}]]; // 테스트용 팀 ID (백엔드와 맞춰서 수정)
   const senderId = [[${userId}]]; // 로그인된 사용자 ID
-  const senderNickname = [[${userNickName}]]; // 로그인된 사용자 닉네임
+  const senderNickname = [[${userNickname}]]; // 로그인된 사용자 닉네임
 
-  let stompClient = null;
 
   function connect() {
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
 
+    //오류 처리
+    stompClient.onWebSocketError = (error) => {
+      console.error('Error with websocket', error);
+    };
+
+    stompClient.onStompError = (frame) => {
+      console.error('Broker reported error: ' + frame.headers['message']);
+      console.error('Additional details: ' + frame.body);
+    };
+
     stompClient.connect({}, function (frame) {
       console.log('Connected: ' + frame);
-
-      // 팀 채팅방 구독 ex) 하드코딩으로 /room/1 에 대한 채팅방 구독
+      // 팀 채팅방 구독
       stompClient.subscribe('/room/' + teamId, function (chat) {
         const message = JSON.parse(chat.body);
-        showMessage(message.senderNickname + ': ' + message.message);
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
       });
     });
   }
+
 
   //실질적인 메시지 전송 (팀id, 보내는 사람 id, 보내는 사람 닉네임, 보내는 내용)
   function sendMessage() {
     const input = document.getElementById('chat-input');
     const messageContent = input.value.trim();
+    const now = new Date();
+    const time = now.toTimeString().slice(0,5);
     if (messageContent && stompClient) {
       const chatMessage = {
         teamId: teamId,
         senderId: senderId,
         senderNickname: senderNickname,
-        message: messageContent
+        message: messageContent,
+        time: time
       };
       stompClient.send('/send/message', {}, JSON.stringify(chatMessage));
       input.value = '';
     }
   }
+
 
   // 보낸 내용을 채팅방에 보여줌 ( 자동스크롤 방식)
   function showMessage(message) {
@@ -358,7 +373,7 @@
 
       // 채팅 (닉네임 : 메시지 ) 형태
       data.forEach(message => {
-        showMessage(message.senderNickname + ': ' + message.message);
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
       });
     })
     .catch(error => {

@@ -1,5 +1,7 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.model.chat.entity.ChatRoom;
+import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -29,10 +31,17 @@ public class TeamService {
     private final ParticipantRepository participantRepository;
 
     private final UserRepository userRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     // 모임 생성
     public void saveTeam(Team team) {
         teamRepository.save(team);
+        // 1. ChatRoom 생성
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setTeam(team);         // ChatRoom → Team 연결
+        chatRoom.setName(team.getTeamId()+"번 채팅방");
+        chatRoomRepository.save(chatRoom);
+
     }
 
     // 참여자 추가
