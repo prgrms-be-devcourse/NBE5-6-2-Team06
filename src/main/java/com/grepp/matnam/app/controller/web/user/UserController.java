@@ -116,15 +116,18 @@ public class UserController {
 
             // 주최한 모임 조회
             List<Team> hostingTeams = teamService.getTeamsByLeader(userId);
-            model.addAttribute("hostingTeams", hostingTeams);
-
             // 참여 중인 모임 조회 (승인된 참여자 상태)
             List<Team> participatingTeams = teamService.getTeamsByParticipant(userId);
-            model.addAttribute("participatingTeams", participatingTeams);
-
             // 참여한 모든 모임 조회 (승인된 참여자 및 상태 무관)
             List<Team> allTeamsForUser = teamService.getAllTeamsForUser(userId);
+
+            participatingTeams.removeAll(hostingTeams);
+
+            model.addAttribute("hostingTeams", hostingTeams);
+            model.addAttribute("participatingTeams", participatingTeams);
             model.addAttribute("allTeamsForUser", allTeamsForUser);
+
+
 
             // 빈 목록 추가 (실제 구현 전까지 사용)
 //            model.addAttribute("allTeams", new ArrayList<>());

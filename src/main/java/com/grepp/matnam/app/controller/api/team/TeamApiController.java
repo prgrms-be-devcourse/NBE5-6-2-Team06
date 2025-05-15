@@ -119,11 +119,11 @@ public class TeamApiController {
             // 승인 처리
             teamService.approveParticipant(participantId);
 
-            // 팀 정보 조회 (DTO로 변환)
+            // 팀 정보 조회
             Team team = teamService.getTeamById(teamId);
             TeamDto teamDto = convertToTeamDto(team); // 이 메서드를 추가해야 합니다.
 
-            // 성공 응답 반환 (DTO 포함)
+            // 성공 응답 반환
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "참여자가 승인되었습니다.", teamDto));
 
         } catch (RuntimeException e) {
