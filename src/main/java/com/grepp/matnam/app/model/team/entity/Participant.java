@@ -2,6 +2,7 @@ package com.grepp.matnam.app.model.team.entity;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
+import com.grepp.matnam.app.model.user.dto.ReportDto;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -29,4 +30,7 @@ public class Participant extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ParticipantStatus participantStatus;
+
+    @Transient
+    private ReportDto reportDto;
 }

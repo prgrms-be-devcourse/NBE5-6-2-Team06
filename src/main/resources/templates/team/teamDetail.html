@@ -13,8 +13,25 @@
     .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
     button { background: black; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
     .info-section { margin-bottom: 2rem; }
-    .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
-    footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
+    .map-placeholder {
+      background: #f4f4f4;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem; border-top: 1px solid #eee;
+      font-size: 0.8rem;
+      color: #777;
+    }
+    /* 버튼 비활성화 시 회색 배경 */
+    button:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -39,7 +56,7 @@
         📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
-        👥 <span th:text="${team.participants.size()}">4</span>/<span th:text="${team.maxPeople}">10</span>명
+        👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
       <div class="info-section">
         <h3>모임 소개</h3>
@@ -55,10 +72,14 @@
   <div class="sidebar">
     <div class="card">
       <h4>모임 참여하기</h4>
-      <p th:text="${team.participants.size()} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
+      <p th:text="${team.nowPeople} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
       <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
         <input type="hidden" name="userId" th:value="${#authentication.name}">
-        <button type="submit">지금 참여 신청하기</button>
+        <button type="submit"
+                th:disabled="${isParticipant}"
+                class="btn"
+                th:text="${isParticipant ? '이미 신청한 모임입니다.' : '신청하기'}">
+        </button>
       </form>
     </div>
     <div class="card">
@@ -69,7 +90,7 @@
       <h4>비슷한 모임</h4>
       <p>🍜 강남 라멘 맛집 탐방</p>
       <p>🍻 강남 호프집 투어</p>
-      <button type="button">더 많은 모임 보기</button>
+      <button type="button" onclick="window.location.href='/team/search'">더 많은 모임 보기</button>
     </div>
   </div>
 </div>

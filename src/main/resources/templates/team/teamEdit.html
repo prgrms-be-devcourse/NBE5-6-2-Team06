@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>맛남 | 모임 만들기</title>
+  <title>맛남 | 모임 수정</title>
   <style>
+    /* 기존 스타일 그대로 유지 */
     body {
       font-family: 'Noto Sans KR', sans-serif;
       margin: 0;
@@ -119,54 +120,56 @@
 </header>
 
 <div class="container">
-  <h1>모임 만들기</h1>
-  <form th:action="@{/team/create}" method="post" enctype="multipart/form-data">
+  <h1>모임 수정</h1>
+  <form th:action="@{|/team/edit/${teamId}}|"] method="post" enctype="multipart/form-data">
+    <input type="hidden" name="id" th:value="${team.id}">
+
     <div class="section">
       <label>모임 제목</label>
-      <input type="text" name="title" placeholder="모임 제목을 입력하세요" required>
+      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.title}" required>
 
       <label>모임 설명</label>
-      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" required></textarea>
+      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.description}" required></textarea>
 
       <label>날짜</label>
-      <input type="date" name="date" required>
+      <input type="date" name="date" th:value="${#dates.format(team.date, 'yyyy-MM-dd')}" required>
 
       <label>시간</label>
-      <input type="time" name="time" required>
+      <input type="time" name="time" th:value="${#dates.format(team.time, 'HH:mm')}" required>
 
       <label>음식 카테고리</label>
       <select name="category" required>
         <option value="">카테고리 선택</option>
-        <option value="한식">한식</option>
-        <option value="일식">일식</option>
-        <option value="중식">중식</option>
-        <option value="양식">양식</option>
-        <option value="분식">분식</option>
-        <option value="디저트">디저트</option>
+        <option value="한식" th:selected="${team.category == '한식'}">한식</option>
+        <option value="일식" th:selected="${team.category == '일식'}">일식</option>
+        <option value="중식" th:selected="${team.category == '중식'}">중식</option>
+        <option value="양식" th:selected="${team.category == '양식'}">양식</option>
+        <option value="분식" th:selected="${team.category == '분식'}">분식</option>
+        <option value="디저트" th:selected="${team.category == '디저트'}">디저트</option>
       </select>
 
       <label>최대 인원</label>
       <select name="capacity" required>
-        <option value="1">1명</option>
-        <option value="2">2명</option>
-        <option value="3">3명</option>
-        <option value="4">4명</option>
-        <option value="5">5명</option>
-        <option value="6">6명</option>
-        <option value="7">7명</option>
-        <option value="8">8명</option>
-        <option value="9">9명</option>
-        <option value="10">10명</option>
+        <option value="1" th:selected="${team.capacity == 1}">1명</option>
+        <option value="2" th:selected="${team.capacity == 2}">2명</option>
+        <option value="3" th:selected="${team.capacity == 3}">3명</option>
+        <option value="4" th:selected="${team.capacity == 4}">4명</option>
+        <option value="5" th:selected="${team.capacity == 5}">5명</option>
+        <option value="6" th:selected="${team.capacity == 6}">6명</option>
+        <option value="7" th:selected="${team.capacity == 7}">7명</option>
+        <option value="8" th:selected="${team.capacity == 8}">8명</option>
+        <option value="9" th:selected="${team.capacity == 9}">9명</option>
+        <option value="10" th:selected="${team.capacity == 10}">10명</option>
       </select>
     </div>
 
     <div class="section">
       <h2>식당 정보</h2>
       <label>식당 이름</label>
-      <input type="text" name="restaurantName" placeholder="식당 이름을 입력하세요" required>
+      <input type="text" name="restaurantName" placeholder="식당 이름을 입력하세요" th:value="${team.restaurantName}" required>
 
       <label>주소</label>
-      <input type="text" name="restaurantAddress" placeholder="식당 주소를 입력하세요" required>
+      <input type="text" name="restaurantAddress" placeholder="식당 주소를 입력하세요" th:value="${team.restaurantAddress}" required>
 
       <label>위치 선택</label>
       <div class="map-placeholder">지도에서 위치를 선택해주세요</div>
@@ -176,13 +179,14 @@
       <h2>모임 이미지</h2>
       <div class="image-upload-box">
         클릭하여 업로드 또는 드래그 앤 드롭 (JPG, PNG, JPEG 파일 / 최대 10MB)
+        <img th:if="${team.imageUrl}" th:src="${team.imageUrl}" style="max-width: 100px; max-height: 100px;">
       </div>
       <input type="file" name="image" accept="image/*">
     </div>
 
     <div class="btn-row">
       <button type="button" class="btn cancel" onclick="history.back()">취소</button>
-      <button type="submit" class="btn submit">모임 생성하기</button>
+      <button type="submit" class="btn submit">모임 수정하기</button>
     </div>
   </form>
 </div>
