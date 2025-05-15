@@ -215,7 +215,7 @@ INSERT INTO report (report.activated, report.created_at, report.modified_at, rep
                     report.report_type)
 VALUES (1, '2024-05-10 10:00:00', '2024-05-10 10:00:00', '부적절한 행동', 'user2', 'user1', null, 2,
         'POST'),
-       (1, '2024-05-11 11:15:00', '2024-05-11 11:15:00', '불쾌한 메시지', 'user3', 'user2', 2, null,
+       (1, '2024-05-11 11:15:00', '2024-05-11 11:15:00', '불쾌한 메시지', 'user3', 'user2', 2, 2,
         'CHAT'),
        (1, '2024-05-12 12:30:00', '2024-05-12 12:30:00', '모임 규칙 위반', 'user8', 'user5', null, 8,
         'POST'),
