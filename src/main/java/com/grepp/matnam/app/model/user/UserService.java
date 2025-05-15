@@ -5,6 +5,8 @@ import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.time.LocalDate;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -176,5 +178,23 @@ public class UserService {
 
         user.unActivated();
         userRepository.save(user);
+    }
+
+    @Transactional
+    public User updateOAuth2User(User user) {
+        log.info("OAuth2 사용자 정보 저장: {}", user.getUserId());
+
+        Optional<User> existingUser = userRepository.findByUserId(user.getUserId());
+
+        if (existingUser.isPresent()) {
+            User existing = existingUser.get();
+            existing.setNickname(user.getNickname());
+            existing.setAddress(user.getAddress());
+            existing.setAge(user.getAge());
+            existing.setGender(user.getGender());
+            return userRepository.save(existing);
+        } else {
+            return userRepository.save(user);
+        }
     }
 }
