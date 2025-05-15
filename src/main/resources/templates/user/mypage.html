@@ -377,14 +377,11 @@
     }
 
     .map-container {
-      height: 300px;
-      background-color: #f5f5f5;
+      height: 600px;
+      background-color: transparent;
       border-radius: 8px;
-      margin-top: 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #888;
+      padding: 0;
+      overflow: hidden;
     }
 
     .empty-state {
@@ -623,37 +620,34 @@
         </div>
       </div>
     </div>
-
-    <!-- 내 맛집 지도 -->
-    <div class="main-section mypage-section">
-      <h2>내 맛집 지도</h2>
-      <div class="tabs">
-        <button class="active" onclick="switchMapTab('all')">전체</button>
-        <button onclick="switchMapTab('korean')">한식</button>
-        <button onclick="switchMapTab('japanese')">일식</button>
-        <button onclick="switchMapTab('chinese')">중식</button>
-        <button onclick="switchMapTab('western')">양식</button>
-        <button onclick="switchMapTab('cafe')">카페</button>
-        <button class="create-meeting" onclick="location.href='/map/add'">맛집 등록</button>
-      </div>
-
-      <div id="maps-container">
-        <!-- 맛집 지도가 없을 때 표시할 내용 -->
-        <div th:if="${#lists.isEmpty(userMaps)}" class="empty-state">
-          <p>아직 등록한 맛집이 없습니다.</p>
-          <p>나만의 맛집을 등록하고 지도에서 관리해보세요!</p>
+      <!-- 내 맛집 지도 -->
+      <div class="main-section mypage-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="margin-bottom: 0;">내 맛집 지도</h2>
+          <button onclick="location.href='/map/add'"
+                  style="
+          background: #000;
+          color: #fff;
+          border: none;
+          padding: 8px 14px;
+          font-weight: bold;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: background 0.2s ease, transform 0.2s ease;"
+                  onmouseover="this.style.background='#333'; this.style.transform='translateY(-1px)'"
+                  onmouseout="this.style.background='#000'; this.style.transform='none'">
+            맛집 등록
+          </button>
         </div>
-
-        <!-- 맛집 목록 -->
-        <div th:unless="${#lists.isEmpty(userMaps)}" class="map-container">
-          <!-- 여기에 카카오맵 API 활용하여 맛집 위치 표시 -->
-          <div id="map-view" style="width:100%; height:300px;"></div>
-
-          <!-- 맛집 리스트 -->
-          <div th:each="map : ${userMaps}" class="restaurant-item" style="margin-top: 1rem;">
-            <h4 th:text="${map.restaurant.name}">맛집 이름</h4>
-            <p th:text="${map.restaurant.address}">맛집 주소</p>
-            <p>카테고리: <span th:text="${map.restaurant.category}">카테고리</span></p>
+        <div id="map-container">
+          <div class="map-container">
+            <iframe th:src="@{/map/editMap}"
+                    width="100%"
+                    height="600px"
+                    style="border: none;
+                    border-radius: 8px;
+                    overflow: hidden;">
+            </iframe>
           </div>
         </div>
       </div>
