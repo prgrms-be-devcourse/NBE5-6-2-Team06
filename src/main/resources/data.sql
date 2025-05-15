@@ -146,13 +146,14 @@ VALUES
     (1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, '2024-05-06 15:00:00', '2024-05-06 15:00:00', 10, 'user10');
 
 -- 신고(report) 데이터
-INSERT INTO report (activated, created_at, modified_at, reason, reported_id, user_id)
+INSERT INTO report (report.activated, report.created_at, report.modified_at, report.reason, report.reported_id, report.user_id, report.chat_id, report.team_id, report.report_type)
 VALUES
-    (1, '2024-05-10 10:00:00', '2024-05-10 10:00:00', '부적절한 행동', 'user5', 'user1'),
-    (1, '2024-05-11 11:15:00', '2024-05-11 11:15:00', '불쾌한 메시지', 'user3', 'user2'),
-    (1, '2024-05-12 12:30:00', '2024-05-12 12:30:00', '모임 규칙 위반', 'user7', 'user4'),
-    (1, '2024-05-13 13:45:00', '2024-05-13 13:45:00', '약속 시간 안 지킴', 'user6', 'user8'),
-    (1, '2024-05-14 15:00:00', '2024-05-14 15:00:00', '부적절한 프로필 사진', 'user9', 'user10');
+    (1, '2024-05-10 10:00:00', '2024-05-10 10:00:00', '부적절한 행동', 'user2', 'user1', null, 2, 'POST'),
+    (1, '2024-05-11 11:15:00', '2024-05-11 11:15:00', '불쾌한 메시지', 'user3', 'user2', 2, null, 'CHAT'),
+    (1, '2024-05-12 12:30:00', '2024-05-12 12:30:00', '모임 규칙 위반', 'user8', 'user5', null, 8, 'POST'),
+    (1, '2024-05-13 13:45:00', '2024-05-13 13:45:00', '약속 시간 안 지킴', 'user7', 'user10', null, 7, 'POST'),
+    (1, '2024-05-14 15:00:00', '2024-05-14 15:00:00', '부적절한 프로필 사진', 'user6', 'user9', null, 6, 'POST'),
+    (0, '2024-05-14 15:00:00', '2024-05-14 15:00:00', '부적절한 프로필 사진', 'user8', 'user7', null, 8, 'POST');
 
 -- 개인 맛집 지도 (mymap) 데이터
 INSERT INTO mymap (activated, created_at, modified_at, user_id, place_name, road_address, latitude, longitude, memo, pinned)

@@ -2,6 +2,7 @@ package com.grepp.matnam.app.controller.web.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Slf4j
 @RequestMapping("/admin")
 @RequiredArgsConstructor
+//@PreAuthorize("hasRole('ADMIN')") // TODO : 모든 관리자 페이지 권한 설정 필요
 public class AdminDashboardController {
 
     @GetMapping({"", "/", "/dashboard"})
