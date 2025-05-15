@@ -3,12 +3,10 @@ package com.grepp.matnam.app.controller.web.team;
 import com.grepp.matnam.app.controller.api.team.payload.TeamRequest;
 import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamReviewRepository;
-import com.grepp.matnam.app.model.team.TeamReviewService;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
-import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
@@ -33,7 +31,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/team")
@@ -156,27 +153,27 @@ public class TeamController {
         return "team/teamPage";
     }
 
-    // 모임 참여 신청
-    @PostMapping("/{teamId}/apply")
-    public String applyToJoinTeam(@PathVariable Long teamId, @RequestParam String userId) {
-        User user = userService.getUserById(userId);
-
-        teamService.addParticipant(teamId, user);
-//        return "redirect:/team/" + teamId + "/page";
-        return "redirect:/team/detail/" + teamId;
-    }
-
-    // 승인 처리
-    @PostMapping("/{teamId}/approve")
-    public ResponseEntity<Team> approveParticipant(@PathVariable Long teamId, @RequestParam String userId) {
-        try {
-            teamService.approveParticipant(teamId, userId);
-            Team team = teamService.getTeamById(teamId);
-            return ResponseEntity.ok(team);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-    }
+//    // 모임 참여 신청
+//    @PostMapping("/{teamId}/apply/{userId}")
+//    public String applyToJoinTeam(@PathVariable Long teamId, @PathVariable String userId) {
+//        User user = userService.getUserById(userId);
+//        teamService.addParticipant(teamId, user);
+//        return "redirect:/team/detail/" + teamId;
+//    }
+//
+//
+//    // 승인 처리
+//    @PostMapping("/{teamId}/approve/{participantId}")
+//    public ResponseEntity<Team> approveParticipant(@PathVariable Long teamId,
+//        @PathVariable Long participantId) {
+//        try {
+//            teamService.approveParticipant(participantId);
+//            Team team = teamService.getTeamById(teamId);
+//            return ResponseEntity.ok(team);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+//        }
+//    }
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시

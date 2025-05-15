@@ -72,12 +72,11 @@
       <p>
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
-      <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
-        <input type="hidden" name="userId" th:value="${#authentication.name}">
+      <form th:action="@{/team/{teamId}/apply/{userId}(teamId=${team.teamId}, userId=${#authentication.name})}" method="post">
         <button type="submit"
-                th:disabled="${isParticipant}"
+                th:disabled="${isParticipant or alreadyApplied}"
                 class="btn"
-                th:text="${isParticipant ? '이미 신청한 모임입니다.' : '신청하기'}">
+                th:text="${isParticipant ? '이미 신청한 모임입니다.' : alreadyApplied ? '신청 대기 중' : '신청하기'}">
         </button>
       </form>
     </div>
