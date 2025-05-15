@@ -31,7 +31,7 @@ public class TeamRequest {
 //        team.setMeetDate(LocalDateTime.now());
 //        team.setTeamDate(LocalDateTime.now());
         team.setMaxPeople(this.capacity);
-        team.setNowPeople(0);
+        team.setNowPeople(1);
         team.setStatus(Status.RECRUITING);
         team.setRestaurantName(this.restaurantName);
         return team;
