@@ -23,8 +23,8 @@
                 </div>
                 <div class="stat-info">
                     <h3>오늘 이용 회원</h3>
-                    <p class="stat-number" th:text="${todayActiveUsers ?: 87}">87</p>
-                    <p class="stat-change positive" th:text="${activeUserGrowth ?: '+5%'}">+5% <i class="fas fa-arrow-up"></i></p>
+                    <p class="stat-number" th:text="${todayLogStats.todayActiveUsers}"></p>
+                    <p class="stat-change positive" th:text="${todayLogStats.activeUserGrowth ?: '+5%'}">+5% <i class="fas fa-arrow-up"></i></p>
                 </div>
             </div>
             <div class="stat-card">
