@@ -56,6 +56,7 @@
       flex-direction: column;
       align-items: center;
       margin-top: 4rem;
+      margin-bottom: 4rem;
     }
     .login-box {
       width: 300px;
@@ -72,58 +73,47 @@
       text-align: center;
       font-size: 0.85rem;
       color: #666;
-      margin-bottom: 1rem;
-    }
-    .tab-buttons {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .tab-buttons button {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      background: #f5f5f5;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .tab-buttons button.active {
-      background: #fff;
-      border-bottom: 2px solid #000;
-      font-weight: bold;
+      margin-bottom: 1.5rem;
     }
     .login-form label {
       font-size: 0.85rem;
       margin-bottom: 0.3rem;
       display: block;
+      font-weight: 500;
     }
     .login-form input {
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.7rem;
       margin-bottom: 1rem;
       border: 1px solid #ddd;
       border-radius: 4px;
+      font-size: 0.9rem;
+      box-sizing: border-box;
     }
     .login-form .actions {
       display: flex;
       justify-content: flex-end;
       font-size: 0.75rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
     .login-form button {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.8rem;
       background: #000;
       color: white;
       border: none;
       border-radius: 4px;
       font-size: 0.9rem;
       cursor: pointer;
+      margin-bottom: 1.5rem;
+    }
+    .login-form button:hover {
+      background: #333;
     }
     .login-footer {
       text-align: center;
       font-size: 0.8rem;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
     }
     footer {
       margin-top: 5rem;
@@ -138,6 +128,62 @@
       font-size: 0.8rem;
       margin-top: -0.7rem;
       margin-bottom: 1rem;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #eee;
+    }
+    .divider span {
+      padding: 0 12px;
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    .social-login {
+      margin-bottom: 0.5rem;
+    }
+    .google-btn {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 40px;
+      background-color: white;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-shadow: 0 2px 4px 0 rgba(0,0,0,0.05);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+    }
+    .google-btn:hover {
+      background-color: #f8f8f8;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    .google-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 40px;
+      height: 40px;
+      background: #4285F4;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .btn-text {
+      margin: 0;
+      color: #333;
+      font-size: 0.9rem;
+      text-align: center;
+      flex-grow: 1;
     }
   </style>
   <script th:src="@{/js/auth.js}"></script>
@@ -166,10 +212,7 @@
   <div class="login-box">
     <h2>로그인</h2>
     <p>맛남에 오신 것을 환영합니다! 계정에 로그인하세요.</p>
-    <div class="tab-buttons">
-      <button class="active">아이디</button>
-      <button>소셜 로그인</button>
-    </div>
+
     <form class="login-form" id="loginForm">
       <label for="userId">아이디</label>
       <input type="text" id="userId" name="userId" placeholder="아이디를 입력하세요" required>
@@ -184,6 +227,18 @@
 
       <button type="submit">로그인</button>
     </form>
+
+    <div class="divider">
+      <span>또는</span>
+    </div>
+
+    <div class="social-login">
+      <a href="/oauth2/authorization/google" class="google-btn">
+        <span class="google-icon">G</span>
+        <span class="btn-text">Google로 계속하기</span>
+      </a>
+    </div>
+
     <div class="login-footer">
       계정이 없으신가요? <a th:href="@{/user/signup}" style="text-decoration: underline;">회원가입</a>
     </div>

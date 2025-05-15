@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Google 회원가입 | 맛남</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            color: #333;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #eee;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .header-left .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .header-left nav a {
+            margin-right: 1rem;
+            text-decoration: none;
+            color: #333;
+            font-size: 0.9rem;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .header-right span {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #000;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 4rem;
+            margin-bottom: 4rem;
+        }
+        .signup-box {
+            width: 400px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .signup-box h2 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .signup-box p {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        .signup-form .form-group {
+            margin-bottom: 1.2rem;
+        }
+        .signup-form label {
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            display: block;
+            font-weight: 500;
+        }
+        .signup-form input,
+        .signup-form select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+        .signup-form select {
+            background: white;
+        }
+        .signup-form input:disabled {
+            background-color: #f9f9f9;
+            color: #888;
+        }
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+        .signup-form button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .signup-form button:hover {
+            background: #333;
+        }
+        footer {
+            margin-top: 5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+            padding: 1rem 0;
+            border-top: 1px solid #eee;
+        }
+        .radio-option input[type="radio"] {
+            width: auto;
+            margin-right: 0.3rem;
+        }
+        .radio-option label {
+            display: inline;
+            margin: 0;
+        }
+        .oauth-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .google-icon {
+            background-color: #4285F4;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        .oauth-text {
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+    <div class="header-left">
+        <div class="logo">맛남</div>
+        <nav>
+            <a th:href="@{/}">홈</a>
+            <a th:href="@{/team/teamSearch.html}">모임 찾기</a>
+            <a th:href="@{restaurants/restaurant.html}">맛집 탐색</a>
+        </nav>
+    </div>
+    <div class="header-right">
+        <span title="알림">🔔</span>
+        <span title="프로필">👤</span>
+        <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+    </div>
+</header>
+
+<!-- Main Signup Box -->
+<main>
+    <div class="signup-box">
+        <h2>Google 회원가입</h2>
+        <p>Google 계정으로 맛남에 가입하여 다양한 모임에 참여해보세요.</p>
+
+        <div class="oauth-info">
+            <div class="google-icon">G</div>
+            <div class="oauth-text">Google 계정으로 로그인하셨습니다.<br>서비스 이용을 위해 추가 정보를 입력해주세요.</div>
+        </div>
+
+        <form class="signup-form" action="/user/oauth2/signup" method="post">
+            <div class="form-group">
+                <label for="email">이메일</label>
+                <input type="email" id="email" name="email" th:value="${email}" disabled>
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="nickname">닉네임</label>
+                <input type="text" id="nickname" name="nickname" th:value="${nickname}" placeholder="사용할 닉네임을 입력하세요" required>
+                <div class="error-message" id="nicknameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">주소</label>
+                <input type="text" id="address" name="address" placeholder="서울시 강남구" required>
+                <div class="error-message" id="addressError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="age">나이</label>
+                <input type="number" id="age" name="age" placeholder="나이를 입력하세요" min="14" max="120" required>
+                <div class="error-message" id="ageError"></div>
+            </div>
+            <div class="form-group">
+                <label for="gender">성별</label>
+                <select id="gender" name="gender" required>
+                    <option value="">성별을 선택하세요</option>
+                    <option value="MAN">남성</option>
+                    <option value="WOMAN">여성</option>
+                </select>
+                <div class="error-message" id="genderError"></div>
+            </div>
+
+            <button type="submit">회원가입 완료</button>
+        </form>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer>
+    © 2025 맛남. 모든 권리 보유.
+</footer>
+
+</body>
+</html>

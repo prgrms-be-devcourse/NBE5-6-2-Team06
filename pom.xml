@@ -194,6 +194,12 @@
       <version>0.12.3</version>
       <scope>runtime</scope>
     </dependency>
+
+    <!-- OAUTH 2.0 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-client</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
