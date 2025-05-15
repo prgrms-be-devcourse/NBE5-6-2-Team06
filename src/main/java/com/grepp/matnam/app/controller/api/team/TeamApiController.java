@@ -119,11 +119,12 @@ public class TeamApiController {
             // 승인 처리
             teamService.approveParticipant(participantId);
 
-            // 팀 정보 조회
+            // 팀 정보 조회 (DTO로 변환)
             Team team = teamService.getTeamById(teamId);
+            TeamDto teamDto = convertToTeamDto(team); // 이 메서드를 추가해야 합니다.
 
-            // 성공 응답 반환
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "참여자가 승인되었습니다.", team));
+            // 성공 응답 반환 (DTO 포함)
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "참여자가 승인되었습니다.", teamDto));
 
         } catch (RuntimeException e) {
             // 예외 발생 시 오류 처리
@@ -136,6 +137,18 @@ public class TeamApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "서버 오류 발생", e.getMessage()));
         }
+    }
+
+    private TeamDto convertToTeamDto(Team team) {
+        TeamDto teamDto = new TeamDto();
+        teamDto.setTeamTitle(team.getTeamTitle());
+        teamDto.setTeamDetails(team.getTeamDetails());
+        teamDto.setMeetDate(team.getMeetDate());
+        teamDto.setRestaurantName(team.getRestaurantName());
+        teamDto.setMaxPeople(team.getMaxPeople());
+        teamDto.setNowPeople(team.getNowPeople());
+        teamDto.setImageUrl(team.getImageUrl());
+        return teamDto;
     }
 
 
