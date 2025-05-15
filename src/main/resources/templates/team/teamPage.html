@@ -83,6 +83,66 @@
       border-radius: 4px;
       cursor: pointer;
     }
+
+    .participant-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 100%;
+    }
+
+    .participant {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .info-item {
+      font-size: 1rem;
+      color: #333;
+    }
+
+    .info-item strong {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .preferences {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .preference-tag {
+      background-color: #f5f5f5;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .preference-tag:hover {
+      background-color: #e0e0e0;
+    }
+
+    @media (max-width: 768px) {
+      .participant-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .participant-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -102,18 +162,108 @@
   <div class="section">
     <h2>방장 정보</h2>
     <div class="participant-list">
-      <div class="participant">방장</div>
+      <div class="participant" th:if="${leader}">
+        <div class="participant-info">
+          <!-- 방장 닉네임 -->
+          <div class="info-item">
+            <strong>닉네임:</strong>
+            <span th:text="${leader.nickname}">방장 닉네임</span>
+          </div>
+
+          <!-- 방장 나이 -->
+          <div class="info-item">
+            <strong>나이:</strong>
+            <span th:text="${leader.age}">나이</span>
+          </div>
+
+          <!-- 방장 성별 -->
+          <div class="info-item">
+            <strong>성별:</strong>
+            <span th:text="${leader.gender}">성별</span>
+          </div>
+
+          <!-- 방장 매너 온도 -->
+          <div class="info-item">
+            <strong>매너 온도:</strong>
+            <span th:text="${leader.temperature}">매너온도</span> °C
+          </div>
+
+          <!-- 방장 취향 -->
+          <div class="info-item">
+            <div class="preferences">
+              <span th:if="${leader.preference != null and leader.preference.goodTalk}" class="preference-tag">💬 대화하기 좋은</span>
+              <span th:if="${leader.preference != null and leader.preference.manyDrink}" class="preference-tag">🍺 술이 다양한</span>
+              <span th:if="${leader.preference != null and leader.preference.goodMusic}" class="preference-tag">🎵 음악이 좋은</span>
+              <span th:if="${leader.preference != null and leader.preference.clean}" class="preference-tag">✨ 깨끗한</span>
+              <span th:if="${leader.preference != null and leader.preference.goodView}" class="preference-tag">🏞️ 뷰가 좋은</span>
+              <span th:if="${leader.preference != null and leader.preference.terrace}" class="preference-tag">🪑 테라스가 있는</span>
+              <span th:if="${leader.preference != null and leader.preference.goodPicture}" class="preference-tag">📸 사진이 잘 나오는</span>
+              <span th:if="${leader.preference != null and leader.preference.goodMenu}" class="preference-tag">🍽️ 메뉴가 다양한</span>
+              <span th:if="${leader.preference != null and leader.preference.longStay}" class="preference-tag">⏱️ 오래 머물 수 있는</span>
+              <span th:if="${leader.preference != null and leader.preference.bigStore}" class="preference-tag">🏢 매장이 넓은</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
   <div class="section">
     <h2>참여자 정보</h2>
     <div class="participant-list">
-      <div class="participant">참여자 1</div>
-      <div class="participant">참여자 2</div>
-      <div class="participant">참여자 3</div>
+      <div class="participant" th:each="participant : ${participants}">
+        <div class="participant-info">
+          <!-- 사용자 닉네임 -->
+          <div class="info-item">
+            <strong>닉네임:</strong>
+            <span th:text="${participant.user.nickname}">참여자 닉네임</span>
+          </div>
 
+          <!-- 사용자 나이 -->
+          <div class="info-item">
+            <strong>나이:</strong>
+            <span th:text="${participant.user.age}">나이</span>
+          </div>
+
+          <!-- 사용자 성별 -->
+          <div class="info-item">
+            <strong>성별:</strong>
+            <span th:text="${participant.user.gender}">성별</span>
+          </div>
+
+          <!-- 사용자 매너 온도 -->
+          <div class="info-item">
+            <strong>매너 온도:</strong>
+            <span th:text="${participant.user.temperature}">매너온도</span> °C
+          </div>
+
+          <!-- 사용자 취향 -->
+          <div class="info-item">
+            <div class="preferences">
+              <span th:if="${participant.user.preference != null and participant.user.preference.goodTalk}" class="preference-tag">💬 대화하기 좋은</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.manyDrink}" class="preference-tag">🍺 술이 다양한</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.goodMusic}" class="preference-tag">🎵 음악이 좋은</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.clean}" class="preference-tag">✨ 깨끗한</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.goodView}" class="preference-tag">🏞️ 뷰가 좋은</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.terrace}" class="preference-tag">🪑 테라스가 있는</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.goodPicture}" class="preference-tag">📸 사진이 잘 나오는</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.goodMenu}" class="preference-tag">🍽️ 메뉴가 다양한</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.longStay}" class="preference-tag">⏱️ 오래 머물 수 있는</span>
+              <span th:if="${participant.user.preference != null and participant.user.preference.bigStore}" class="preference-tag">🏢 매장이 넓은</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="participant" th:if="${#lists.isEmpty(participants)}">
+        <span>현재 참여자가 없습니다.</span>
+      </div>
     </div>
   </div>
+
+
+
+
 
   <div class="section">
     <h2>채팅</h2>
