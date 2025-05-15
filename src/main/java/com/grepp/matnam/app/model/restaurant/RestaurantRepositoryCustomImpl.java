@@ -26,6 +26,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .orderBy(restaurant.restaurantId.desc())
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -33,6 +34,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -43,6 +45,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -50,6 +53,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
@@ -61,6 +65,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -69,6 +74,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category))
             .from(restaurant);
 
@@ -81,6 +87,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category).and(restaurant.name.contains(keyword)))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -89,6 +96,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.category.eq(category).and(restaurant.name.contains(keyword)))
             .from(restaurant);
 
@@ -100,6 +108,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
         List<Restaurant> content = queryFactory
             .select(restaurant)
             .from(restaurant)
+            .where(restaurant.activated)
             .where(restaurant.name.contains(keyword))
             .orderBy(getOrderSpecifiers(pageable.getSort()))
             .offset(pageable.getOffset())
@@ -108,6 +117,7 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
 
         JPAQuery<Long> countQuery = queryFactory
             .select(restaurant.count())
+            .where(restaurant.activated)
             .where(restaurant.name.contains(keyword))
             .from(restaurant);
 

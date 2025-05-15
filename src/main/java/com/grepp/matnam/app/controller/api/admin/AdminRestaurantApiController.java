@@ -63,8 +63,8 @@ public class AdminRestaurantApiController {
     }
 
     @DeleteMapping("/{restaurantId}")
-    public ResponseEntity<?> deleteRestaurant(@PathVariable Long restaurantId) {
-        restaurantService.deleteById(restaurantId);
+    public ResponseEntity<?> unActivatedRestaurant(@PathVariable Long restaurantId) {
+        restaurantService.unActivatedRestaurant(restaurantId);
         return ResponseEntity.ok("식당이 삭제되었습니다.");
     }
 

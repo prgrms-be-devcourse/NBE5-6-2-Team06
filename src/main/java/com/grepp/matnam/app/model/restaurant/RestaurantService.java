@@ -59,11 +59,10 @@ public class RestaurantService {
     }
 
     @Transactional
-    public void deleteById(Long restaurantId) {
-        if (!restaurantRepository.existsById(restaurantId)) {
-            throw new IllegalArgumentException("해당 식당이 존재하지 않습니다.");
-        }
-        restaurantRepository.deleteById(restaurantId);
+    public void unActivatedRestaurant(Long restaurantId) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+            .orElseThrow(() -> new IllegalArgumentException("식당을 찾을 수 없습니다."));
+        restaurant.unActivated();
     }
 
     @Transactional
