@@ -13,8 +13,11 @@
                 </div>
                 <div class="stat-info">
                     <h3>총 회원 수</h3>
-                    <p class="stat-number" th:text="${totalUserStats.totalUsers ?: 1245}">1,245</p>
-                    <p class="stat-change positive" th:text="${totalUserStats.totalUserGrowth ?: '+12%'}">+12% <i class="fas fa-arrow-up"></i></p>
+                    <p class="stat-number" th:text="${totalUserStats.totalUsers}"></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(totalUserStats.totalUserGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${totalUserStats.totalUserGrowth}">
+                    </p>
                 </div>
             </div>
             <div class="stat-card">
@@ -24,17 +27,10 @@
                 <div class="stat-info">
                     <h3>오늘 이용 회원</h3>
                     <p class="stat-number" th:text="${todayLogStats.todayActiveUsers}"></p>
-                    <p class="stat-change positive" th:text="${todayLogStats.activeUserGrowth ?: '+5%'}">+5% <i class="fas fa-arrow-up"></i></p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-user-slash"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>오늘 이용 비회원</h3>
-                    <p class="stat-number" th:text="${todayGuestUsers ?: 32}">32</p>
-                    <p class="stat-change negative" th:text="${guestUserGrowth ?: '-2%'}">-2% <i class="fas fa-arrow-down"></i></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(todayLogStats.activeUserGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${todayLogStats.activeUserGrowth}">
+                    </p>
                 </div>
             </div>
             <div class="stat-card">
@@ -45,6 +41,19 @@
                     <h3>활성 모임</h3>
                     <p class="stat-number" th:text="${activeMeetings ?: 56}">56</p>
                     <p class="stat-change positive" th:text="${meetingGrowth ?: '+8%'}">+8% <i class="fas fa-arrow-up"></i></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>오늘 생성된 모임</h3>
+                    <p class="stat-number" th:text="${newTeamStats.newTeams}"></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(newTeamStats.newTeamGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${newTeamStats.newTeamGrowth}">
+                    </p>
                 </div>
             </div>
         </div>

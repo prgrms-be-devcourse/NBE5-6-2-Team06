@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
@@ -10,9 +11,9 @@ import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.User;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -261,6 +262,28 @@ public class TeamService {
         log.info("team {}", team);
         team.unActivated();
     }
+
+    public NewTeamResponse getNewTeamStats() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+        long totalTeamCount = teamRepository.count();
+        long yesterdayTotalTeamCount = totalTeamCount - newTeams;
+        String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
+        return new NewTeamResponse(newTeams, userGrowth);
+    }
+
+    private String calculateGrowthRate(long today, long yesterday) {
+        if (yesterday == 0) {
+            if (today == 0) return "+0%";
+            return "+100%"; // 또는 "N/A"
+        }
+        long diff = today - yesterday;
+        double percent = ((double) diff / yesterday) * 100;
+        String sign = percent >= 0 ? "+" : "";
+        return String.format("%s%.0f%%", sign, percent);
+    }
+
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }

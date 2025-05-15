@@ -2,6 +2,7 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.entity.Team;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -32,4 +33,5 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user WHERE t.teamId = :teamId")
     Optional<Team> findByIdWithParticipantsAndUser(@Param("teamId") Long teamId);
 
+    long countByCreatedAtBetween(LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
 }
