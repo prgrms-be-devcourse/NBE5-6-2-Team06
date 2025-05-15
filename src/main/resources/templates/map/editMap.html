@@ -41,7 +41,7 @@
 
         .place-info strong {
             cursor: pointer;
-            color: #007bff;
+            color: inherit;
         }
 
         .place-info strong:hover {
@@ -95,13 +95,12 @@
         const mapContainer = document.getElementById('map');
         const mapOption = {
             center: new kakao.maps.LatLng(37.5665, 126.9780),
-            level: 4
+            level: 3
         };
         map = new kakao.maps.Map(mapContainer, mapOption);
 
         const bounds = new kakao.maps.LatLngBounds();
-
-        markers = []; // 초기화
+        markers = [];
         overlays = [];
 
         places.forEach(place => {
@@ -126,11 +125,11 @@
                 closeAllOverlays();
                 overlay.setMap(map);
                 map.setCenter(pos);
+                map.setLevel(3); // 확대
                 overlays.push(overlay);
             });
 
             markers.push({ id: place.mapId, marker, pos, overlay });
-
             bounds.extend(pos);
         });
 
@@ -155,13 +154,14 @@
             const nameEl = document.createElement('strong');
             nameEl.innerText = place.placeName;
             nameEl.style.cursor = 'pointer';
-            nameEl.style.color = 'inherit'; // ✅ 검정색 유지
+            nameEl.style.color = 'inherit';
             nameEl.onclick = () => {
                 const target = markers.find(m => m.id === place.mapId);
                 if (target) {
                     closeAllOverlays();
                     target.overlay.setMap(map);
                     map.setCenter(target.pos);
+                    map.setLevel(3); // 확대
                     overlays.push(target.overlay);
                 }
             };
@@ -176,17 +176,16 @@
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'place-actions';
             actionsDiv.innerHTML = `
-            <button onclick="updatePlace(${place.mapId}, true)">공개</button>
-            <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
-            <button onclick="deletePlace(${place.mapId})">삭제</button>
-        `;
+                <button onclick="updatePlace(${place.mapId}, true)">공개</button>
+                <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
+                <button onclick="deletePlace(${place.mapId})">삭제</button>
+            `;
 
             item.appendChild(infoDiv);
             item.appendChild(actionsDiv);
             container.appendChild(item);
         });
     }
-
 
     function updatePlace(id, isPinned) {
         const item = document.querySelector(`.place-item[data-id="${id}"]`);
