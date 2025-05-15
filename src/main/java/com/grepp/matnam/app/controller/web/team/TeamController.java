@@ -80,7 +80,7 @@ public class TeamController {
     @PostMapping("/create")
     public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName(); // 현재 로그인한 사용자 ID 가져오기
+        String userId = authentication.getName();
         User user = userService.getUserById(userId);
         Team team = teamRequest.toDto(user);
         team.setUser(user);
@@ -117,6 +117,24 @@ public class TeamController {
 
 
     // 모임 상세 조회
+//    @GetMapping("/detail/{teamId}")
+//    public String teamDetail(@PathVariable Long teamId, Model model) {
+//        // 현재 로그인한 사용자 정보 가져오기
+//        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+//        User user = userService.getUserById(userId);
+//        Team team = teamService.getTeamByIdWithParticipants(teamId);
+//        model.addAttribute("team", team);
+//
+//        boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamId(userId,
+//            teamId);
+//
+//        model.addAttribute("team", team);
+//        model.addAttribute("isParticipant", isParticipant);
+//        model.addAttribute("user", user);
+//
+//        return "team/teamDetail";
+//    }
+
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
