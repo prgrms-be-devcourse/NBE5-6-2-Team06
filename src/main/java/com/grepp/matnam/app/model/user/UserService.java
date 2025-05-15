@@ -1,10 +1,13 @@
 package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
@@ -198,5 +201,22 @@ public class UserService {
         } else {
             return userRepository.save(user);
         }
+    }
+
+    public TotalUserResponse getTotalUserStats() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        long totalUsers = userRepository.count(); // 현재 전체 회원 수
+        long yesterdayUserCount = userRepository.countByCreatedAtBefore(LocalDateTime.of(today, LocalTime.MIDNIGHT));
+        String userGrowth = calculateGrowthRate(totalUsers, yesterdayUserCount);
+        return new TotalUserResponse(totalUsers, userGrowth);
+    }
+
+    private String calculateGrowthRate(long today, long yesterday) {
+        if (yesterday == 0) return "+100%"; // 또는 "N/A"
+        long diff = today - yesterday;
+        double percent = ((double) diff / yesterday) * 100;
+        String sign = percent >= 0 ? "+" : "";
+        return String.format("%s%.0f%%", sign, percent);
     }
 }
