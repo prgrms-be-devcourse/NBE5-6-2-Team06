@@ -12,6 +12,8 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/team")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Team API", description = "모임 관련 REST API")
 public class TeamController {
 
     private final TeamService teamService;
@@ -99,6 +100,7 @@ public class TeamController {
 
 
     // 모임 상세 조회
+    @Operation(summary = "특정 모임 정보 조회 (REST API)", description = "주어진 ID의 모임 정보를 REST API로 조회")
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -107,7 +109,7 @@ public class TeamController {
         model.addAttribute("team", team);
 
         boolean isLeader = team.getUser().getUserId().equals(userId);
-        model.addAttribute("isLeader", isLeader);  // 방장 여부를 모델에 추가
+        model.addAttribute("isLeader", isLeader);
 
         // 현재 사용자가 이미 팀에 참여했는지
         boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
@@ -152,28 +154,6 @@ public class TeamController {
 
         return "team/teamPage";
     }
-
-//    // 모임 참여 신청
-//    @PostMapping("/{teamId}/apply/{userId}")
-//    public String applyToJoinTeam(@PathVariable Long teamId, @PathVariable String userId) {
-//        User user = userService.getUserById(userId);
-//        teamService.addParticipant(teamId, user);
-//        return "redirect:/team/detail/" + teamId;
-//    }
-//
-//
-//    // 승인 처리
-//    @PostMapping("/{teamId}/approve/{participantId}")
-//    public ResponseEntity<Team> approveParticipant(@PathVariable Long teamId,
-//        @PathVariable Long participantId) {
-//        try {
-//            teamService.approveParticipant(participantId);
-//            Team team = teamService.getTeamById(teamId);
-//            return ResponseEntity.ok(team);
-//        } catch (RuntimeException e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-//        }
-//    }
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시
