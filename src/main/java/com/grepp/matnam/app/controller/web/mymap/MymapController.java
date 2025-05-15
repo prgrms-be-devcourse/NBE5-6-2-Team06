@@ -26,3 +26,4 @@ public class MymapController {
         return "map/editMap";
     }
 }
+

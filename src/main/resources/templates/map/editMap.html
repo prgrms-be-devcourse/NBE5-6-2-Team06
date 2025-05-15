@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>맛남 | 마이페이지 - 수정 | 맛집 지도 & 리스트</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        #map {
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        #placeList {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .place-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .place-info {
+            flex: 1;
+        }
+
+        .place-actions button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            background-color: #eee;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .place-actions button:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<h4 style="margin-top:0.5rem;"> 저장된 맛집 리스트를 삭제하거나 숨김여부를 선택해주세요 </h4>
+<h5 style="margin-top:0; margin-bottom: 1rem;">💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
+<div id="map"></div>
+<div id="placeList"></div>
+
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f&libraries=services"></script>
+<script>
+    const yellowMarkerImage = new kakao.maps.MarkerImage(
+        '/img/map-marker-yellow.png',
+        new kakao.maps.Size(38, 40),
+        { offset: new kakao.maps.Point(19, 40) }
+    );
+
+    const blueMarkerImage = new kakao.maps.MarkerImage(
+        '/img/map-marker-blue.png',
+        new kakao.maps.Size(38, 40),
+        { offset: new kakao.maps.Point(19, 40) }
+    );
+
+    let map;
+
+    function initMap(places) {
+        const mapContainer = document.getElementById('map');
+        const mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 4
+        };
+        map = new kakao.maps.Map(mapContainer, mapOption);
+
+        const bounds = new kakao.maps.LatLngBounds();
+
+        places.forEach(place => {
+            const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
+            const marker = new kakao.maps.Marker({
+                map,
+                position: pos,
+                image: place.pinned ? blueMarkerImage : yellowMarkerImage
+            });
+
+            bounds.extend(pos);
+        });
+
+        if (!bounds.isEmpty()) {
+            map.setBounds(bounds);
+        }
+    }
+
+    function renderPlaceList(places) {
+        const container = document.getElementById('placeList');
+        container.innerHTML = '';
+
+        places.forEach(place => {
+            const item = document.createElement('div');
+            item.className = 'place-item';
+            item.dataset.id = place.id;
+            item.dataset.pinned = place.pinned;
+
+            item.innerHTML = `
+                <div class="place-info">
+                    <strong>${place.placeName}</strong><br />
+                    <small>${place.roadAddress}</small>
+                </div>
+                <div class="place-actions">
+                    <button onclick="updatePlace(${place.mapId}, true)">공개</button>
+                    <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
+                    <button onclick="deletePlace(${place.mapId})">삭제</button>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function updatePlace(id, isPinned) {
+        const item = document.querySelector(`.place-item[data-id="${id}"]`);
+        if (!item) {
+            alert("장소 정보를 찾을 수 없습니다.");
+            return;
+        }
+
+        const currentPinned = item.dataset.pinned === 'true';
+        if (currentPinned === isPinned) {
+            alert(isPinned ? "이미 공개된 장소입니다." : "이미 숨김 처리된 장소입니다.");
+            return;
+        }
+
+        fetch('/api/mymap/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ pinned: isPinned })
+        }).then(res => {
+            if (!res.ok) throw new Error("업데이트 실패");
+            alert(isPinned ? "공개로 설정되었습니다." : "숨김 처리되었습니다.");
+            location.reload();
+        }).catch(err => alert("에러: " + err.message));
+    }
+
+    function deletePlace(id) {
+        if (!confirm("정말로 이 장소를 삭제하시겠습니까?")) return;
+
+        fetch('/api/mymap/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ activated: false })
+        }).then(res => {
+            if (!res.ok) throw new Error("삭제 실패");
+            alert("삭제되었습니다.");
+            location.reload();
+        }).catch(err => alert("에러: " + err.message));
+    }
+
+    fetch('/api/mymap/activated', {
+        credentials: 'include'
+    })
+        .then(async res => {
+            const contentType = res.headers.get("Content-Type");
+            if (!res.ok) {
+                const errorText = await res.text();
+                throw new Error(`서버 응답 오류: ${res.status} \n${errorText}`);
+            }
+            if (!contentType.includes("application/json")) {
+                throw new Error("JSON이 아닌 응답 형식입니다.");
+            }
+            return res.json();
+        })
+        .then(data => {
+            initMap(data);
+            renderPlaceList(data);
+        })
+        .catch(err => {
+            alert("장소 정보를 불러오지 못했습니다.");
+            console.error(err);
+        });
+</script>
+
+</body>
+</html>
