@@ -49,37 +49,61 @@ public class TeamService {
     }
 
     // 참여자 추가
+//    @Transactional
+//    public void addParticipant(Long teamId, User user) {
+//        Team team = teamRepository.findById(teamId)
+//            .orElseThrow(() -> new RuntimeException("Team not found"));
+//
+//        Participant participant = new Participant();
+//        participant.setTeam(team);
+//        participant.setUser(user);
+//        participant.setParticipantStatus(ParticipantStatus.PENDING);
+//
+//        if (team.getUser().equals(user)) {
+//            participant.setRole(Role.LEADER);  // 모임을 생성한 사용자는 LEADER
+//        } else {
+//            participant.setRole(Role.MEMBER);  // 나머지 사용자는 MEMBER
+//        }
+//
+//        participantRepository.save(participant);
+//    }
+
     @Transactional
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found"));
+            .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
-        Participant participant = new Participant();
-        participant.setTeam(team);
-        participant.setUser(user);
-        participant.setParticipantStatus(ParticipantStatus.PENDING);
+        if (!participantRepository.existsByUser_UserIdAndTeam_TeamId(user.getUserId(), teamId)) {
+            Participant participant = new Participant();
+            participant.setTeam(team);
+            participant.setUser(user);
+            participant.setRole(Role.MEMBER);
 
-        if (team.getUser().equals(user)) {
-            participant.setRole(Role.LEADER);  // 모임을 생성한 사용자는 LEADER
+            if (team.getUser().equals(user)) {
+                participant.setParticipantStatus(ParticipantStatus.APPROVED);
+                participant.setRole(Role.LEADER);
+            } else {
+                participant.setParticipantStatus(ParticipantStatus.PENDING);
+            }
+
+            participantRepository.save(participant);
+            team.setNowPeople(team.getNowPeople() + 1);
         } else {
-            participant.setRole(Role.MEMBER);  // 나머지 사용자는 MEMBER
+            throw new IllegalStateException("이미 참여한 사용자입니다.");
         }
-
-        participantRepository.save(participant);
     }
 
+    // 수정한 필드 저장
     public void updateTeam(Long teamId, TeamDto teamDto) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("Team not found"));
 
-        // 수정할 필드들 업데이트
         team.setTeamTitle(teamDto.getTeamTitle());
         team.setMeetDate(teamDto.getMeetDate());
         team.setRestaurantName(teamDto.getRestaurantName());
         team.setMaxPeople(teamDto.getMaxPeople());
         team.setNowPeople(teamDto.getNowPeople());
 
-        // 팀 정보 저장
         teamRepository.save(team);
     }
 
