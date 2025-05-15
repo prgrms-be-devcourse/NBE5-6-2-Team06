@@ -50,30 +50,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // 모임 성공률 차트
     const meetingSuccessCtx = document.getElementById('meetingSuccessChart');
     if (meetingSuccessCtx) {
-        new Chart(meetingSuccessCtx, {
-            type: 'bar',
-            data: {
-                labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
-                datasets: [{
-                    label: '성공률 (%)',
-                    data: [75, 78, 80, 82, 85, 88],
-                    backgroundColor: '#4a6cf7'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
+        fetch('/api/admin/team/success-rate/monthly')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const result = data.data
+            const labels = result.map(item => item.month);
+            const successRates = result.map(item => parseFloat(item.successRate));
+
+            new Chart(meetingSuccessCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '성공률 (%)',
+                        data: successRates,
+                        backgroundColor: '#4a6cf7'
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
                     }
                 }
-            }
+            });
+        })
+        .catch(error => {
+            console.error('모임 성공률 데이터를 가져오는 중 오류 발생:', error);
         });
     }
 });

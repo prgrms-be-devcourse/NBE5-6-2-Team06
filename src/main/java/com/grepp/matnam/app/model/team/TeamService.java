@@ -16,6 +16,7 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -293,6 +294,25 @@ public class TeamService {
         double percent = ((double) diff / yesterday) * 100;
         String sign = percent >= 0 ? "+" : "";
         return String.format("%s%.0f%%", sign, percent);
+    }
+
+    public List<Map<String, String>> getMonthlyMeetingSuccessRate() {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<Map<String, Long>> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
+
+        return monthlyStats.stream().map(stat -> {
+            Object monthObj = stat.get("meetingMonth");
+            String month = String.valueOf(monthObj);
+
+            Long total = stat.get("totalMeetings");
+            Long completed = stat.get("completedMeetings");
+            double successRate = (total > 0) ? ((double) completed / total) * 100 : 0;
+
+            return Map.of(
+                "month", month,
+                "successRate", String.format("%.2f", successRate)
+            );
+        }).collect(Collectors.toList());
     }
 
     // 모임 수정
