@@ -6,7 +6,9 @@ import com.grepp.matnam.app.model.team.TeamReviewRepository;
 import com.grepp.matnam.app.model.team.TeamReviewService;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
+import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -105,6 +109,9 @@ public class TeamController {
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
 
+        boolean isLeader = team.getUser().getUserId().equals(userId);
+        model.addAttribute("isLeader", isLeader);  // 방장 여부를 모델에 추가
+
         // 현재 사용자가 이미 팀에 참여했는지
         boolean isParticipant = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
             userId, teamId, ParticipantStatus.APPROVED);
@@ -142,7 +149,7 @@ public class TeamController {
         }
 
         List<Participant> approvedParticipants = team.getParticipants().stream()
-            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
+            .filter(participant -> participant.getRole() == Role.MEMBER)
             .toList();
         model.addAttribute("participants", approvedParticipants);
 
@@ -158,6 +165,19 @@ public class TeamController {
 //        return "redirect:/team/" + teamId + "/page";
         return "redirect:/team/detail/" + teamId;
     }
+
+    // 승인 처리
+    @PostMapping("/{teamId}/approve")
+    public ResponseEntity<Team> approveParticipant(@PathVariable Long teamId, @RequestParam String userId) {
+        try {
+            teamService.approveParticipant(teamId, userId);
+            Team team = teamService.getTeamById(teamId);
+            return ResponseEntity.ok(team);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
 
     // 모임 완료 후 리뷰 작성 페이지 표시
     @GetMapping("/{teamId}/reviews")
