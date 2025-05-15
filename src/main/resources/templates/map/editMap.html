@@ -10,8 +10,8 @@
             padding: 20px;
         }
 
-        h2 {
-            margin-bottom: 20px;
+        h4, h5 {
+            margin: 0 0 1rem;
         }
 
         #map {
@@ -39,6 +39,15 @@
             flex: 1;
         }
 
+        .place-info strong {
+            cursor: pointer;
+            color: #007bff;
+        }
+
+        .place-info strong:hover {
+            text-decoration: underline;
+        }
+
         .place-actions button {
             margin-left: 5px;
             padding: 5px 10px;
@@ -54,8 +63,8 @@
     </style>
 </head>
 <body>
-<h4 style="margin-top:0.5rem;"> 저장된 맛집 리스트를 삭제하거나 숨김여부를 선택해주세요 </h4>
-<h5 style="margin-top:0; margin-bottom: 1rem;">💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
+<h4>저장된 맛집 리스트를 조회하고 삭제 또는 공개여부를 선택해주세요</h4>
+<h5>💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
 <div id="map"></div>
 <div id="placeList"></div>
 
@@ -74,6 +83,13 @@
     );
 
     let map;
+    let markers = [];
+    let overlays = [];
+
+    function closeAllOverlays() {
+        overlays.forEach(o => o.setMap(null));
+        overlays = [];
+    }
 
     function initMap(places) {
         const mapContainer = document.getElementById('map');
@@ -85,6 +101,9 @@
 
         const bounds = new kakao.maps.LatLngBounds();
 
+        markers = []; // 초기화
+        overlays = [];
+
         places.forEach(place => {
             const pos = new kakao.maps.LatLng(place.latitude, place.longitude);
             const marker = new kakao.maps.Marker({
@@ -92,6 +111,25 @@
                 position: pos,
                 image: place.pinned ? blueMarkerImage : yellowMarkerImage
             });
+
+            const overlayContent = `
+                <div style="padding:5px 10px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                    ${place.placeName}
+                </div>`;
+            const overlay = new kakao.maps.CustomOverlay({
+                content: overlayContent,
+                position: pos,
+                yAnchor: 1.5
+            });
+
+            marker.addListener('click', () => {
+                closeAllOverlays();
+                overlay.setMap(map);
+                map.setCenter(pos);
+                overlays.push(overlay);
+            });
+
+            markers.push({ id: place.mapId, marker, pos, overlay });
 
             bounds.extend(pos);
         });
@@ -108,23 +146,47 @@
         places.forEach(place => {
             const item = document.createElement('div');
             item.className = 'place-item';
-            item.dataset.id = place.id;
+            item.dataset.id = place.mapId;
             item.dataset.pinned = place.pinned;
 
-            item.innerHTML = `
-                <div class="place-info">
-                    <strong>${place.placeName}</strong><br />
-                    <small>${place.roadAddress}</small>
-                </div>
-                <div class="place-actions">
-                    <button onclick="updatePlace(${place.mapId}, true)">공개</button>
-                    <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
-                    <button onclick="deletePlace(${place.mapId})">삭제</button>
-                </div>
-            `;
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'place-info';
+
+            const nameEl = document.createElement('strong');
+            nameEl.innerText = place.placeName;
+            nameEl.style.cursor = 'pointer';
+            nameEl.style.color = 'inherit'; // ✅ 검정색 유지
+            nameEl.onclick = () => {
+                const target = markers.find(m => m.id === place.mapId);
+                if (target) {
+                    closeAllOverlays();
+                    target.overlay.setMap(map);
+                    map.setCenter(target.pos);
+                    overlays.push(target.overlay);
+                }
+            };
+
+            const addressEl = document.createElement('small');
+            addressEl.innerText = place.roadAddress;
+
+            infoDiv.appendChild(nameEl);
+            infoDiv.appendChild(document.createElement('br'));
+            infoDiv.appendChild(addressEl);
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'place-actions';
+            actionsDiv.innerHTML = `
+            <button onclick="updatePlace(${place.mapId}, true)">공개</button>
+            <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
+            <button onclick="deletePlace(${place.mapId})">삭제</button>
+        `;
+
+            item.appendChild(infoDiv);
+            item.appendChild(actionsDiv);
             container.appendChild(item);
         });
     }
+
 
     function updatePlace(id, isPinned) {
         const item = document.querySelector(`.place-item[data-id="${id}"]`);
@@ -186,9 +248,8 @@
         })
         .catch(err => {
             alert("장소 정보를 불러오지 못했습니다.");
-            console.error(err);
+            console.error("에러:", err);
         });
 </script>
-
 </body>
 </html>
