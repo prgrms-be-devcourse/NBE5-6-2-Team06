@@ -168,6 +168,63 @@
           <canvas id="topRecommendedChart"></canvas>
         </div>
       </div>
+      <div class="table-container">
+        <h3>식당 통계 요약</h3>
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>구분</th>
+            <th>식당 수</th>
+            <th>평균 평점</th>
+            <th>추천 누적 합계</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>전체</td>
+            <td th:text="${restaurantStats.totalRestaurants}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.averageGoogleRating, 1, 1)}"></td>
+            <td th:text="${restaurantStats.totalRecommendedCount}"></td>
+          </tr>
+          <tr>
+            <td>한식</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.KOREAN}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.KOREAN, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.KOREAN}"></td>
+          </tr>
+          <tr>
+            <td>중식</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.CHINESE}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.CHINESE, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.CHINESE}"></td>
+          </tr>
+          <tr>
+            <td>일식</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.JAPANESE}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.JAPANESE, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.JAPANESE}"></td>
+          </tr>
+          <tr>
+            <td>양식</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.WESTERN}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.WESTERN, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.WESTERN}"></td>
+          </tr>
+          <tr>
+            <td>분식</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.BUNSIK}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.BUNSIK, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.BUNSIK}"></td>
+          </tr>
+          <tr>
+            <td>디저트</td>
+            <td th:text="${restaurantStats.categoryRestaurantCounts.DESSERT}"></td>
+            <td th:text="${#numbers.formatDecimal(restaurantStats.categoryAverageRatings.DESSERT, 1, 1)}"></td>
+            <td th:text="${restaurantStats.categoryTotalRecommendedCounts.DESSERT}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

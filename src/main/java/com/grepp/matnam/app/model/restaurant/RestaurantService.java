@@ -2,6 +2,7 @@ package com.grepp.matnam.app.model.restaurant;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRankingResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.controller.web.admin.payload.RestaurantStatsResponse;
 import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import java.util.HashMap;
@@ -119,5 +120,35 @@ public class RestaurantService {
         return topRestaurants.stream()
             .map(restaurant -> new RestaurantRankingResponse(restaurant.getName(), restaurant.getRecommendedCount()))
             .collect(Collectors.toList());
+    }
+
+    public RestaurantStatsResponse getConsolidatedRestaurantStatistics() {
+        RestaurantStatsResponse statsResponse = new RestaurantStatsResponse();
+
+        // 전체 통계
+        statsResponse.setTotalRestaurants(restaurantRepository.count());
+        statsResponse.setAverageGoogleRating(restaurantRepository.averageGoogleRating());
+        statsResponse.setTotalRecommendedCount(restaurantRepository.sumRecommendedCount());
+
+        // 카테고리별 통계
+        Map<String, Long> categoryRestaurantCounts = new HashMap<>();
+        Map<String, Double> categoryAverageRatings = new HashMap<>();
+        Map<String, Long> categoryTotalRecommendedCounts = new HashMap<>();
+
+        for (Category category : Category.values()) {
+            long count = restaurantRepository.countByCategory(category.getKoreanName());
+            Double avgRating = restaurantRepository.averageGoogleRatingByCategory(category.getKoreanName());
+            Long totalRecommended = restaurantRepository.sumRecommendedCountByCategory(category.getKoreanName());
+
+            categoryRestaurantCounts.put(category.name(), count);
+            categoryAverageRatings.put(category.name(), avgRating != null ? avgRating : 0.0);
+            categoryTotalRecommendedCounts.put(category.name(), totalRecommended != null ? totalRecommended : 0L);
+        }
+
+        statsResponse.setCategoryRestaurantCounts(categoryRestaurantCounts);
+        statsResponse.setCategoryAverageRatings(categoryAverageRatings);
+        statsResponse.setCategoryTotalRecommendedCounts(categoryTotalRecommendedCounts);
+
+        return statsResponse;
     }
 }

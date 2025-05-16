@@ -1,7 +1,9 @@
 package com.grepp.matnam.app.controller.web.admin;
 
+import com.grepp.matnam.app.controller.web.admin.payload.RestaurantStatsResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
+import com.grepp.matnam.app.model.restaurant.RestaurantService;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class AdminStatisticsController {
 
     private final UserService userService;
     private final TeamService teamService;
+    private final RestaurantService restaurantService;
 
     @GetMapping({"", "/", "/user"})
     public String userStatistics(Model model) {
@@ -46,12 +49,12 @@ public class AdminStatisticsController {
 
     @GetMapping("/restaurant")
     public String restaurantStatistics(Model model) {
+        RestaurantStatsResponse restaurantStats = restaurantService.getConsolidatedRestaurantStatistics();
+
         model.addAttribute("activeTab", "restaurant-stats");
         model.addAttribute("pageTitle", "통계 및 분석");
         model.addAttribute("currentPage", "statistics");
-
-        // 여기에 통계 데이터를 모델에 추가
-        // 예: 사용자 통계, 성공률 분석 등
+        model.addAttribute("restaurantStats", restaurantStats);
 
         return "admin/statistics";
     }
