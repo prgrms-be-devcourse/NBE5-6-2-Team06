@@ -2,49 +2,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // 연령대별 사용자 분포 차트
     const ageDistributionCtx = document.getElementById('ageDistributionChart');
     if (ageDistributionCtx) {
-        new Chart(ageDistributionCtx, {
-            type: 'bar',
-            data: {
-                labels: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
-                datasets: [{
-                    label: '사용자 수',
-                    data: [120, 450, 380, 210, 85, 40],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)',
-                        'rgba(255, 206, 86, 0.7)',
-                        'rgba(75, 192, 192, 0.7)',
-                        'rgba(153, 102, 255, 0.7)',
-                        'rgba(255, 159, 64, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    title: {
-                        display: true,
-                        text: '연령대별 사용자 분포'
-                    }
+        fetch('/api/admin/user/statistics/age-distribution')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const result = data.data
+            // 예: [{"ageGroup": "10대", "count": 0}, {"ageGroup": "20대", "count": 6}, ...]
+            const labels = result.map(item => item.ageGroup); // ['10대', '20대', ...]
+            const counts = result.map(item => item.count);    // [0, 6, ...]
+
+            new Chart(ageDistributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '사용자 수',
+                        data: counts,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '연령대별 사용자 분포'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
                     }
                 }
-            }
+            });
+        })
+        .catch(error => {
+            console.error('연령대별 사용자 분포 데이터 가져오기 실패:', error);
         });
     }
     

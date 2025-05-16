@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.model.auth.code.Role;
@@ -8,8 +9,12 @@ import com.grepp.matnam.app.model.user.entity.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -221,5 +226,38 @@ public class UserService {
         double percent = ((double) diff / yesterday) * 100;
         String sign = percent >= 0 ? "+" : "";
         return String.format("%s%.0f%%", sign, percent);
+    }
+
+    public List<AgeDistributionResponse> getAgeDistribution() {
+        List<Integer> ages = userRepository.findAllAges(); // 모든 활성 사용자의 나이를 가져옴
+
+        // 연령대 정의 (순서 보장을 위해 LinkedHashMap 사용)
+        Map<String, Long> ageGroupCounts = new LinkedHashMap<>();
+        ageGroupCounts.put("10대", 0L); // 10-19
+        ageGroupCounts.put("20대", 0L); // 20-29
+        ageGroupCounts.put("30대", 0L); // 30-39
+        ageGroupCounts.put("40대", 0L); // 40-49
+        ageGroupCounts.put("50대", 0L); // 50-59
+        ageGroupCounts.put("60대 이상", 0L); // 60+
+
+        for (int age : ages) {
+            if (age >= 10 && age <= 19) {
+                ageGroupCounts.put("10대", ageGroupCounts.get("10대") + 1);
+            } else if (age >= 20 && age <= 29) {
+                ageGroupCounts.put("20대", ageGroupCounts.get("20대") + 1);
+            } else if (age >= 30 && age <= 39) {
+                ageGroupCounts.put("30대", ageGroupCounts.get("30대") + 1);
+            } else if (age >= 40 && age <= 49) {
+                ageGroupCounts.put("40대", ageGroupCounts.get("40대") + 1);
+            } else if (age >= 50 && age <= 59) {
+                ageGroupCounts.put("50대", ageGroupCounts.get("50대") + 1);
+            } else if (age >= 60) {
+                ageGroupCounts.put("60대 이상", ageGroupCounts.get("60대 이상") + 1);
+            }
+        }
+
+        return ageGroupCounts.entrySet().stream()
+            .map(entry -> new AgeDistributionResponse(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toList());
     }
 }

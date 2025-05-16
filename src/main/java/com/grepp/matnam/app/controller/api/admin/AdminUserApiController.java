@@ -1,11 +1,13 @@
 package com.grepp.matnam.app.controller.api.admin;
 
+import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportChatResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportTeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.infra.response.ApiResponse;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -57,4 +59,9 @@ public class AdminUserApiController {
         return ResponseEntity.ok(ApiResponse.success(reportChatResponse));
     }
 
+    @GetMapping("/statistics/age-distribution")
+    public ResponseEntity<ApiResponse<List<AgeDistributionResponse>>> getAgeDistributionData() {
+        List<AgeDistributionResponse> ageDistribution = userService.getAgeDistribution();
+        return ResponseEntity.ok(ApiResponse.success(ageDistribution));
+    }
 }
