@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title th:text="${team.teamTitle} + ' | 맛남'">강남 맛집 탐방 모임 | 맛남</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
     header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #eee; }
@@ -13,32 +14,19 @@
     .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
     button { background: black; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
     .info-section { margin-bottom: 2rem; }
-    .map-placeholder {
-      background: #f4f4f4;
-      height: 200px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #aaa;
-    }
-    footer {
-      text-align: center;
-      padding: 1rem; border-top: 1px solid #eee;
-      font-size: 0.8rem;
-      color: #777;
-    }
-    /* 버튼 비활성화 시 회색 배경 */
-    button:disabled {
-      background: #6c757d;
-      cursor: not-allowed;
-    }
+    .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
+    footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+
+    /* 알림 스타일 */
+    #notificationArea { position: fixed; top: 20px; right: 20px; z-index: 1000; display: none; }
+    .notification-card { background-color: #f9f9f9; border: 1px solid #ccc; padding: 15px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); text-align: center; }
+    #notificationButton { margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
   </style>
 </head>
 <body>
 <header>
-  <div>
-    <a href="/">맛남</a>
-  </div>
+  <div><a href="/" style="text-decoration:none; color:black; font-weight:bold;">맛남</a></div>
   <nav>
     <a th:href="@{/}">홈</a>
     <a th:href="@{/team/search}">모임찾기</a>
@@ -50,10 +38,10 @@
     <div class="card">
       <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'CLOSED'}">모집 완료</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FINISHED'}">종료된 모임</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
+      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'COMPLETED'}">종료된 모임</span>
       <p>
-        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
@@ -72,19 +60,61 @@
   <div class="sidebar">
     <div class="card">
       <h4>모임 참여하기</h4>
-      <p th:text="${team.nowPeople} + '/' + ${team.maxPeople} + '명 참여중입니다.'">4/10명 참여중입니다.</p>
-      <form th:action="@{/team/{teamId}/apply(teamId=${team.teamId})}" method="post">
-        <input type="hidden" name="userId" th:value="${#authentication.name}">
-        <button type="submit"
-                th:disabled="${isParticipant}"
-                class="btn"
-                th:text="${isParticipant ? '이미 신청한 모임입니다.' : '신청하기'}">
-        </button>
-      </form>
+      <p>
+        👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
+      </p>
+      <button type="button" id="applyButton"
+              th:data-team-id="${team.teamId}"
+              th:data-user-id="${#authentication.name}"
+              th:disabled="${isParticipant or alreadyApplied}"
+              class="btn"
+              th:text="${isParticipant ? '이미 신청한 모임입니다.' : alreadyApplied ? '신청 대기 중' : '신청하기'}">
+        신청하기
+      </button>
     </div>
     <div class="card">
       <h4>방장 정보</h4>
       <p th:text="'🙋‍♂️ ' + ${team.user.nickname}">방장 이름</p>
+    </div>
+    <div class="card">
+      <h4>참여자 정보</h4>
+      <div class="participant-list">
+        <h5>참여 요청</h5>
+        <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING}">
+          <div class="participant-info" th:if="${participant.user != null}">
+            <div class="info-item">
+              <strong>👤:</strong>
+              <span th:text="${participant.user.nickname}">참여자 닉네임</span> -
+              <span th:text="${participant.user.temperature}">매너온도</span> °C
+              <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display: inline;">
+                <button type="submit" class="approve-button"
+                        th:data-team-id="${team.teamId}"
+                        th:data-participant-id="${participant.participantId}">수락</button>
+              </form>
+            </div>
+          </div>
+          <div class="participant-info" th:unless="${participant.user != null}">
+            <span>탈퇴한 사용자</span>
+          </div>
+        </div>
+        <hr/>
+        <h5>현재 참여자</h5>
+        <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and participant.role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER}">
+          <div class="participant-info" th:if="${participant.user != null}">
+            <div class="info-item">
+              <strong>👤:</strong>
+              <span th:text="${participant.user.nickname}">참여자 닉네임</span> :
+              <span th:text="${participant.user.temperature}">매너온도</span> °C
+            </div>
+          </div>
+          <div class="participant-info" th:unless="${participant.user != null}">
+            <span>탈퇴한 사용자</span>
+          </div>
+        </div>
+        <div class="participant" th:if="${#lists.isEmpty(team.participants.?[participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER]) and #lists.isEmpty(team.participants.?[participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING])}">
+          <span>현재 참여자가 없습니다.</span>
+        </div>
+      </div>
     </div>
     <div class="card">
       <h4>비슷한 모임</h4>
@@ -94,8 +124,83 @@
     </div>
   </div>
 </div>
+<div id="notificationArea">
+  <div class="notification-card">
+    <p id="notificationMessage"></p>
+    <button id="notificationButton">확인</button>
+  </div>
+</div>
 <footer>
   © 2025 맛남. 모든 권리 보유.
 </footer>
+
+<script th:inline="javascript">
+  $(document).ready(function() {
+    // 모임 참여 신청
+    $('#applyButton').click(function() {
+      var teamId = $(this).data('team-id');
+      var userId = $(this).data('user-id');
+
+      $.ajax({
+        type: 'POST',
+        url: '/api/team/' + teamId + '/apply/' + userId,
+        dataType: 'json', // 서버 응답을 JSON으로 처리
+        success: function(response) {
+          $('#notificationMessage').text(response.message);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+            location.reload(); // 성공 시 페이지 리로드
+          });
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = "참여 신청에 실패했습니다.";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage += " (" + xhr.responseJSON.message + ")";
+          }
+          $('#notificationMessage').text(errorMessage);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+        }
+      });
+    });
+
+    // 참여자 승인 처리
+    $('.approve-button').click(function(event) {
+      event.preventDefault(); // 기본 폼 제출 막기
+      var teamId = $(this).data('team-id');
+      var participantId = $(this).data('participant-id');
+      var form = $(this).closest('form');
+      var url = form.attr('action'); // 폼의 action 속성에서 URL 가져오기
+
+      $.ajax({
+        type: 'POST',
+        url: url,
+        dataType: 'json', // 서버 응답을 JSON으로 처리
+        success: function(response) {
+          $('#notificationMessage').text(response.message);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+            location.reload(); // 성공 시 페이지 리로드
+          });
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = "승인 처리에 실패했습니다.";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage += " (" + xhr.responseJSON.message + ")";
+          }
+          $('#notificationMessage').text(errorMessage);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+        }
+      });
+    });
+  });
+</script>
 </body>
 </html>

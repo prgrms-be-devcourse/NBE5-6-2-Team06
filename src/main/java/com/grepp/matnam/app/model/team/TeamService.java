@@ -2,8 +2,11 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
+import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
+import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
+import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -33,6 +36,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
     private final ParticipantRepository participantRepository;
+//    private final RestaurantRepository restaurantRepository;
 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -52,50 +56,98 @@ public class TeamService {
     @Transactional
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found"));
+            .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
-        Participant participant = new Participant();
-        participant.setTeam(team);
-        participant.setUser(user);
-        participant.setParticipantStatus(ParticipantStatus.PENDING);
+        if (!participantRepository.existsByUser_UserIdAndTeam_TeamId(user.getUserId(), teamId)) {
+            // 이미 참가한 여부 파악 -> 예외처리
+            Participant participant = new Participant();
+            participant.setTeam(team);
+            participant.setUser(user);
 
-        if (team.getUser().equals(user)) {
-            participant.setRole(Role.LEADER);  // 모임을 생성한 사용자는 LEADER
+            if(user.getUserId().equals(team.getUser().getUserId())) {
+                participant.setParticipantStatus(ParticipantStatus.APPROVED);
+                participant.setRole(Role.LEADER);
+
+                if (team.getNowPeople() == null || team.getNowPeople() == 0) {
+                    team.setNowPeople(1);
+                }
+            } else { // 일반 사용자
+                participant.setParticipantStatus(ParticipantStatus.PENDING);
+                participant.setRole(Role.MEMBER);
+            }
+
+            participantRepository.save(participant);
         } else {
-            participant.setRole(Role.MEMBER);  // 나머지 사용자는 MEMBER
+            throw new IllegalStateException("이미 참여한 사용자입니다.");
         }
-
-        participantRepository.save(participant);
     }
 
-    public void updateTeam(Long teamId, TeamDto teamDto) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found"));
+    // 모임 참여 수락
+    @Transactional
+    public void approveParticipant(Long participantId) {
+        Participant participant = participantRepository.findById(participantId)
+            .orElseThrow(() -> new RuntimeException("참가자를 찾을 수 없습니다."));
 
-        // 수정할 필드들 업데이트
-        team.setTeamTitle(teamDto.getTeamTitle());
-        team.setMeetDate(teamDto.getMeetDate());
-        team.setRestaurantName(teamDto.getRestaurantName());
-        team.setMaxPeople(teamDto.getMaxPeople());
-        team.setNowPeople(teamDto.getNowPeople());
+        if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+            throw new RuntimeException("이미 수락된 참가자입니다.");
+        }
 
-        // 팀 정보 저장
+        Team team = participant.getTeam();
+        if (team.getMaxPeople() != null && team.getNowPeople() >= team.getMaxPeople()) {
+            throw new RuntimeException("모임의 최대 인원 수를 초과했습니다.");
+        }
+
+        participant.setParticipantStatus(ParticipantStatus.APPROVED);
+        participantRepository.save(participant);
+
+//        team.setNowPeople(team.getNowPeople() + 1);
+        if (team.getNowPeople() == null) {
+            team.setNowPeople(1);
+        } else {
+            team.setNowPeople(team.getNowPeople() + 1);
+        }
         teamRepository.save(team);
     }
 
-//    public void deleteTeam(Long teamId) {
+//    // 수정한 필드 저장
+//    @Transactional
+//    public Team updateTeam(Long teamId, TeamUpdateRequest request) {
+//        // 팀 찾기
 //        Team team = teamRepository.findById(teamId)
-//            .orElseThrow(() -> new RuntimeException("Team not found"));
+//            .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 //
-//        // 관련된 참가자 정보 삭제
-//        participantRepository.deleteByTeam_TeamId(teamId);
+//        // 필드 수정
+//        if (request.getTeamTitle() != null) {
+//            team.setTeamTitle(request.getTeamTitle());
+//        }
+//        if (request.getTeamDetails() != null) {
+//            team.setTeamDetails(request.getTeamDetails());
+//        }
+//        if (request.getRestaurantName() != null) {
+//            team.setRestaurantName(request.getRestaurantName());
+//        }
+//        if (request.getTeamDate() != null) {
+//            team.setMeetDate(request.getTeamDate());
+//        }
+//        if (request.getMeetDate() != null) {
+//            team.setMeetDate(request.getMeetDate());
+//        }
+//        if (request.getCapacity() != null) {
+//            team.setMaxPeople(request.getCapacity());
+//        }
 //
-//        // 팀 정보 삭제
-//        teamRepository.delete(team);
+//        if (request.getCategory() != null && team.getRestaurant() != null) {
+//            Restaurant restaurant = team.getRestaurant();
+//            restaurant.setCategory(request.getCategory());
+//            restaurantRepository.save(restaurant); // Restaurant 정보 업데이트
+//        }
+//        if (request.getImageUrl() != null) {
+//            team.setImageUrl(request.getImageUrl());
+//        }
+//
+//        // 수정된 팀 정보 저장
+//        return teamRepository.save(team);
 //    }
-
-
-
 
     // 참여자 상태 변경
     public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
@@ -119,21 +171,6 @@ public class TeamService {
         }
     }
 
-
-//    // 모임 참여 수락
-//    @Transactional
-//    public void acceptParticipant(Long teamId, String userId) {
-//        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
-//
-//        if (participant == null) {
-//            throw new RuntimeException("참가자가 존재하지 않거나 팀에 속하지 않습니다.");
-//        }
-//
-//        // 이미 수락된 참가자는 상태 변경을 하지 않음
-//        participant.setParticipantStatus(ParticipantStatus.APPROVED);
-//        participantRepository.save(participant);
-//    }
-
     // 팀 삭제
     @Transactional
     public void deleteTeam(Long teamId) {
@@ -149,11 +186,6 @@ public class TeamService {
     public List<Team> getTeamsByLeader(String userId) {
         return teamRepository.findTeamsByUser_UserId(userId);
     }
-
-    //참여자로서의 팀 조회
-//    public List<Team> getTeamsByParticipant(String userId) {
-//        return teamRepository.findTeamsByParticipantUserId(userId);
-//    }
 
     //참여자로서의 팀 조회 (APPROVED 상태)
     public List<Team> getTeamsByParticipant(String userId) {
@@ -181,7 +213,6 @@ public class TeamService {
 
 
     // 참여자 상세 정보 조회(참여 상태)
-
     public Team getTeamById(Long teamId) {
         return teamRepository.findById(teamId)
             .orElse(null);

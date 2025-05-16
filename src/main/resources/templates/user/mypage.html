@@ -522,8 +522,6 @@
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
 
-          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
-
           <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
@@ -574,9 +572,7 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/teamPage/' + ${team.teamId}}">팀페이지</a><br>
-
-          <button type="button" onclick="showApplicationInfo(${teamId})">신청 리스트</button>
+          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
 
           <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
@@ -755,53 +751,6 @@
     } else if (tabName === 'participating') {
       participatingMeetingsDiv.style.display = 'block';
     }
-  }
-
-
-
-  // 신청 정보 표시/숨기기 및 신청자 목록 로드
-  function showApplicationInfo(teamId) {
-    const applicationInfo = document.getElementById(`application-info-${teamId}`);
-    const currentDisplay = applicationInfo.style.display;
-
-    // 신청 정보 토글 (보이게/숨기게)
-    if (currentDisplay === 'none' || currentDisplay === '') {
-      applicationInfo.style.display = 'block';
-      loadApplicants(teamId);
-    } else {
-      applicationInfo.style.display = 'none';
-    }
-  }
-
-  // 신청자 목록 로드
-  function loadApplicants(teamId) {
-    fetch(`/team/${teamId}/applicants`)
-    .then(response => response.json())
-    .then(participants => {
-      const applicantList = document.getElementById(`applicant-list-${teamId}`);
-      applicantList.innerHTML = '';
-
-      if (participants.length === 0) {
-        const emptyMessage = document.createElement('li');
-        emptyMessage.textContent = '신청자가 없습니다.';
-        applicantList.appendChild(emptyMessage);
-      } else {
-        participants.forEach(participant => {
-          const listItem = document.createElement('li');
-          listItem.classList.add('applicant-item');
-
-          // 참가자의 User 정보를 사용
-          listItem.innerHTML = `
-            <span><strong>닉네임:</strong> ${participant.user.nickname}</span><br>
-            <span><strong>매너 온도:</strong> ${participant.user.temperature} °C</span><br>
-            <span><strong>상태:</strong> ${participant.participantStatus}</span>
-          `;
-
-          applicantList.appendChild(listItem);
-        });
-      }
-    })
-    .catch(error => console.error('신청자 목록을 가져오는 중 오류 발생:', error));
   }
 
   // 모임 수정 요청
