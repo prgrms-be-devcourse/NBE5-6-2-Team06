@@ -115,6 +115,7 @@ public class TeamService {
     }
 
     // 모임 참여 거절
+    @Transactional
     public void rejectParticipant(Long participantId) {
         Participant participant = participantRepository.findById(participantId)
             .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
@@ -129,6 +130,7 @@ public class TeamService {
 
 
     // 모임 업데이트
+    @Transactional
     public void updateTeam(Long teamId, Team updatedTeam) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
@@ -158,27 +160,28 @@ public class TeamService {
     // 모임 상태 변경
     @Transactional
     public void changeTeamStatus(Long teamId, Status status) {
+        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status); // 로그 추가
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
         Status prevStatus = team.getStatus();
         team.setStatus(status);
-        teamRepository.save(team);
 
         // 모집완료 상태 처리
         if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
             team.setStatus(Status.FULL);
-            teamRepository.save(team);
         }
 
         if (team.getTeamDate().isBefore(LocalDateTime.now()) && team.getStatus() != Status.COMPLETED) {
             team.setStatus(Status.COMPLETED);
-            teamRepository.save(team);
         }
 
         // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
         if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
             increaseTemperatureForCompletedTeam(team);
         }
+
+        teamRepository.save(team);
+        log.info("팀 상태 변경 완료: {}", team.getStatus());
     }
 
     // 모임 취소

@@ -53,8 +53,16 @@ public class TeamApiController {
     @PatchMapping("/{teamId}/status")
     public ResponseEntity<?> changeTeamStatus(@PathVariable Long teamId,
         @RequestParam Status status) {
-        teamService.changeTeamStatus(teamId, status);
-        return ResponseEntity.ok().build();
+        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
+
+        try {
+            teamService.changeTeamStatus(teamId, status);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("팀 상태 변경 실패: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("팀 상태 변경 실패");
+        }
     }
 
     @PostMapping("/{teamId}/cancel")
