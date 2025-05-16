@@ -127,46 +127,26 @@
       </div>
 
       <div class="table-container">
-        <h3>성공률 상위 모임 주최자</h3>
+        <h3>모임 통계 요약</h3>
         <table class="data-table">
           <thead>
           <tr>
-            <th>순위</th>
-            <th>사용자</th>
-            <th>모임 수</th>
-            <th>성공 모임</th>
-            <th>성공률</th>
+            <th>구분</th>
+            <th>총 모임 수</th>
+            <th>활성 모임 수</th>
+            <th>완료된 모임 수</th>
+            <th>신규 모임 (30일)</th>
+            <th>평균 모임 규모</th>
           </tr>
           </thead>
           <tbody>
-          <tr th:each="host, stat : ${topHosts}">
-            <td th:text="${stat.count}">1</td>
-            <td th:text="${host.name}">김철수</td>
-            <td th:text="${host.totalMeetings}">15</td>
-            <td th:text="${host.successfulMeetings}">14</td>
-            <td th:text="${host.successRate + '%'}">93.3%</td>
-          </tr>
-          <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-          <tr th:if="${topHosts == null || topHosts.isEmpty()}">
-            <td>1</td>
-            <td>김철수</td>
-            <td>15</td>
-            <td>14</td>
-            <td>93.3%</td>
-          </tr>
-          <tr th:if="${topHosts == null || topHosts.isEmpty()}">
-            <td>2</td>
-            <td>박지민</td>
-            <td>12</td>
-            <td>11</td>
-            <td>91.7%</td>
-          </tr>
-          <tr th:if="${topHosts == null || topHosts.isEmpty()}">
-            <td>3</td>
-            <td>이영희</td>
-            <td>10</td>
-            <td>9</td>
-            <td>90.0%</td>
+          <tr>
+            <td>전체</td>
+            <td th:text="${teamStats.totalTeams}"></td>
+            <td th:text="${teamStats.activeTeams}"></td>
+            <td th:text="${teamStats.completedTeams}"></td>
+            <td th:text="${teamStats.newTeamsLast30Days}"></td>
+            <td th:text="${#numbers.formatDecimal(teamStats.averageTeamSize, 0, 0)}"></td>
           </tr>
           </tbody>
         </table>

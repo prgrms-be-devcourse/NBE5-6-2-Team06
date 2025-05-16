@@ -2,6 +2,8 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
+import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
+import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
@@ -351,6 +353,17 @@ public class TeamService {
                 (oldValue, newValue) -> oldValue,
                 LinkedHashMap::new
             ));
+    }
+
+    public TeamStatsResponse getTeamStatistics() {
+        TeamStatsResponse statsDto = new TeamStatsResponse();
+        statsDto.setTotalTeams(teamRepository.count());
+        statsDto.setActiveTeams(teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(Status.FULL));
+        statsDto.setCompletedTeams(teamRepository.countByStatus(Status.COMPLETED));
+        statsDto.setNewTeamsLast30Days(teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+        Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
+        statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
+        return statsDto;
     }
 
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
