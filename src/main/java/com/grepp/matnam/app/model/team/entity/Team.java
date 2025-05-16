@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team.entity;
 
+import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.entity.BaseEntity;
@@ -32,10 +33,17 @@ public class Team extends BaseEntity {
     @JoinColumn(name = "userId")
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "restaurantId")
+    private Restaurant restaurant;
+
 //    @OneToMany(cascade = CascadeType.ALL)
     @OneToMany(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "teamId")
     private List<Participant> participants;
+    
+    private String restaurantAddress; // 추가
+    private String category; // 추가
 
     private String teamTitle;
 

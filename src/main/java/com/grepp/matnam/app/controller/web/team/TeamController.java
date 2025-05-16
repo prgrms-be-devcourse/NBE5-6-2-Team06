@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/team")
@@ -54,7 +53,7 @@ public class TeamController {
 
     // 모임 생성
     @PostMapping("/create")
-    public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
+    public String createTeam(@ModelAttribute TeamRequest teamRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
@@ -71,19 +70,20 @@ public class TeamController {
             team.setTeamDate(LocalDateTime.now());
         }
 
-//        team.setTeamDate(LocalDateTime.now());
-
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);
 
         return "redirect:/team/detail/" + team.getTeamId();
     }
 
-    // 모임 수정
+    // 모임 수정 페이지
     @GetMapping("/edit/{teamId}")
     public String getTeamEditPage(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamById(teamId);
         model.addAttribute("team", team);
+//        if (team.getRestaurant() != null) {
+//            model.addAttribute("restaurant", team.getRestaurant());  // restaurant 객체를 모델에 추가
+//        }
         return "team/teamEdit";
     }
 
@@ -92,7 +92,7 @@ public class TeamController {
     public String updateTeam(@PathVariable Long teamId, @ModelAttribute Team team) {
         team.setTeamId(teamId);
         teamService.updateTeam(teamId, team);
-        return "redirect:/team/{teamId}";
+        return "redirect:/team/detail/" + team.getTeamId();
     }
 
     // 모임 검색 페이지

@@ -138,7 +138,7 @@
       <input type="time" name="time" th:value="${#temporals.format(team.teamDate, 'HH:mm')}" required>
 
       <label>음식 카테고리</label>
-      <select name="category" required>
+      <select th:field="*{team.category}" required>
         <option value="">카테고리 선택</option>
         <option value="한식" th:selected="${team.category == '한식'}">한식</option>
         <option value="일식" th:selected="${team.category == '일식'}">일식</option>
@@ -149,17 +149,17 @@
       </select>
 
       <label>최대 인원</label>
-      <select name="capacity" required>
-        <option value="1" th:selected="${team.capacity == 1}">1명</option>
-        <option value="2" th:selected="${team.capacity == 2}">2명</option>
-        <option value="3" th:selected="${team.capacity == 3}">3명</option>
-        <option value="4" th:selected="${team.capacity == 4}">4명</option>
-        <option value="5" th:selected="${team.capacity == 5}">5명</option>
-        <option value="6" th:selected="${team.capacity == 6}">6명</option>
-        <option value="7" th:selected="${team.capacity == 7}">7명</option>
-        <option value="8" th:selected="${team.capacity == 8}">8명</option>
-        <option value="9" th:selected="${team.capacity == 9}">9명</option>
-        <option value="10" th:selected="${team.capacity == 10}">10명</option>
+      <select th:field="*{team.maxPeople}" required>
+        <option value="1" th:selected="${team.maxPeople == 1}">1명</option>
+        <option value="2" th:selected="${team.maxPeople == 2}">2명</option>
+        <option value="3" th:selected="${team.maxPeople == 3}">3명</option>
+        <option value="4" th:selected="${team.maxPeople == 4}">4명</option>
+        <option value="5" th:selected="${team.maxPeople == 5}">5명</option>
+        <option value="6" th:selected="${team.maxPeople == 6}">6명</option>
+        <option value="7" th:selected="${team.maxPeople == 7}">7명</option>
+        <option value="8" th:selected="${team.maxPeople == 8}">8명</option>
+        <option value="9" th:selected="${team.maxPeople == 9}">9명</option>
+        <option value="10" th:selected="${team.maxPeople == 10}">10명</option>
       </select>
     </div>
 

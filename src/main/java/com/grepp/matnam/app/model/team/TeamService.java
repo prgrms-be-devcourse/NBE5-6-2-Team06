@@ -118,6 +118,8 @@ public class TeamService {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("Team not found"));
 
+//        team.setRestaurant(updatedTeam.getRestaurant());
+
 //        // 날짜와 시간 처리 (teamDate만 사용)
 //        if (updatedTeam.getTeamDate() != null && updatedTeam.getTime() != null) {
 //            String dateTimeString = updatedTeam.getTeamDate() + "T" + updatedTeam.getTime() + ":00";
@@ -139,6 +141,8 @@ public class TeamService {
         team.setImageUrl(updatedTeam.getImageUrl());
         team.setNowPeople(updatedTeam.getNowPeople());
         team.setStatus(updatedTeam.getStatus());
+        team.setRestaurantAddress(updatedTeam.getRestaurantAddress()); // 추가
+        team.setCategory(updatedTeam.getCategory()); // 추가
 
         teamRepository.save(team);
     }

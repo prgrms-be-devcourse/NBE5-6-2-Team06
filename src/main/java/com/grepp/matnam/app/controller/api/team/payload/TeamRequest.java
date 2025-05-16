@@ -18,7 +18,7 @@ public class TeamRequest {
     private String time;
 
     private String category;
-    private int capacity;
+    private int maxPeople;
 
     private String restaurantName;
     private String restaurantAddress;
@@ -28,12 +28,12 @@ public class TeamRequest {
         team.setUser(user);
         team.setTeamTitle(this.title);
         team.setTeamDetails(this.description);
-//        team.setMeetDate(LocalDateTime.now());
-//        team.setTeamDate(LocalDateTime.now());
-        team.setMaxPeople(this.capacity);
+        team.setMaxPeople(this.maxPeople);
+        team.setCategory(this.category);
         team.setNowPeople(1);
         team.setStatus(Status.RECRUITING);
         team.setRestaurantName(this.restaurantName);
+        team.setRestaurantAddress(this.restaurantAddress);
         return team;
     }
 
