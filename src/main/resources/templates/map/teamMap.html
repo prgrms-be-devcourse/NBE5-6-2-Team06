@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>참여자 맛집 지도</title>
+  <title>맛남 | 모임 참여자 맛집 지도</title>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -40,12 +40,12 @@
       font-weight: 500;
     }
 
-    .header-left nav a:hover {
+    .header-left nav a:hover,
+    .header-left nav a.active {
       color: #000;
     }
 
     .header-left nav a.active {
-      color: #000;
       border-bottom: 2px solid #000;
       padding-bottom: 3px;
     }
@@ -62,26 +62,85 @@
     }
 
     h1 {
-      padding: 2rem;
+      padding: 2rem 2rem 0.2rem 2rem;
+      margin: 0;
     }
 
-    .map-section {
-      margin: 2rem;
-      background: #fff;
-      padding: 1rem;
+    h4 {
+      padding: 0.2rem 2rem 1rem 4rem;
+      margin: 0;
+      color: #555;
+    }
+
+    .nickname-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      padding: 0.5rem 2rem 1rem 3.5rem;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .nickname-list span {
+      background-color: #f0f0f0;
+      border-radius: 20px;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid #ccc;
+      cursor: pointer;
+    }
+
+    .nickname-list span.all-view {
+      background-color: #d0eaff;
+      font-weight: bold;
+    }
+
+    .main-content {
+      display: flex;
+      padding: 0 3rem;
+      gap: 1.5rem;
+    }
+
+    .map {
+      flex: 2;
+      height: 65vh;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
-    .map {
-      width: 100%;
-      height: 300px;
-      margin-top: 0.5rem;
+    .restaurant-list {
+      flex: 1;
+      background: #fff;
+      padding: 1rem;
       border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      max-height: 65vh;
+    }
+
+    .restaurant-item {
+      padding: 0.7rem 0.5rem;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+
+    .restaurant-item:last-child {
+      border-bottom: none;
+    }
+
+    .restaurant-name {
+      font-weight: bold;
+      font-size: 1rem;
+      color: #222;
+    }
+
+    .restaurant-address,
+    .restaurant-nickname {
+      font-size: 0.85rem;
+      color: #666;
     }
 
     footer {
-      margin-top: 5rem;
+      margin-top: 3rem;
       text-align: center;
       font-size: 0.8rem;
       color: #999;
@@ -109,90 +168,188 @@
   </div>
 </header>
 
-<h1>참여자별 맛집 지도</h1>
-<div id="map-container"></div>
+<h1>🌐 모임 참여자 맛집 지도</h1>
+<h4>서로의 맛집을 공유하고 추천해보세요!</h4>
+<div class="nickname-list" id="nickname-list"></div>
+
+<div class="main-content">
+  <div id="map" class="map"></div>
+  <div id="restaurant-list" class="restaurant-list"></div>
+</div>
 
 <footer>
   © 2025 맛남. 모든 권리 보유.
 </footer>
+
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f"></script>
 <script th:inline="javascript">
   const teamId = [[${teamId}]];
-
   fetch('/api/team/map/' + teamId)
           .then(res => res.json())
           .then(data => {
-            const mapContainer = document.getElementById('map-container');
-
-            // 지도 HTML 추가
-            const mapDiv = document.createElement('div');
-            mapDiv.className = 'map';
-            mapDiv.id = 'teamMap';
-            mapContainer.appendChild(mapDiv);
-
-            // 지도 생성
-            const map = new kakao.maps.Map(mapDiv, {
+            const nicknameList = document.getElementById('nickname-list');
+            const mapContainer = document.getElementById('map');
+            const restaurantList = document.getElementById('restaurant-list');
+            const map = new kakao.maps.Map(mapContainer, {
               center: new kakao.maps.LatLng(37.5665, 126.9780),
               level: 5
             });
 
             const bounds = new kakao.maps.LatLngBounds();
-            const markerMap = new Map();
+            const markerGroupMap = new Map();
+            const locationMarkerMap = new Map();
+            const nicknameColorMap = new Map();
+            const allMarkers = [];
+            let currentInfowindow = null;
 
-            data.forEach(participant => {
+            const markerColors = ['blue', 'green', 'lavender', 'orange', 'pink', 'purple', 'red', 'slate', 'teal', 'yellow'];
+            const colorHexMap = {
+              red: "#FFCCBC", blue: "#BBDEFB", green: "#C8E6C9", orange: "#FFE0B2",
+              purple: "#D1C4E9", yellow: "#FFF9C4", teal: "#B2EBF2", slate: "#CFD8DC",
+              pink: "#F8BBD0", lavender: "#EDE7F6"
+            };
+
+            const locationInfoMap = new Map();
+
+            data.forEach((participant, index) => {
+              const color = markerColors[index % markerColors.length];
+              nicknameColorMap.set(participant.nickname, color);
               participant.restaurants.forEach(store => {
                 const key = `${store.latitude},${store.longitude}`;
-                if (!markerMap.has(key)) {
-                  markerMap.set(key, []);
-                }
-                markerMap.get(key).push({
-                  nickname: participant.nickname,
-                  name: store.name,
-                  roadAddress: store.roadAddress,
-                  memo: store.memo
-                });
+                if (!locationInfoMap.has(key)) locationInfoMap.set(key, []);
+                locationInfoMap.get(key).push({ ...store, nickname: participant.nickname });
               });
             });
 
-            markerMap.forEach((infos, coord) => {
+            function styleButton(button, backgroundColor, textColor = "#000") {
+              button.style.backgroundColor = backgroundColor;
+              button.style.color = textColor;
+              button.style.border = "1px solid rgba(0, 0, 0, 0.1)";
+              button.style.borderRadius = "20px";
+              button.style.padding = "5px 10px";
+              button.style.margin = "4px";
+              button.style.fontSize = "0.85rem";
+              button.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.1)";
+              button.style.cursor = "pointer";
+              button.style.transition = "all 0.2s";
+              button.addEventListener('mouseenter', () => button.style.filter = "brightness(95%)");
+              button.addEventListener('mouseleave', () => button.style.filter = "brightness(100%)");
+            }
+
+            function renderRestaurantList(items) {
+              restaurantList.innerHTML = '';
+              items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'restaurant-item';
+                div.innerHTML = `
+              <div class="restaurant-name">${item.name}</div>
+              <div class="restaurant-address">${item.roadAddress}</div>
+              <div class="restaurant-nickname">등록자: ${item.nickname}</div>
+            `;
+                div.addEventListener('click', () => {
+                  const key = `${item.latitude},${item.longitude}`;
+                  const marker = locationMarkerMap.get(key);
+                  if (currentInfowindow) currentInfowindow.close();
+                  map.setCenter(marker.getPosition());
+                  map.setLevel(3);
+                  currentInfowindow = new kakao.maps.InfoWindow({
+                    content: `
+                  <div style="padding:7px; font-size:0.9rem; max-width:250px;">
+                    <strong style="font-size:1rem;">${item.name}</strong><br/>
+                    <ul style="padding-left: 1rem; margin-top: 5px; font-size: 0.85rem;">
+                      ${locationInfoMap.get(key).map(i => `<li>${i.nickname}</li>`).join('')}
+                    </ul>
+                  </div>
+                `
+                  });
+                  currentInfowindow.open(map, marker);
+                });
+                restaurantList.appendChild(div);
+              });
+            }
+
+            const allTag = document.createElement('span');
+            allTag.textContent = '전체보기';
+            styleButton(allTag, "#ffffff", "#000000");
+            nicknameList.appendChild(allTag);
+
+            allTag.addEventListener('click', () => {
+              if (currentInfowindow) currentInfowindow.close();
+              allMarkers.forEach(marker => marker.setMap(map));
+              renderRestaurantList(data.flatMap(d => d.restaurants.map(r => ({ ...r, nickname: d.nickname }))));
+              const allBounds = new kakao.maps.LatLngBounds();
+              allMarkers.forEach(marker => allBounds.extend(marker.getPosition()));
+              map.setBounds(allBounds);
+            });
+
+            data.forEach(participant => {
+              const tag = document.createElement('span');
+              tag.textContent = participant.nickname;
+              const color = nicknameColorMap.get(participant.nickname);
+              styleButton(tag, colorHexMap[color] || '#eee');
+              nicknameList.appendChild(tag);
+
+              tag.addEventListener('click', () => {
+                if (currentInfowindow) currentInfowindow.close();
+                allMarkers.forEach(marker => marker.setMap(null));
+                const markers = markerGroupMap.get(participant.nickname) || [];
+                const bounds = new kakao.maps.LatLngBounds();
+                markers.forEach(marker => {
+                  marker.setMap(map);
+                  bounds.extend(marker.getPosition());
+                });
+                if (!bounds.isEmpty()) map.setBounds(bounds);
+                renderRestaurantList(participant.restaurants.map(r => ({ ...r, nickname: participant.nickname })));
+              });
+            });
+
+            locationInfoMap.forEach((infoList, coord) => {
               const [lat, lng] = coord.split(',').map(Number);
               const position = new kakao.maps.LatLng(lat, lng);
+              const nickname = infoList[0].nickname;
+              const color = nicknameColorMap.get(nickname);
+              const markerImage = new kakao.maps.MarkerImage(
+                      `/img/map-marker-${color}.png`,
+                      new kakao.maps.Size(42, 42),
+                      { offset: new kakao.maps.Point(21, 42) }
+              );
 
               const marker = new kakao.maps.Marker({
-                position: position,
-                map: map
+                position,
+                map,
+                image: markerImage
               });
 
-              const content = `
-          <div style="padding:7px; font-size:0.9rem; max-width:250px;">
-            <strong style="font-size:1rem;">[공유된 위치의 맛집]</strong><br/>
-            <ul style="padding-left: 1rem; margin-top: 5px; font-size: 0.85rem;">
-              ${infos.map(info => `
-                <li>
-                  <strong>${info.nickname}</strong>: ${info.name}
-                </li>
-              `).join('')}
-            </ul>
-          </div>
-        `;
+              allMarkers.push(marker);
+              locationMarkerMap.set(coord, marker);
+              if (!markerGroupMap.has(nickname)) markerGroupMap.set(nickname, []);
+              markerGroupMap.get(nickname).push(marker);
+              bounds.extend(position);
 
               const infowindow = new kakao.maps.InfoWindow({
-                content: content
+                content: `
+              <div style="padding:7px; font-size:0.9rem; max-width:250px;">
+                <strong style="font-size:1rem;">${infoList[0].name}</strong><br/>
+                <ul style="padding-left: 1rem; margin-top: 5px; font-size: 0.85rem;">
+                  ${infoList.map(i => `<li>${i.nickname}</li>`).join('')}
+                </ul>
+              </div>
+            `
               });
 
               kakao.maps.event.addListener(marker, 'click', () => {
+                if (currentInfowindow) currentInfowindow.close();
                 infowindow.open(map, marker);
+                map.setCenter(position);
+                map.setLevel(3);
+                currentInfowindow = infowindow;
               });
-
-              bounds.extend(position);
             });
 
-            map.setBounds(bounds);
+            if (!bounds.isEmpty()) map.setBounds(bounds);
+            allTag.click();
           })
-          .catch(err => {
-            console.error("지도 데이터 로드 실패:", err);
-          });
+          .catch(err => console.error("지도 데이터 로드 실패:", err));
 </script>
-
 </body>
 </html>
