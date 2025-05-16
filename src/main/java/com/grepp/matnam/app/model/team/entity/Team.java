@@ -43,7 +43,7 @@ public class Team extends BaseEntity {
 
     private LocalDateTime teamDate;
 
-    private LocalDateTime meetDate;
+//    private LocalDateTime meetDate;
 
     private Integer maxPeople;
 
@@ -63,5 +63,6 @@ public class Team extends BaseEntity {
     public LocalDateTime createdAt() {
         return this.createdAt;
     }
+
 
 }

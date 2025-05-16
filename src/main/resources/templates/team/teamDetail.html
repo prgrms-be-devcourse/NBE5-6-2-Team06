@@ -156,8 +156,8 @@
         <i class="bi bi-flag"></i> 신고하기
       </button>
       <p>
-        📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
-        🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
+        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        🕖 <span th:text="${#temporals.format(team.teamDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>

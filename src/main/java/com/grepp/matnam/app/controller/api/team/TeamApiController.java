@@ -148,7 +148,7 @@ public class TeamApiController {
         TeamDto teamDto = new TeamDto();
         teamDto.setTeamTitle(team.getTeamTitle());
         teamDto.setTeamDetails(team.getTeamDetails());
-        teamDto.setMeetDate(team.getMeetDate());
+        teamDto.setTeamDate(team.getTeamDate());
         teamDto.setRestaurantName(team.getRestaurantName());
         teamDto.setMaxPeople(team.getMaxPeople());
         teamDto.setNowPeople(team.getNowPeople());

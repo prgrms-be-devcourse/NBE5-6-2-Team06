@@ -515,7 +515,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge active">주최중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
@@ -546,7 +546,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -567,7 +567,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge active">주최중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
@@ -607,7 +607,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -662,7 +662,7 @@
           <span th:text="${team.teamTitle}">모임 제목</span>
           <span class="badge">완료됨</span>
         </h4>
-        <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+        <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
         <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
         <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
         <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>

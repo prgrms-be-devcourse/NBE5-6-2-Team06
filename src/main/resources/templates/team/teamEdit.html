@@ -125,16 +125,17 @@
 
     <div class="section">
       <label>모임 제목</label>
-      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.title}" required>
+      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.teamTitle}" required>
 
       <label>모임 설명</label>
-      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.description}" required></textarea>
+      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.teamDetails}" required></textarea>
 
       <label>날짜</label>
-      <input type="date" name="date" th:value="${#dates.format(team.date, 'yyyy-MM-dd')}" required>
+      <input type="date" name="date" th:value="${#temporals.format(team.teamDate, 'yyyy-MM-dd')}" required>
+
 
       <label>시간</label>
-      <input type="time" name="time" th:value="${#dates.format(team.time, 'HH:mm')}" required>
+      <input type="time" name="time" th:value="${#temporals.format(team.teamDate, 'HH:mm')}" required>
 
       <label>음식 카테고리</label>
       <select name="category" required>

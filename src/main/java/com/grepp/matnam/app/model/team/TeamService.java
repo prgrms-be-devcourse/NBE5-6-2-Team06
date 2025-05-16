@@ -117,6 +117,19 @@ public class TeamService {
     public void updateTeam(Long teamId, Team updatedTeam) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("Team not found"));
+
+//        // 날짜와 시간 처리 (teamDate만 사용)
+//        if (updatedTeam.getTeamDate() != null && updatedTeam.getTime() != null) {
+//            String dateTimeString = updatedTeam.getTeamDate() + "T" + updatedTeam.getTime() + ":00";
+//            try {
+//                team.setTeamDate(LocalDateTime.parse(dateTimeString));
+//            } catch (Exception e) {
+//                team.setTeamDate(LocalDateTime.now());
+//            }
+//        } else {
+//            team.setTeamDate(LocalDateTime.now());
+//        }
+
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
         team.setMeetDate(updatedTeam.getMeetDate());
@@ -126,8 +139,11 @@ public class TeamService {
         team.setImageUrl(updatedTeam.getImageUrl());
         team.setNowPeople(updatedTeam.getNowPeople());
         team.setStatus(updatedTeam.getStatus());
+
         teamRepository.save(team);
     }
+
+
 
 
     // 참여자 상태 변경
