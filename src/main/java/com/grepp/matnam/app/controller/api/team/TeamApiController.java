@@ -48,42 +48,6 @@ public class TeamApiController {
         }
     }
 
-//    // 모임 수정
-//    @PutMapping("/update/{teamId}")
-//    public ResponseEntity<String> updateTeam(@PathVariable Long teamId, @RequestBody TeamDto teamDto) {
-//        try {
-//            teamService.updateTeam(teamId, teamDto);
-//            return ResponseEntity.ok("모임 수정 성공");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("모임 수정 실패");
-//        }
-//    }
-//    @PatchMapping("/{teamId}")
-//    @Operation(summary = "모임 수정", description = "모임의 정보를 수정합니다.")
-//    public ResponseEntity<ApiResponse> TeamUpdateRequest(@PathVariable Long teamId,
-//        @Validated @RequestBody TeamRequest request) {
-//        try {
-//            // 모임 수정 서비스 호출
-//            Team updatedTeam = teamService.updateTeam(teamId, request);
-//
-//            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "모임 수정 성공", updatedTeam));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "모임 수정 실패", e.getMessage()));
-//        }
-//    }
-
-//    // 모임 삭제
-//    @DeleteMapping("/delete/{teamId}")
-//    public ResponseEntity<String> deleteTeam(@PathVariable Long teamId) {
-//        try {
-//            teamService.deleteTeam(teamId);
-//            return ResponseEntity.ok("모임 삭제 성공");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("모임 삭제 실패");
-//        }
-//    }
-
     // 모임 상태 변경
     @PatchMapping("/{teamId}/status")
     public ResponseEntity<?> changeTeamStatus(@PathVariable Long teamId,
@@ -143,6 +107,28 @@ public class TeamApiController {
                 .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "서버 오류 발생", e.getMessage()));
         }
     }
+
+    // 거절 처리
+    @PostMapping("/{teamId}/reject/{participantId}")
+    @Operation(summary = "참여자 거절", description = "모임에 참여한 참가자를 거절합니다.")
+    public ResponseEntity<ApiResponse> rejectParticipant(@PathVariable Long teamId, @PathVariable Long participantId) {
+        try {
+            teamService.rejectParticipant(participantId);
+            Team team = teamService.getTeamById(teamId);
+            TeamDto teamDto = convertToTeamDto(team);
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "참여자가 거절되었습니다.", teamDto));
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "참여자 거절 실패", e.getMessage()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "서버 오류 발생", e.getMessage()));
+        }
+    }
+
 
     private TeamDto convertToTeamDto(Team team) {
         TeamDto teamDto = new TeamDto();

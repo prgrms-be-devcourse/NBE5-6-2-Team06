@@ -91,7 +91,6 @@ public class TeamController {
         Team team = updatedTeamRequest.toTeam();
         team.setTeamId(teamId);
 
-        // 업데이트 처리
         teamService.updateTeam(teamId, team);
         return "redirect:/team/detail/" + teamId;
     }

@@ -114,10 +114,24 @@ public class TeamService {
         teamRepository.save(team);
     }
 
+    // 모임 참여 거절
+    public void rejectParticipant(Long participantId) {
+        Participant participant = participantRepository.findById(participantId)
+            .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
+
+        if (participant.getParticipantStatus() == ParticipantStatus.PENDING) {
+            participant.setParticipantStatus(ParticipantStatus.REJECTED);
+            participantRepository.save(participant);
+        } else {
+            throw new IllegalStateException("대기 중인 참여자만 거절 가능합니다.");
+        }
+    }
+
+
     // 모임 업데이트
     public void updateTeam(Long teamId, Team updatedTeam) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new EntityNotFoundException("Team not found"));
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
@@ -138,7 +152,7 @@ public class TeamService {
     // 참여자 상태 변경
     public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
         Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
+            .orElseThrow(() -> new RuntimeException("참가자를 찾을 수 없습니다.")); //예외처리 수정하기
         participant.setParticipantStatus(status);
         participantRepository.save(participant);
     }
@@ -146,7 +160,7 @@ public class TeamService {
     // 모임 상태 변경
     public void changeTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
         Status prevStatus = team.getStatus();
         team.setStatus(status);
         teamRepository.save(team);
@@ -155,16 +169,6 @@ public class TeamService {
         if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
             increaseTemperatureForCompletedTeam(team);
         }
-    }
-
-    // 팀 삭제
-    @Transactional
-    public void deleteTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
-
-        participantRepository.deleteByTeam_TeamId(teamId);
-        teamRepository.delete(team);
     }
 
     //조회 부분
