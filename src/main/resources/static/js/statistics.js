@@ -250,38 +250,50 @@ document.addEventListener('DOMContentLoaded', function () {
   const meetingSuccessRateCtx = document.getElementById(
       'meetingSuccessRateChart');
   if (meetingSuccessRateCtx) {
-    new Chart(meetingSuccessRateCtx, {
-      type: 'line',
-      data: {
-        labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
-        datasets: [{
-          label: '성공률 (%)',
-          data: [75, 78, 80, 82, 85, 88],
-          borderColor: 'rgba(54, 162, 235, 1)',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: '모임 성공률 추이'
-          }
+    fetch('/api/admin/team/success-rate/monthly')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data
+      const labels = result.map(item => item.month);
+      const successRates = result.map(item => parseFloat(item.successRate));
+      new Chart(meetingSuccessRateCtx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '성공률 (%)',
+            data: successRates,
+            borderColor: 'rgba(54, 162, 235, 1)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: '모임 성공률 추이'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100
+            }
           }
         }
-      }
-    });
+      });
+    })
   }
 
   // 카테고리별 성공률 차트
