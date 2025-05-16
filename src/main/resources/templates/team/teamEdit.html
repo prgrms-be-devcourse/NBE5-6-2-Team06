@@ -121,8 +121,7 @@
 
 <div class="container">
   <h1>모임 수정</h1>
-  <form th:action="@{|/team/edit/${teamId}}|"] method="post" enctype="multipart/form-data">
-    <input type="hidden" name="id" th:value="${team.id}">
+  <form th:action="@{/edit/{teamId}(teamId=${team.teamId})}" method="post">
 
     <div class="section">
       <label>모임 제목</label>

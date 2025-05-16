@@ -182,9 +182,7 @@
 
     <div class="btn-row">
       <button type="button" class="btn cancel" onclick="history.back()">취소</button>
-      <button th:if="${team != null}" th:text="'수정'" type="submit" class="btn btn-primary">수정</button>
-<!--      <button type="submit" class="btn submit">모임 생성하기</button>-->
-      <button th:if="${team == null}" th:text="'모임 생성'" type="submit" class="btn btn-success">모임 생성</button>
+      <button type="submit" class="btn submit">모임 생성하기</button>
     </div>
   </form>
 </div>

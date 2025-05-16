@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/team")
@@ -50,15 +51,6 @@ public class TeamController {
     public String create() {
         return "team/teamCreate";
     }
-
-    // 모임 수정
-//    @GetMapping("/edit/{teamId}")
-//    public String getTeamEditPage(@PathVariable Long teamId, Model model) {
-//        TeamDto teamDto = teamService.getTeamDetails(teamId);
-//        model.addAttribute("teamDto", teamDto);
-//        return "team/teamCreate";
-//    }
-
 
     // 모임 생성
     @PostMapping("/create")
@@ -85,6 +77,21 @@ public class TeamController {
         teamService.addParticipant(team.getTeamId(), user);
 
         return "redirect:/team/detail/" + team.getTeamId();
+    }
+
+    // 모임 수정
+    @GetMapping("/edit/{teamId}")
+    public String getTeamEditPage(@PathVariable Long teamId, Model model) {
+        Team team = teamService.getTeamById(teamId);
+        model.addAttribute("team", team);
+        return "team/teamEdit";
+    }
+
+    @PostMapping("/edit/{teamId}")
+    public String updateTeam(@PathVariable Long teamId, @ModelAttribute Team team) {
+        team.setTeamId(teamId);
+        teamService.updateTeam(teamId, team);
+        return "redirect:/team/{teamId}";
     }
 
     // 모임 검색 페이지
