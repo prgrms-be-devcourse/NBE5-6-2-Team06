@@ -17,10 +17,13 @@ import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -325,6 +328,29 @@ public class TeamService {
         distribution.put("6-7명", teamRepository.countByNowPeopleBetween(6, 7));
         distribution.put("8-10명", teamRepository.countByNowPeopleBetween(8, 10));
         return distribution;
+    }
+
+    public Map<String, Long> getDailyNewTeamCountsLast7Days() {
+        LocalDate today = LocalDate.now();
+        Map<LocalDate, Long> dailyCounts = IntStream.rangeClosed(0, 6)
+            .mapToObj(today::minusDays)
+            .collect(Collectors.toMap(
+                date -> date,
+                date -> teamRepository.countByCreatedAtBetween(
+                    LocalDateTime.of(date, LocalTime.MIN),
+                    LocalDateTime.of(date, LocalTime.MAX)
+                ),
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
+
+        return dailyCounts.entrySet().stream()
+            .collect(Collectors.toMap(
+                entry -> entry.getKey().toString().substring(5),
+                Map.Entry::getValue,
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
     }
 
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기

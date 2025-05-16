@@ -358,6 +358,56 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // 최근 7일 일일 모임 생성 수 차트
+  const dailyNewTeamsCtx = document.getElementById('dailyNewTeamsChart');
+  if (dailyNewTeamsCtx) {
+    fetch('/api/admin/team/statistics/daily-new-teams')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data
+      const labels = Object.keys(result);
+      const values = Object.values(result);
+
+      new Chart(dailyNewTeamsCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '생성된 모임 수',
+            data: values,
+            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: '최근 7일 일일 모임 생성 수'
+            }
+          }
+        }
+      });
+    });
+  }
+
   // 카테고리별 성공률 차트
   const categorySuccessRateCtx = document.getElementById(
       'categorySuccessRateChart');

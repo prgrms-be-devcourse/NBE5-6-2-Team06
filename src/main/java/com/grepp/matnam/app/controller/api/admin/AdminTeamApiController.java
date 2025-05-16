@@ -66,4 +66,10 @@ public class AdminTeamApiController {
         return ResponseEntity.ok(ApiResponse.success(participantDistribution));
     }
 
+    @GetMapping("/statistics/daily-new-teams")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getDailyNewTeamCounts() {
+        Map<String, Long> dailyNewTeamCounts = teamService.getDailyNewTeamCountsLast7Days();
+        return ResponseEntity.ok(ApiResponse.success(dailyNewTeamCounts));
+    }
+
 }
