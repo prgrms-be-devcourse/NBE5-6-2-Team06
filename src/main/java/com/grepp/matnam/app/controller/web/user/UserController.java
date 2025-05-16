@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -90,12 +91,9 @@ public class UserController {
             User user = userService.getUserById(userId);
             log.info("사용자 정보 조회 성공: {}", user.getUserId());
 
-            // 통계 데이터 (임시)
-            model.addAttribute("stats", new HashMap<String, Integer>() {{
-                put("hostingCount", 3);
-                put("participatingCount", 5);
-                put("restaurantCount", 2);
-            }});
+            // 통계 데이터
+            Map<String, Integer> stats = teamService.getUserStats(userId);
+            model.addAttribute("stats", stats);
 
             // 리뷰 정보
             List<Team> teamsWithoutReview = new ArrayList<>();

@@ -487,9 +487,9 @@
 
     <div class="stats-section">
       <h4>활동 통계</h4>
-      <p>주최한 모임: <span th:text="${stats.hostingCount}">5</span>회</p>
+      <p>주최한 모임: <span th:text="${stats.leaderCount}">5</span>회</p>
       <p>참여한 모임: <span th:text="${stats.participatingCount}">12</span>회</p>
-      <p>함께한 맛집: <span th:text="${stats.restaurantCount}">8</span>곳</p>
+      <p>왼료한 모임: <span th:text="${stats.completedCount}">8</span>곳</p>
     </div>
   </div>
 
@@ -647,7 +647,7 @@
           </div>
         </div>
       </div>
-    </div>
+
 
     <!-- 모임 리뷰 -->
     <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview)}">
