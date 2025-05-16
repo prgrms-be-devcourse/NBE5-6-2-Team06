@@ -121,39 +121,51 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 일일 활성 사용자 차트
+  // 일일 이용 회원 수 차트
   const dailyActiveUsersCtx = document.getElementById('dailyActiveUsersChart');
   if (dailyActiveUsersCtx) {
-    new Chart(dailyActiveUsersCtx, {
-      type: 'line',
-      data: {
-        labels: ['월', '화', '수', '목', '금', '토', '일'],
-        datasets: [{
-          label: '활성 사용자',
-          data: [85, 92, 88, 95, 120, 135, 110],
-          borderColor: 'rgba(75, 192, 192, 1)',
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: '일일 활성 사용자'
-          }
+    fetch('/api/admin/statistics/week-user-activity')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data;
+      const labels = result.map(item => item.activityDay);
+      const chartData = result.map(item => item.uniqueUserCount);
+      new Chart(dailyActiveUsersCtx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '이용 회원 수',
+            data: chartData,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.3,
+            fill: true
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+              display: true,
+              text: '이용 회원 수'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
+      });
     });
   }
 

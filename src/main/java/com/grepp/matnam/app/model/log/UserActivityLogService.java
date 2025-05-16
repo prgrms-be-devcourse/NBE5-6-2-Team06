@@ -48,4 +48,9 @@ public class UserActivityLogService {
         LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6).withDayOfMonth(1);
         return userActivityLogRepository.findMonthlyUserActivity(sixMonthsAgo);
     }
+
+    public List<Map<String, Object>> getWeekUserActivity() {
+        LocalDate sevenDaysAgo = LocalDate.now().minusDays(7);
+        return userActivityLogRepository.findWeekUserActivity(sevenDaysAgo);
+    }
 }

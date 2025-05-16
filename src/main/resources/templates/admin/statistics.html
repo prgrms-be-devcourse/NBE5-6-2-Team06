@@ -22,18 +22,18 @@
 
     <div class="tab-content" id="user-stats" th:classappend="${activeTab == 'user-stats'} ? 'active'"
          th:if="${activeTab == 'user-stats'}">
-      <div class="filter-container">
-        <div class="date-filter">
-          <label>기간:</label>
-          <select id="period-filter">
-            <option value="7days">최근 7일</option>
-            <option value="30days">최근 30일</option>
-            <option value="90days">최근 90일</option>
-            <option value="1year">최근 1년</option>
-            <option value="custom">직접 설정</option>
-          </select>
-        </div>
-      </div>
+<!--      <div class="filter-container">-->
+<!--        <div class="date-filter">-->
+<!--          <label>기간:</label>-->
+<!--          <select id="period-filter">-->
+<!--            <option value="7days">최근 7일</option>-->
+<!--            <option value="30days">최근 30일</option>-->
+<!--            <option value="90days">최근 90일</option>-->
+<!--            <option value="1year">최근 1년</option>-->
+<!--            <option value="custom">직접 설정</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <div class="stats-grid">
         <div class="chart-container">
@@ -45,7 +45,7 @@
           <canvas id="genderDistributionChart"></canvas>
         </div>
         <div class="chart-container">
-          <h3>일일 활성 사용자</h3>
+          <h3>일일 이용 회원 수</h3>
           <canvas id="dailyActiveUsersChart"></canvas>
         </div>
         <div class="chart-container">
