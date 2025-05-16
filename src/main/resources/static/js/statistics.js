@@ -296,6 +296,68 @@ document.addEventListener('DOMContentLoaded', function () {
     })
   }
 
+  // 모임 참가 인원 분포 차트
+  const participantDistributionCtx = document.getElementById('participantDistributionChart');
+  if (participantDistributionCtx) {
+    fetch('/api/admin/team/statistics/participant-distribution')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data
+      const labels = ["2-3명", "4-5명", "6-7명", "8-10명"];
+      const values = labels.map(label => result[label]);
+
+      console.log(labels)
+      console.log(values)
+      new Chart(participantDistributionCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '모임 수',
+            data: values,
+            backgroundColor: [
+              'rgba(54, 162, 235, 0.7)',
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(255, 206, 86, 0.7)',
+              'rgba(75, 192, 192, 0.7)'
+            ],
+            borderColor: [
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 99, 132, 1)',
+              'rgba(255, 206, 86, 1)',
+              'rgba(75, 192, 192, 1)'
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: '모임 참가 인원 분포'
+            }
+          }
+        }
+      });
+    });
+  }
+
   // 카테고리별 성공률 차트
   const categorySuccessRateCtx = document.getElementById(
       'categorySuccessRateChart');

@@ -99,17 +99,17 @@
 
     <div class="tab-content" id="team-stats" th:classappend="${activeTab == 'team-stats'} ? 'active'"
          th:if="${activeTab == 'team-stats'}">
-      <div class="filter-container">
-        <div class="date-filter">
-          <label>기간:</label>
-          <select id="success-period-filter">
-            <option value="30days">최근 30일</option>
-            <option value="90days">최근 90일</option>
-            <option value="1year">최근 1년</option>
-            <option value="custom">직접 설정</option>
-          </select>
-        </div>
-      </div>
+<!--      <div class="filter-container">-->
+<!--        <div class="date-filter">-->
+<!--          <label>기간:</label>-->
+<!--          <select id="success-period-filter">-->
+<!--            <option value="30days">최근 30일</option>-->
+<!--            <option value="90days">최근 90일</option>-->
+<!--            <option value="1year">최근 1년</option>-->
+<!--            <option value="custom">직접 설정</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <div class="stats-grid">
         <div class="chart-container">
@@ -117,11 +117,11 @@
           <canvas id="meetingSuccessRateChart"></canvas>
         </div>
         <div class="chart-container">
-          <h3>카테고리별 성공률</h3>
-          <canvas id="categorySuccessRateChart"></canvas>
+          <h3>모임 참가 인원 분포</h3>
+          <canvas id="participantDistributionChart"></canvas>
         </div>
         <div class="chart-container">
-          <h3>인원수별 성공률</h3>
+          <h3>일일 모임 생성 수</h3>
           <canvas id="memberCountSuccessRateChart"></canvas>
         </div>
       </div>

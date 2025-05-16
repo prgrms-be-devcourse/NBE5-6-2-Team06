@@ -318,6 +318,15 @@ public class TeamService {
         }).collect(Collectors.toList());
     }
 
+    public Map<String, Long> getTeamParticipantDistribution() {
+        Map<String, Long> distribution = new HashMap<>();
+        distribution.put("2-3명", teamRepository.countByNowPeopleBetween(2, 3));
+        distribution.put("4-5명", teamRepository.countByNowPeopleBetween(4, 5));
+        distribution.put("6-7명", teamRepository.countByNowPeopleBetween(6, 7));
+        distribution.put("8-10명", teamRepository.countByNowPeopleBetween(8, 10));
+        return distribution;
+    }
+
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
     public List<Map<String, Object>> getParticipantMymapData(Long teamId) {
         List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);

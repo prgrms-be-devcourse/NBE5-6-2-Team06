@@ -60,4 +60,10 @@ public class AdminTeamApiController {
         return ResponseEntity.ok(ApiResponse.success(teamService.getMonthlyMeetingSuccessRate()));
     }
 
+    @GetMapping("/statistics/participant-distribution")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getTeamParticipantDistribution() {
+        Map<String, Long> participantDistribution = teamService.getTeamParticipantDistribution();
+        return ResponseEntity.ok(ApiResponse.success(participantDistribution));
+    }
+
 }
