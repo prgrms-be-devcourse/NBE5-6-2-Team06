@@ -60,11 +60,18 @@
         .place-actions button:hover {
             background-color: #ddd;
         }
+
+        .place-memo {
+            margin-top: 4px;
+            font-size: 0.85rem;
+            color: #444;
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
 <h4>저장된 맛집 리스트를 조회하고 삭제 또는 공개여부를 선택해주세요</h4>
-<h5>💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
+<h5>등록 시 공개 상태로 저장됩니다. 💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
 <div id="map"></div>
 <div id="placeList"></div>
 
@@ -112,9 +119,9 @@
             });
 
             const overlayContent = `
-                <div style="padding:5px 10px; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                    ${place.placeName}
-                </div>`;
+                    <div style="padding:5px 10px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                        ${place.placeName}
+                    </div>`;
             const overlay = new kakao.maps.CustomOverlay({
                 content: overlayContent,
                 position: pos,
@@ -125,7 +132,7 @@
                 closeAllOverlays();
                 overlay.setMap(map);
                 map.setCenter(pos);
-                map.setLevel(3); // 확대
+                map.setLevel(3);
                 overlays.push(overlay);
             });
 
@@ -153,15 +160,13 @@
 
             const nameEl = document.createElement('strong');
             nameEl.innerText = place.placeName;
-            nameEl.style.cursor = 'pointer';
-            nameEl.style.color = 'inherit';
             nameEl.onclick = () => {
                 const target = markers.find(m => m.id === place.mapId);
                 if (target) {
                     closeAllOverlays();
                     target.overlay.setMap(map);
                     map.setCenter(target.pos);
-                    map.setLevel(3); // 확대
+                    map.setLevel(3);
                     overlays.push(target.overlay);
                 }
             };
@@ -173,13 +178,20 @@
             infoDiv.appendChild(document.createElement('br'));
             infoDiv.appendChild(addressEl);
 
+            if (place.memo && place.memo.trim() !== '') {
+                const memoEl = document.createElement('div');
+                memoEl.className = 'place-memo';
+                memoEl.innerText = place.memo;
+                infoDiv.appendChild(memoEl);
+            }
+
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'place-actions';
             actionsDiv.innerHTML = `
-                <button onclick="updatePlace(${place.mapId}, true)">공개</button>
-                <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
-                <button onclick="deletePlace(${place.mapId})">삭제</button>
-            `;
+                    <button onclick="updatePlace(${place.mapId}, true)">공개</button>
+                    <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
+                    <button onclick="deletePlace(${place.mapId})">삭제</button>
+                `;
 
             item.appendChild(infoDiv);
             item.appendChild(actionsDiv);
