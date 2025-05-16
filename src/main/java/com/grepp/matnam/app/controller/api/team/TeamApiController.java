@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -55,6 +56,21 @@ public class TeamApiController {
         teamService.changeTeamStatus(teamId, status);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{teamId}/cancel")
+    @Operation(summary = "모임 취소", description = "모임을 취소합니다.")
+    public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId, @AuthenticationPrincipal User currentUser) {
+        try {
+            // 주최자만 취소 가능
+            teamService.cancelTeam(teamId, currentUser);
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "모임이 취소되었습니다.", null));
+        } catch (Exception e) {
+            log.error("모임 취소 처리 실패: {}", e.getMessage());
+            return ResponseEntity.badRequest()
+                .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "모임 취소 실패", e.getMessage()));
+        }
+    }
+
 
     // 참여자 상태 변경
 //    @PatchMapping("/{participantId}/participantStatus")

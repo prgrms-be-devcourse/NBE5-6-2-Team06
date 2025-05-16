@@ -156,6 +156,7 @@ public class TeamService {
 //    }
 
     // 모임 상태 변경
+    @Transactional
     public void changeTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
@@ -163,11 +164,41 @@ public class TeamService {
         team.setStatus(status);
         teamRepository.save(team);
 
+        // 모집완료 상태 처리
+        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
+            team.setStatus(Status.FULL);
+            teamRepository.save(team);
+        }
+
+        if (team.getTeamDate().isBefore(LocalDateTime.now()) && team.getStatus() != Status.COMPLETED) {
+            team.setStatus(Status.COMPLETED);
+            teamRepository.save(team);
+        }
+
         // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
         if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
             increaseTemperatureForCompletedTeam(team);
         }
     }
+
+    // 모임 취소
+    @Transactional
+    public void cancelTeam(Long teamId, User currentUser) {
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+        if (!team.getUser().getUserId().equals(currentUser.getNickname())) {
+            throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
+        }
+
+        if (team.getStatus() != Status.COMPLETED) {
+            team.setStatus(Status.CANCELED);
+            teamRepository.save(team);
+        } else {
+            throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
+        }
+    }
+
 
     //조회 부분
     // 주최자로서의 팀 조회

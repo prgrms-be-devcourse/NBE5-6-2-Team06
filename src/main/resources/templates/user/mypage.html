@@ -407,6 +407,36 @@
       text-decoration: none;
     }
 
+    .cancel-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .cancel-btn i {
+      font-size: 18px;
+    }
+
+    .cancel-btn:hover {
+      background-color: #ff3333;
+      transform: scale(1.05);
+    }
+
+    /* 버튼 비활성화 상태 */
+    .cancel-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     footer {
       margin-top: 5rem;
       text-align: center;
@@ -528,10 +558,10 @@
             모임 수정
           </button>
 
-          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
-            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          <!-- 모임 취소 버튼-->
+          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
+            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELLED}" class="cancel-btn">모임 취소</button>
           </form>
-
 
           <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
@@ -580,11 +610,10 @@
             모임 수정
           </button>
 
-          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
-            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          <!-- 모임 취소 버튼-->
+          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
+            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELLED}" class="cancel-btn">모임 취소</button>
           </form>
-
-
 
           <div id="application-info-${teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
