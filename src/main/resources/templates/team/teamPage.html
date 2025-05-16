@@ -209,7 +209,21 @@
   </div>
 
   <div class="section">
-    <h2>참여자 정보</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2>참여자 정보</h2>
+      <button
+              class="btn"
+              th:onclick="|location.href='/team/map/${teamId}'|"
+              style="padding: 0.4rem 1rem;
+              font-size: 0.9rem;
+              border: none;
+              border-radius: 4px;
+              background-color: #000;
+              color: #fff;
+              cursor: pointer;">
+        참여자 맛집 지도 조회
+      </button>
+    </div>
     <div class="participant-list">
       <div class="participant" th:each="participant : ${participants}">
         <div class="participant-info">

@@ -4,6 +4,8 @@ import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
+import com.grepp.matnam.app.model.mymap.MymapRepository;
+import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -15,6 +17,7 @@ import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +36,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
     private final ParticipantRepository participantRepository;
-
+    private final MymapRepository mymapRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
@@ -315,6 +318,35 @@ public class TeamService {
         }).collect(Collectors.toList());
     }
 
+    // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
+    public List<Map<String, Object>> getParticipantMymapData(Long teamId) {
+        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);
+
+        return participants.stream()
+                .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED) // 승인된 참여자만
+                .map(p -> {
+                    User user = p.getUser();
+                    List<Mymap> mymaps = mymapRepository.findByUserAndActivatedTrueAndPinnedTrue(user); // 맛집 필터링
+                    List<Map<String, Object>> restaurants = mymaps.stream()
+                            .map(m -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("mapId", m.getMapId());
+                                map.put("name", m.getPlaceName());
+                                map.put("roadAddress", m.getRoadAddress());
+                                map.put("latitude", m.getLatitude());
+                                map.put("longitude", m.getLongitude());
+                                map.put("memo", m.getMemo());
+                                return map;
+                            })
+                            .toList();
+                    return Map.of(
+                            "userId", user.getUserId(),
+                            "nickname", user.getNickname(),
+                            "restaurants", restaurants
+                    );
+                })
+                .toList();
+    }
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }

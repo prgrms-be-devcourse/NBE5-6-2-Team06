@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>참여자 맛집 지도</title>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-bottom: 1px solid #eee;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .header-left .logo {
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .header-left nav a {
+      text-decoration: none;
+      color: #333;
+      margin-right: 1rem;
+      font-weight: 500;
+    }
+
+    .header-left nav a:hover {
+      color: #000;
+    }
+
+    .header-left nav a.active {
+      color: #000;
+      border-bottom: 2px solid #000;
+      padding-bottom: 3px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-right span {
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+
+    h1 {
+      padding: 2rem;
+    }
+
+    .map-section {
+      margin: 2rem;
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .map {
+      width: 100%;
+      height: 300px;
+      margin-top: 0.5rem;
+      border-radius: 8px;
+    }
+
+    footer {
+      margin-top: 5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #999;
+      padding: 1rem 0;
+      border-top: 1px solid #eee;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="header-left">
+    <div class="logo">맛남</div>
+    <nav>
+      <a th:href="@{/}">홈</a>
+      <a th:href="@{/team/search}">모임 찾기</a>
+      <a th:href="@{/map}">맛집 탐색</a>
+      <a th:href="@{/user/mypage}" class="active">마이페이지</a>
+    </nav>
+  </div>
+  <div class="header-right">
+    <span title="알림">🔔</span>
+    <span title="프로필">👤</span>
+    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
+  </div>
+</header>
+
+<h1>참여자별 맛집 지도</h1>
+<div id="map-container"></div>
+
+<footer>
+  © 2025 맛남. 모든 권리 보유.
+</footer>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f"></script>
+<script th:inline="javascript">
+  const teamId = [[${teamId}]];
+
+  fetch('/api/team/map/' + teamId)
+          .then(res => res.json())
+          .then(data => {
+            const mapContainer = document.getElementById('map-container');
+
+            // 지도 HTML 추가
+            const mapDiv = document.createElement('div');
+            mapDiv.className = 'map';
+            mapDiv.id = 'teamMap';
+            mapContainer.appendChild(mapDiv);
+
+            // 지도 생성
+            const map = new kakao.maps.Map(mapDiv, {
+              center: new kakao.maps.LatLng(37.5665, 126.9780),
+              level: 5
+            });
+
+            const bounds = new kakao.maps.LatLngBounds();
+            const markerMap = new Map();
+
+            data.forEach(participant => {
+              participant.restaurants.forEach(store => {
+                const key = `${store.latitude},${store.longitude}`;
+                if (!markerMap.has(key)) {
+                  markerMap.set(key, []);
+                }
+                markerMap.get(key).push({
+                  nickname: participant.nickname,
+                  name: store.name,
+                  roadAddress: store.roadAddress,
+                  memo: store.memo
+                });
+              });
+            });
+
+            markerMap.forEach((infos, coord) => {
+              const [lat, lng] = coord.split(',').map(Number);
+              const position = new kakao.maps.LatLng(lat, lng);
+
+              const marker = new kakao.maps.Marker({
+                position: position,
+                map: map
+              });
+
+              const content = `
+          <div style="padding:7px; font-size:0.9rem; max-width:250px;">
+            <strong style="font-size:1rem;">[공유된 위치의 맛집]</strong><br/>
+            <ul style="padding-left: 1rem; margin-top: 5px; font-size: 0.85rem;">
+              ${infos.map(info => `
+                <li>
+                  <strong>${info.nickname}</strong>: ${info.name}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+
+              const infowindow = new kakao.maps.InfoWindow({
+                content: content
+              });
+
+              kakao.maps.event.addListener(marker, 'click', () => {
+                infowindow.open(map, marker);
+              });
+
+              bounds.extend(position);
+            });
+
+            map.setBounds(bounds);
+          })
+          .catch(err => {
+            console.error("지도 데이터 로드 실패:", err);
+          });
+</script>
+
+</body>
+</html>

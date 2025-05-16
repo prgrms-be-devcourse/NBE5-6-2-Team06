@@ -15,4 +15,7 @@ public interface MymapRepository extends JpaRepository<Mymap, Long> {
 
     // activated = true
     List<Mymap> findByUserAndActivatedTrue(User user);
+
+    // 팀페이지용 공개, 활성화 핀
+    List<Mymap> findByUserAndActivatedTrueAndPinnedTrue(User user);
 }
