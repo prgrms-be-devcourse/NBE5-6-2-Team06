@@ -1,8 +1,11 @@
 package com.grepp.matnam.app.model.restaurant;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,5 +83,14 @@ public class RestaurantService {
         } else {
             return restaurantRepository.findAll(pageable);
         }
+    }
+
+    public Map<String, Long> getRestaurantCategoryDistribution() {
+        Map<String, Long> distribution = new HashMap<>();
+        for (Category category : Category.values()) {
+            long count = restaurantRepository.countByCategory(category.getKoreanName());
+            distribution.put(category.getKoreanName(), count);
+        }
+        return distribution;
     }
 }

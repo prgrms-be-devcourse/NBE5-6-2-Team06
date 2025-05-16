@@ -83,4 +83,10 @@ public class AdminRestaurantApiController {
         restaurantService.createRestaurant(request);
         return ResponseEntity.ok("식당이 추가되었습니다.");
     }
+
+    @GetMapping("/statistics/category-distribution")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getRestaurantCategoryDistribution() {
+        Map<String, Long> categoryDistribution = restaurantService.getRestaurantCategoryDistribution();
+        return ResponseEntity.ok(ApiResponse.success(categoryDistribution));
+    }
 }

@@ -154,6 +154,12 @@
     </div>
     <div class="tab-content" id="restaurant-stats" th:classappend="${activeTab == 'restaurant-stats'} ? 'active'"
          th:if="${activeTab == 'restaurant-stats'}">
+      <div class="stats-grid">
+        <div class="chart-container">
+          <h3>카테고리별 식당 분포</h3>
+          <canvas id="categoryDistributionChart"></canvas>
+        </div>
+      </div>
     </div>
   </div>
 </div>

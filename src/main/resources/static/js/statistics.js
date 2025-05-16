@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return response.json();
     })
     .then(data => {
-      const result = data.data
+      const result = data.data;
       const labels = Object.keys(result);
       const values = Object.values(result);
 
@@ -408,91 +408,70 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 카테고리별 성공률 차트
-  const categorySuccessRateCtx = document.getElementById(
-      'categorySuccessRateChart');
-  if (categorySuccessRateCtx) {
-    new Chart(categorySuccessRateCtx, {
-      type: 'bar',
-      data: {
-        labels: ['한식', '중식', '일식', '양식', '분식', '디저트'],
-        datasets: [{
-          label: '성공률 (%)',
-          data: [90, 85, 88, 82, 78, 75],
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.7)',
-            'rgba(54, 162, 235, 0.7)',
-            'rgba(255, 206, 86, 0.7)',
-            'rgba(75, 192, 192, 0.7)',
-            'rgba(153, 102, 255, 0.7)',
-            'rgba(255, 159, 64, 0.7)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: '카테고리별 성공률'
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100
-          }
-        }
+  const categoryDistributionCtx = document.getElementById('categoryDistributionChart');
+  if (categoryDistributionCtx) {
+    fetch('/api/admin/restaurant/statistics/category-distribution')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    });
-  }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data;
+      const labels = Object.keys(result);
+      const values = Object.values(result);
+      const backgroundColors = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)'
+        // 필요에 따라 더 많은 색상 추가
+      ];
+      const borderColors = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+        // 필요에 따라 더 많은 색상 추가
+      ];
 
-  // 인원수별 성공률 차트
-  const memberCountSuccessRateCtx = document.getElementById(
-      'memberCountSuccessRateChart');
-  if (memberCountSuccessRateCtx) {
-    new Chart(memberCountSuccessRateCtx, {
-      type: 'bar',
-      data: {
-        labels: ['2-4명', '5-8명', '9-12명', '13명 이상'],
-        datasets: [{
-          label: '성공률 (%)',
-          data: [92, 85, 75, 65],
-          backgroundColor: 'rgba(75, 192, 192, 0.7)',
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: '인원수별 성공률'
-          }
+      new Chart(categoryDistributionCtx, {
+        type: 'bar', // 파이 차트 대신 막대 그래프로 변경
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '식당 수',
+            data: values,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true,
-            max: 100
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false // 막대 그래프에서는 범례를 숨기는 것이 일반적
+            },
+            title: {
+              display: true,
+              text: '카테고리별 식당 분포'
+            }
           }
         }
-      }
+      });
     });
   }
 
