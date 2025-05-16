@@ -1,5 +1,7 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
+import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
@@ -10,9 +12,11 @@ import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.User;
-import java.util.List;
-
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -261,6 +265,56 @@ public class TeamService {
         log.info("team {}", team);
         team.unActivated();
     }
+
+    public NewTeamResponse getNewTeamStats() {
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+        long totalTeamCount = teamRepository.count();
+        long yesterdayTotalTeamCount = totalTeamCount - newTeams;
+        String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
+        return new NewTeamResponse(newTeams, userGrowth);
+    }
+
+    public ActiveTeamResponse getActiveTeamStats() {
+
+        List<Status> activeStatuses = List.of(Status.RECRUITING, Status.FULL);
+        long todayActiveTeams = teamRepository.countByStatusIn(activeStatuses);
+        long totalTeamCount = teamRepository.countAllByActivated(true);
+
+        return new ActiveTeamResponse(todayActiveTeams, totalTeamCount);
+    }
+
+    private String calculateGrowthRate(long today, long yesterday) {
+        if (yesterday == 0) {
+            if (today == 0) return "+0%";
+            return "+100%"; // 또는 "N/A"
+        }
+        long diff = today - yesterday;
+        double percent = ((double) diff / yesterday) * 100;
+        String sign = percent >= 0 ? "+" : "";
+        return String.format("%s%.0f%%", sign, percent);
+    }
+
+    public List<Map<String, String>> getMonthlyMeetingSuccessRate() {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<Map<String, Long>> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
+
+        return monthlyStats.stream().map(stat -> {
+            Object monthObj = stat.get("meetingMonth");
+            String month = String.valueOf(monthObj);
+
+            Long total = stat.get("totalMeetings");
+            Long completed = stat.get("completedMeetings");
+            double successRate = (total > 0) ? ((double) completed / total) * 100 : 0;
+
+            return Map.of(
+                "month", month,
+                "successRate", String.format("%.2f", successRate)
+            );
+        }).collect(Collectors.toList());
+    }
+
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }

@@ -1,8 +1,11 @@
 package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
+import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Team;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +35,19 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user WHERE t.teamId = :teamId")
     Optional<Team> findByIdWithParticipantsAndUser(@Param("teamId") Long teamId);
 
+    long countByCreatedAtBetween(LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
+
+    long countByStatusIn(List<Status> activeStatuses);
+
+    long countAllByActivated(Boolean activated);
+
+    @Query("SELECT " +
+        "FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') AS meetingMonth, " +
+        "COUNT(t) AS totalMeetings, " +
+        "SUM(CASE WHEN t.status = 'COMPLETED' THEN 1 ELSE 0 END) AS completedMeetings " +
+        "FROM Team t " +
+        "WHERE t.teamDate >= :startDate " +
+        "GROUP BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') " +
+        "ORDER BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m')")
+    List<Map<String, Long>> findMonthlyMeetingStats(@Param("startDate") LocalDateTime startDate);
 }

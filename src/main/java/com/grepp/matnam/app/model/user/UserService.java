@@ -213,7 +213,10 @@ public class UserService {
     }
 
     private String calculateGrowthRate(long today, long yesterday) {
-        if (yesterday == 0) return "+100%"; // 또는 "N/A"
+        if (yesterday == 0) {
+            if (today == 0) return "+0%";
+            return "+100%"; // 또는 "N/A"
+        }
         long diff = today - yesterday;
         double percent = ((double) diff / yesterday) * 100;
         String sign = percent >= 0 ? "+" : "";

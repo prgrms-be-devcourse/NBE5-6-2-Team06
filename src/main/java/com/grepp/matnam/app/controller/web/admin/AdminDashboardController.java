@@ -1,8 +1,11 @@
 package com.grepp.matnam.app.controller.web.admin;
 
+import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
+import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserActivityLogResponse;
 import com.grepp.matnam.app.model.log.UserActivityLogService;
+import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,17 +23,22 @@ public class AdminDashboardController {
 
     private final UserActivityLogService userActivityLogService;
     private final UserService userService;
+    private final TeamService teamService;
 
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
 
         UserActivityLogResponse todayLogStats = userActivityLogService.getTodayLogStats();
         TotalUserResponse totalUserStats = userService.getTotalUserStats();
+        NewTeamResponse newTeamStats = teamService.getNewTeamStats();
+        ActiveTeamResponse activeTeamStats = teamService.getActiveTeamStats();
 
         model.addAttribute("pageTitle", "대시보드");
         model.addAttribute("currentPage", "dashboard");
-        model.addAttribute("todayLogStats", todayLogStats);
         model.addAttribute("totalUserStats", totalUserStats);
+        model.addAttribute("todayLogStats", todayLogStats);
+        model.addAttribute("activeTeamStats", activeTeamStats);
+        model.addAttribute("newTeamStats", newTeamStats);
 
         return "admin/dashboard";
     }

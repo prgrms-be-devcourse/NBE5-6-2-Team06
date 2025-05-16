@@ -8,6 +8,7 @@ import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.infra.response.ApiResponse;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,11 @@ public class AdminTeamApiController {
     public ResponseEntity<?> unActivatedTeam(@PathVariable Long teamId) {
         teamService.unActivatedById(teamId);
         return ResponseEntity.ok("모임이 비활성화되었습니다.");
+    }
+
+    @GetMapping("/success-rate/monthly")
+    public ResponseEntity<ApiResponse<List<Map<String, String>>>> getMonthlyMeetingSuccessRateData() {
+        return ResponseEntity.ok(ApiResponse.success(teamService.getMonthlyMeetingSuccessRate()));
     }
 
 }

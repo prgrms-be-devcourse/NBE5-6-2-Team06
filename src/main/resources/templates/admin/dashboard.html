@@ -13,8 +13,11 @@
                 </div>
                 <div class="stat-info">
                     <h3>총 회원 수</h3>
-                    <p class="stat-number" th:text="${totalUserStats.totalUsers ?: 1245}">1,245</p>
-                    <p class="stat-change positive" th:text="${totalUserStats.totalUserGrowth ?: '+12%'}">+12% <i class="fas fa-arrow-up"></i></p>
+                    <p class="stat-number" th:text="${totalUserStats.totalUsers}"></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(totalUserStats.totalUserGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${totalUserStats.totalUserGrowth}">
+                    </p>
                 </div>
             </div>
             <div class="stat-card">
@@ -24,17 +27,10 @@
                 <div class="stat-info">
                     <h3>오늘 이용 회원</h3>
                     <p class="stat-number" th:text="${todayLogStats.todayActiveUsers}"></p>
-                    <p class="stat-change positive" th:text="${todayLogStats.activeUserGrowth ?: '+5%'}">+5% <i class="fas fa-arrow-up"></i></p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">
-                    <i class="fas fa-user-slash"></i>
-                </div>
-                <div class="stat-info">
-                    <h3>오늘 이용 비회원</h3>
-                    <p class="stat-number" th:text="${todayGuestUsers ?: 32}">32</p>
-                    <p class="stat-change negative" th:text="${guestUserGrowth ?: '-2%'}">-2% <i class="fas fa-arrow-down"></i></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(todayLogStats.activeUserGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${todayLogStats.activeUserGrowth}">
+                    </p>
                 </div>
             </div>
             <div class="stat-card">
@@ -42,9 +38,24 @@
                     <i class="fas fa-user-friends"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>활성 모임</h3>
-                    <p class="stat-number" th:text="${activeMeetings ?: 56}">56</p>
-                    <p class="stat-change positive" th:text="${meetingGrowth ?: '+8%'}">+8% <i class="fas fa-arrow-up"></i></p>
+                    <h3>현재 진행 중인 모임</h3>
+                    <p class="stat-number" th:text="${activeTeamStats.activeTeams}"></p>
+                    <p class="stat-change"
+                       th:text="'총 모임 수: ' + ${activeTeamStats.totalTeamCount}">
+                    </p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>오늘 생성된 모임</h3>
+                    <p class="stat-number" th:text="${newTeamStats.newTeams}"></p>
+                    <p class="stat-change"
+                       th:classappend="${#strings.startsWith(newTeamStats.newTeamGrowth, '+') ? 'positive' : 'negative'}"
+                       th:text="${newTeamStats.newTeamGrowth}">
+                    </p>
                 </div>
             </div>
         </div>
@@ -57,40 +68,6 @@
             <div class="chart">
                 <h3>모임 성공률</h3>
                 <canvas id="meetingSuccessChart"></canvas>
-            </div>
-        </div>
-
-        <div class="recent-activities">
-            <h3>최근 활동</h3>
-            <div class="activity-list">
-                <div class="activity-item" th:each="activity : ${recentActivities}">
-                    <div class="activity-icon">
-                        <i th:class="${activity.icon ?: 'fas fa-user-plus'}"></i>
-                    </div>
-                    <div class="activity-details">
-                        <p th:utext="${activity.description ?: '새로운 회원 가입: <strong>김철수</strong>'}">새로운 회원 가입: <strong>김철수</strong></p>
-                        <span class="activity-time" th:text="${activity.time ?: '10분 전'}">10분 전</span>
-                    </div>
-                </div>
-                <!-- 기본 활동 데이터 (서버에서 데이터가 없을 경우) -->
-                <div class="activity-item" th:if="${recentActivities == null || recentActivities.isEmpty()}">
-                    <div class="activity-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <div class="activity-details">
-                        <p>새로운 회원 가입: <strong>김철수</strong></p>
-                        <span class="activity-time">10분 전</span>
-                    </div>
-                </div>
-                <div class="activity-item" th:if="${recentActivities == null || recentActivities.isEmpty()}">
-                    <div class="activity-icon">
-                        <i class="fas fa-flag"></i>
-                    </div>
-                    <div class="activity-details">
-                        <p>신고 접수: <strong>부적절한 채팅</strong></p>
-                        <span class="activity-time">30분 전</span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

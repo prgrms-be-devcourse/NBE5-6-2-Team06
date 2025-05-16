@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const reportType = this.getAttribute('data-type');
             const chatId = this.getAttribute('data-chat-id');
             const teamId = this.getAttribute('data-post-id');
-            console.log(dueReason);
+
             document.getElementById('report-id').textContent = reportId;
             document.getElementById('report-reporter').textContent = userId;
             document.getElementById('report-target').textContent = reportedId;
@@ -187,14 +187,72 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 document.getElementById('detail-modal-footer').style.display = 'flex';
             }
-            // TODO : 채팅 신고, 모임 게시글 신고에 따른 랜더링 필요, fetch 를 통해 API 호출 필요
-            //  + 자세히 보기 버튼을 통해 채팅 신고는 팀 페이지로 새 창 이동, 모임 게시글 페이지는 모임 게시글 페이지로 새 창 이동
 
+            const reportTitle = document.querySelector('.report-title');
+            const contentTime = document.querySelector('.content-time');
+            const reportContent = document.querySelector('.report-content');
+            const detailBtn = document.querySelector('.detail-btn');
 
-            // 모달 표시
-            document.getElementById('reportViewModal').style.display = 'block';
+            let apiUrl;
+            let detailPageUrl;
+
+            if (reportType === 'CHAT') {
+                apiUrl = `/api/admin/user/report/chat/${chatId}`;
+                detailPageUrl = `/team/page/${teamId}`;
+            } else if (reportType === 'POST') {
+                apiUrl = `/api/admin/user/report/team/${teamId}`;
+                detailPageUrl = `/team/detail/${teamId}`;
+            } else {
+                console.error('알 수 없는 reportType:', reportType);
+                alert('알 수 없는 활동 내역 타입입니다.');
+                return; // reportType 이 유효하지 않으면 여기서 종료
+            }
+
+            fetch(apiUrl, {
+                method: 'GET',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const result = data.data;
+
+                if (reportType === 'CHAT') {
+                    reportTitle.textContent = result.senderNickname + '(' + result.senderId + ')';
+                    contentTime.textContent = result.sendDate;
+                    reportContent.textContent = result.message;
+                } else if (reportType === 'POST') {
+                    reportTitle.textContent = result.teamTitle;
+                    contentTime.textContent = result.createdAt;
+                    reportContent.textContent = result.teamDetails;
+                }
+
+                // 기존 이벤트 리스너 제거 (혹시 있다면)
+                detailBtn.removeEventListener('click', openDetailPage);
+
+                // 새로운 URL을 사용하는 이벤트 리스너 등록
+                detailBtn.addEventListener('click', openDetailPage);
+
+                // detailPageUrl을 함수 스코프에서 사용할 수 있도록 전역 변수 또는 데이터 속성으로 관리
+                detailBtn.dataset.detailUrl = detailPageUrl;
+
+                document.getElementById('reportViewModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('활동 내역 조회 중 문제가 발생했습니다.');
+            });
+
         });
     });
+
+    function openDetailPage() {
+        const detailUrl = this.dataset.detailUrl;
+        window.open(detailUrl, '_blank');
+    }
 
     // 사용자 정지 버튼 클릭 이벤트 (신고 상세 모달에서)
     const showSuspendOptionsBtn = document.getElementById('show-suspend-options');
