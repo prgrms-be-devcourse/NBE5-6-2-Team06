@@ -4,6 +4,7 @@ import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse
 import com.grepp.matnam.app.controller.api.admin.payload.ReportChatResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportTeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.code.Gender;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserApiController {
     private final UserService userService;
     private final ReportService reportService;
+    private final PreferenceService preferenceService;
 
     @PatchMapping("/list/{userId}")
     public ResponseEntity<?> updateUserStatus(@PathVariable String userId,
@@ -71,5 +73,11 @@ public class AdminUserApiController {
     public ResponseEntity<ApiResponse<Map<Gender, Long>>> getGenderDistribution() {
         Map<Gender, Long> genderCounts = userService.getGenderDistribution();
         return ResponseEntity.ok(ApiResponse.success(genderCounts));
+    }
+
+    @GetMapping("/statistics/preference-counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getPreferenceCounts() {
+        Map<String, Long> counts = preferenceService.getPreferenceCounts();
+        return ResponseEntity.ok(ApiResponse.success(counts));
     }
 }

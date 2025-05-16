@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
           responsive: true,
           plugins: {
             legend: {
-              position: 'top',
+              display: false,
             },
             title: {
               display: true,
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             title: {
               display: true,
-              text: '이용 회원 수'
+              text: '일일 이용 회원 수'
             }
           },
           scales: {
@@ -169,39 +169,80 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 신규 가입자 추이 차트
-  const newUsersCtx = document.getElementById('newUsersChart');
-  if (newUsersCtx) {
-    new Chart(newUsersCtx, {
-      type: 'line',
-      data: {
-        labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
-        datasets: [{
-          label: '신규 가입자',
-          data: [65, 59, 80, 81, 56, 55],
-          borderColor: 'rgba(153, 102, 255, 1)',
-          backgroundColor: 'rgba(153, 102, 255, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-          },
-          title: {
-            display: true,
-            text: '신규 가입자 추이'
-          }
+  // 사용자 취향 선호도
+  const preferenceCountsCtx = document.getElementById('preferenceCountsChart');
+  if (preferenceCountsCtx) {
+    fetch('/api/admin/user/statistics/preference-counts')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data;
+      new Chart(preferenceCountsCtx, {
+        type: 'bar',
+        data: {
+          labels: ['넓은 매장', '깨끗함', '다양한 메뉴', '좋은 음악', '사진', '대화', '좋은 뷰', '테라스', '오래 머물기', '다양한 술'],
+          datasets: [{
+            label: '선택 횟수',
+            data: [
+              result.bigStoreCount,
+              result.cleanCount,
+              result.goodMenuCount,
+              result.goodMusicCount,
+              result.goodPictureCount,
+              result.goodTalkCount,
+              result.goodViewCount,
+              result.isTerraceCount,
+              result.longStayCount,
+              result.manyDrinkCount
+            ],
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.8)',    // Strong Red
+              'rgba(54, 162, 235, 0.8)',    // Strong Blue
+              'rgba(255, 205, 86, 0.8)',    // Strong Yellow
+              'rgba(75, 192, 192, 0.8)',    // Strong Teal
+              'rgba(153, 102, 255, 0.8)',   // Strong Purple
+              'rgba(255, 159, 64, 0.8)',    // Strong Orange
+              'rgba(0, 123, 255, 0.8)',     // Bright Blue
+              'rgba(220, 53, 69, 0.8)',     // Crimson
+              'rgba(40, 167, 69, 0.8)',     // Forest Green
+              'rgba(253, 126, 20, 0.8)'     // Burnt Orange
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 1)',
+              'rgba(54, 162, 235, 1)',
+              'rgba(255, 205, 86, 1)',
+              'rgba(75, 192, 192, 1)',
+              'rgba(153, 102, 255, 1)',
+              'rgba(255, 159, 64, 1)',
+              'rgba(0, 123, 255, 1)',
+              'rgba(220, 53, 69, 1)',
+              'rgba(40, 167, 69, 1)',
+              'rgba(253, 126, 20, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
-        scales: {
-          y: {
-            beginAtZero: true
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            }
+          },
+          plugins: {
+            legend: {
+              display: false // 범례 숨김
+            },
+            title: {
+              display: true,
+              text: '사용자 취향 선호도'
+            }
           }
         }
-      }
+      });
     });
   }
 
