@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     List<Participant> findParticipantsWithUserByTeamId(@Param("teamId") Long teamId);
 
     void deleteByTeam_TeamId(Long teamId);
+
+    boolean existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(String userId, Long teamId, ParticipantStatus participantStatus);
 }

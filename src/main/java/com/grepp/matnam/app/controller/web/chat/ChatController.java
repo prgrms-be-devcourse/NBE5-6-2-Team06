@@ -19,13 +19,12 @@ public class ChatController {
     public void sendMessage(MessageDto message) {
         Long teamId = message.getTeamId();
 
-        chatService.saveChatMessage(message);
+        Long chatId = chatService.saveChatMessage(message);
+        message.setChatId(chatId);
         System.out.println("==========DB 저장완료===========");
 
         messagingTemplate.convertAndSend("/room/" + teamId, message);
         System.out.println("======/room/" + teamId+"메시지 전송 완료======");
-
-
     }
 }
 

@@ -2,11 +2,19 @@ package com.grepp.matnam.app.model.team.entity;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
-import com.grepp.matnam.app.model.user.dto.ReportDto;
 import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.entity.BaseEntity;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -30,7 +38,4 @@ public class Participant extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private ParticipantStatus participantStatus;
-
-    @Transient
-    private ReportDto reportDto;
 }
