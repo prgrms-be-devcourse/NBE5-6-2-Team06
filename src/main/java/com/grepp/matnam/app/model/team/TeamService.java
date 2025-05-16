@@ -147,15 +147,13 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-
-
     // 참여자 상태 변경
-    public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
-        Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new RuntimeException("참가자를 찾을 수 없습니다.")); //예외처리 수정하기
-        participant.setParticipantStatus(status);
-        participantRepository.save(participant);
-    }
+//    public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
+//        Participant participant = participantRepository.findById(participantId)
+//            .orElseThrow(() -> new RuntimeException("참가자를 찾을 수 없습니다.")); //예외처리 수정하기
+//        participant.setParticipantStatus(status);
+//        participantRepository.save(participant);
+//    }
 
     // 모임 상태 변경
     public void changeTeamStatus(Long teamId, Status status) {

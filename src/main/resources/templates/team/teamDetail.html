@@ -223,9 +223,6 @@
             <span>탈퇴한 사용자</span>
           </div>
         </div>
-      </div>
-    </div>
-
     <hr/>
         <h5>현재 참여자</h5>
         <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and participant.role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER}">

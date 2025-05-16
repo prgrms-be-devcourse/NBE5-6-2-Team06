@@ -57,12 +57,12 @@ public class TeamApiController {
     }
 
     // 참여자 상태 변경
-    @PatchMapping("/{participantId}/participantStatus")
-    public ResponseEntity<?> changeParticipantStatus(@PathVariable Long participantId,
-        @RequestParam ParticipantStatus status) {
-        teamService.changeParticipantStatus(participantId, status);
-        return ResponseEntity.ok().build();
-    }
+//    @PatchMapping("/{participantId}/participantStatus")
+//    public ResponseEntity<?> changeParticipantStatus(@PathVariable Long participantId,
+//        @RequestParam ParticipantStatus status) {
+//        teamService.changeParticipantStatus(participantId, status);
+//        return ResponseEntity.ok().build();
+//    }
 
     // 참여 신청
     @PostMapping("/{teamId}/apply/{userId}")
