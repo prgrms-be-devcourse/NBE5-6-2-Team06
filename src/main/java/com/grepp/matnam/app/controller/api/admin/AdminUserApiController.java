@@ -6,8 +6,10 @@ import com.grepp.matnam.app.controller.api.admin.payload.ReportTeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
+import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.infra.response.ApiResponse;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +65,11 @@ public class AdminUserApiController {
     public ResponseEntity<ApiResponse<List<AgeDistributionResponse>>> getAgeDistributionData() {
         List<AgeDistributionResponse> ageDistribution = userService.getAgeDistribution();
         return ResponseEntity.ok(ApiResponse.success(ageDistribution));
+    }
+
+    @GetMapping("/statistics/gender-distribution")
+    public ResponseEntity<ApiResponse<Map<Gender, Long>>> getGenderDistribution() {
+        Map<Gender, Long> genderCounts = userService.getGenderDistribution();
+        return ResponseEntity.ok(ApiResponse.success(genderCounts));
     }
 }

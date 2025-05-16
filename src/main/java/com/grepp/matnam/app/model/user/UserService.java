@@ -4,11 +4,13 @@ import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.model.auth.code.Role;
+import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -259,5 +261,13 @@ public class UserService {
         return ageGroupCounts.entrySet().stream()
             .map(entry -> new AgeDistributionResponse(entry.getKey(), entry.getValue()))
             .collect(Collectors.toList());
+    }
+
+    public Map<Gender, Long> getGenderDistribution() {
+        List<Gender> genders = userRepository.findAllGenders();
+        Map<Gender, Long> genderCounts = new HashMap<>();
+        genderCounts.put(Gender.MAN, genders.stream().filter(gender -> gender == Gender.MAN).count());
+        genderCounts.put(Gender.WOMAN, genders.stream().filter(gender -> gender == Gender.WOMAN).count());
+        return genderCounts;
     }
 }

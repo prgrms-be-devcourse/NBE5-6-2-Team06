@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
 import java.time.LocalDate;
@@ -22,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, String>, UserReposit
 
     @Query("SELECT u.age FROM User u WHERE u.activated = true")
     List<Integer> findAllAges();
+
+    @Query("SELECT u.gender FROM User u")
+    List<Gender> findAllGenders();
 }
