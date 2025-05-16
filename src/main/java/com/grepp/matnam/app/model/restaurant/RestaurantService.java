@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.model.restaurant;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
+import com.grepp.matnam.app.model.restaurant.dto.RestaurantDto;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import java.util.List;
 import java.util.Optional;
@@ -80,5 +81,23 @@ public class RestaurantService {
         } else {
             return restaurantRepository.findAll(pageable);
         }
+    }
+
+    public RestaurantDto findByName(String name) {
+        Restaurant restaurant = restaurantRepository.findByName(name)
+            .orElse(null);
+
+        if (restaurant == null) {
+            throw new RuntimeException("식당 없음");
+        }
+
+        return new RestaurantDto(
+            restaurant.getName(),
+            restaurant.getSummary(),
+            restaurant.getAddress(),
+            restaurant.getCategory(),
+            restaurant.getOpenTime(),
+            restaurant.getMainFood()
+        );
     }
 }

@@ -30,4 +30,8 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     void deleteByTeam_TeamId(Long teamId);
 
     boolean existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(String userId, Long teamId, ParticipantStatus participantStatus);
+
+    // 특정 팀에 속하고 상태가 승인 상태인 사용자 조회
+    List<Participant> findByTeam_TeamIdAndParticipantStatus(Long teamId, ParticipantStatus participantStatus);
+
 }

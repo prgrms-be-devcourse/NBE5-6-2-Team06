@@ -5,6 +5,7 @@ import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
+import com.grepp.matnam.app.model.preference.repository.PreferenceRepository;
 import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
@@ -14,10 +15,12 @@ import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
+import com.grepp.matnam.app.model.user.entity.Preference;
 import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +39,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
     private final ParticipantRepository participantRepository;
+    private final PreferenceRepository preferenceRepository;
 //    private final RestaurantRepository restaurantRepository;
 
     private final UserRepository userRepository;
@@ -344,6 +348,84 @@ public class TeamService {
                 "successRate", String.format("%.2f", successRate)
             );
         }).collect(Collectors.toList());
+    }
+    // 특정 팀의 사용자 teamId를 통해 userId 리스트 받기[상태가 승인인 사용자]
+    public List<Participant> getApprovedUserIdsByTeamId(Long teamId) {
+        return participantRepository.findByTeam_TeamIdAndParticipantStatus(teamId, ParticipantStatus.APPROVED);
+    }
+
+    //팀원들의 취향 키워드 종합
+    public List<String> countPreferenceKeyword(Long teamId) {
+        //집계 시작
+        List<Participant> approvedParticipants = getApprovedUserIdsByTeamId(teamId);
+
+        if (approvedParticipants.isEmpty()) {
+            throw new RuntimeException("사용자가 없습니다.");
+        } else {
+            //집계 값을 받을 Map
+            Map<String, Integer> keywordCount = new HashMap<>();
+
+            keywordCount.put("goodTalk", 0);
+            keywordCount.put("manyDrink", 0);
+            keywordCount.put("goodMusic", 0);
+            keywordCount.put("clean", 0);
+            keywordCount.put("goodView", 0);
+            keywordCount.put("isTerrace", 0);
+            keywordCount.put("goodPicture", 0);
+            keywordCount.put("goodMenu", 0);
+            keywordCount.put("longStay", 0);
+            keywordCount.put("bigStore", 0);
+
+            //집계 핵심
+            for (Participant participant : approvedParticipants) {
+                User user = participant.getUser();
+                Preference pref = preferenceRepository.findByUser(user);
+
+                if (pref.isGoodTalk()) {
+                    keywordCount.put("goodTalk", keywordCount.get("goodTalk") + 1);
+                }
+                if (pref.isManyDrink()) {
+                    keywordCount.put("manyDrink", keywordCount.get("manyDrink") + 1);
+                }
+                if (pref.isGoodMusic()) {
+                    keywordCount.put("goodMusic", keywordCount.get("goodMusic") + 1);
+                }
+                if (pref.isClean()) {
+                    keywordCount.put("clean", keywordCount.get("clean") + 1);
+                }
+                if (pref.isGoodView()) {
+                    keywordCount.put("goodView", keywordCount.get("goodView") + 1);
+                }
+                if (pref.isTerrace()) {
+                    keywordCount.put("isTerrace", keywordCount.get("isTerrace") + 1);
+                }
+                if (pref.isGoodPicture()) {
+                    keywordCount.put("goodPicture", keywordCount.get("goodPicture") + 1);
+                }
+                if (pref.isGoodMenu()) {
+                    keywordCount.put("goodMenu", keywordCount.get("goodMenu") + 1);
+                }
+                if (pref.isLongStay()) {
+                    keywordCount.put("longStay", keywordCount.get("longStay") + 1);
+                }
+                if (pref.isBigStore()) {
+                    keywordCount.put("bigStore", keywordCount.get("bigStore") + 1);
+                }
+
+            }
+            // 최대값 찾기
+            int max = keywordCount.values().stream().max(Integer::compareTo).orElse(0);
+
+            // 최댓값 키워드
+            List<String> topKeywords = keywordCount.entrySet().stream().
+                filter(entry -> entry.getValue() == max).
+                map(Map.Entry::getKey).
+                toList();
+
+            System.out.println(topKeywords);
+            return topKeywords;
+
+        }
     }
 
     // 모임 수정
