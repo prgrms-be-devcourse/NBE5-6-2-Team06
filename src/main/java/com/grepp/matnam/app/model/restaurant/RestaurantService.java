@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.restaurant;
 
+import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRankingResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
 import com.grepp.matnam.app.model.restaurant.code.Category;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
@@ -7,10 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -93,4 +97,20 @@ public class RestaurantService {
         }
         return distribution;
     }
+
+    public Map<String, Long> getRestaurantMoodPreference() {
+        Map<String, Long> moodCounts = new HashMap<>();
+        moodCounts.put("대화", restaurantRepository.countByGoodTalk(true));
+        moodCounts.put("다양한 술", restaurantRepository.countByManyDrink(true));
+        moodCounts.put("좋은 음악", restaurantRepository.countByGoodMusic(true));
+        moodCounts.put("깨끗함", restaurantRepository.countByClean(true));
+        moodCounts.put("좋은 뷰", restaurantRepository.countByGoodView(true));
+        moodCounts.put("테라스", restaurantRepository.countByIsTerrace(true));
+        moodCounts.put("사진", restaurantRepository.countByGoodPicture(true));
+        moodCounts.put("다양한 메뉴", restaurantRepository.countByGoodMenu(true));
+        moodCounts.put("오래 머물기", restaurantRepository.countByLongStay(true));
+        moodCounts.put("넓은 매장", restaurantRepository.countByBigStore(true));
+        return moodCounts;
+    }
+
 }

@@ -89,4 +89,10 @@ public class AdminRestaurantApiController {
         Map<String, Long> categoryDistribution = restaurantService.getRestaurantCategoryDistribution();
         return ResponseEntity.ok(ApiResponse.success(categoryDistribution));
     }
+
+    @GetMapping("/statistics/mood-preference")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getRestaurantMoodPreference() {
+        Map<String, Long> moodPreference = restaurantService.getRestaurantMoodPreference();
+        return ResponseEntity.ok(ApiResponse.success(moodPreference));
+    }
 }

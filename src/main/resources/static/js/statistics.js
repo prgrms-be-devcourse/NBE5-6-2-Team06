@@ -475,6 +475,80 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // 식당 분위기 선호도 차트
+  const moodPreferenceCtx = document.getElementById('moodPreferenceChart');
+  if (moodPreferenceCtx) {
+    fetch('/api/admin/restaurant/statistics/mood-preference')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data;
+      const labels = Object.keys(result);
+      const values = Object.values(result);
+      const backgroundColors = [
+        'rgba(255, 99, 132, 0.7)',
+        'rgba(54, 162, 235, 0.7)',
+        'rgba(255, 206, 86, 0.7)',
+        'rgba(75, 192, 192, 0.7)',
+        'rgba(153, 102, 255, 0.7)',
+        'rgba(255, 159, 64, 0.7)',
+        'rgba(120, 120, 120, 0.7)',
+        'rgba(200, 200, 50, 0.7)',
+        'rgba(50, 200, 200, 0.7)',
+        'rgba(200, 50, 200, 0.7)'
+      ];
+      const borderColors = [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)',
+        'rgba(120, 120, 120, 1)',
+        'rgba(200, 200, 50, 1)',
+        'rgba(50, 200, 200, 1)',
+        'rgba(200, 50, 200, 1)'
+      ];
+
+      new Chart(moodPreferenceCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '식당 수',
+            data: values,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: '식당 분위기 선호도'
+            }
+          }
+        }
+      });
+    });
+  }
+
   // 기간 필터 변경 이벤트
   const periodFilter = document.getElementById('period-filter');
   if (periodFilter) {
