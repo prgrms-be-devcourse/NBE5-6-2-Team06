@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 일일 이용 회원 수 차트
   const dailyActiveUsersCtx = document.getElementById('dailyActiveUsersChart');
   if (dailyActiveUsersCtx) {
-    fetch('/api/admin/statistics/week-user-activity')
+    fetch('/api/admin/user-activity/statistics/week')
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const meetingSuccessRateCtx = document.getElementById(
       'meetingSuccessRateChart');
   if (meetingSuccessRateCtx) {
-    fetch('/api/admin/team/success-rate/monthly')
+    fetch('/api/admin/team/statistics/success-rate/monthly')
     .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
