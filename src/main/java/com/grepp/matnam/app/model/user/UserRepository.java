@@ -26,4 +26,14 @@ public interface UserRepository extends JpaRepository<User, String>, UserReposit
 
     @Query("SELECT u.gender FROM User u")
     List<Gender> findAllGenders();
+
+    long countByActivated(boolean activated);
+    long countByCreatedAtAfter(LocalDateTime dateTime);
+    long countByGender(Gender gender);
+    long countByGenderAndActivated(Gender gender, boolean activated);
+    long countByGenderAndCreatedAtAfter(Gender gender, LocalDateTime dateTime);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.status <> 'ACTIVE'")
+    long countByStatusNotActive();
+    @Query("SELECT COUNT(u) FROM User u WHERE u.gender = :gender AND u.status <> 'ACTIVE'")
+    long countByGenderAndStatusNotActive(Gender gender);
 }

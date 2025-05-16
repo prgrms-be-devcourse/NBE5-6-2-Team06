@@ -3,6 +3,7 @@ package com.grepp.matnam.app.model.user;
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
+import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
 import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
@@ -269,5 +270,31 @@ public class UserService {
         genderCounts.put(Gender.MAN, genders.stream().filter(gender -> gender == Gender.MAN).count());
         genderCounts.put(Gender.WOMAN, genders.stream().filter(gender -> gender == Gender.WOMAN).count());
         return genderCounts;
+    }
+
+    public UserStatsResponse getUserStatistics() {
+
+        UserStatsResponse statsResponse = new UserStatsResponse();
+
+        statsResponse.setTotalUsers(userRepository.count());
+        statsResponse.setActivatedUsers(userRepository.countByActivated(true));
+        statsResponse.setNewUsers(userRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+        statsResponse.setStopUsers(userRepository.countByStatusNotActive());
+        statsResponse.setInactivatedUsers(userRepository.countByActivated(false));
+
+        statsResponse.setTotalMaleUsers(userRepository.countByGender(Gender.MAN));
+        statsResponse.setActivatedMaleUsers(userRepository.countByGenderAndActivated(Gender.MAN, true));
+        statsResponse.setNewMaleUsers(userRepository.countByGenderAndCreatedAtAfter(Gender.MAN, LocalDateTime.now().minusDays(30)));
+        statsResponse.setStopMaleUsers(userRepository.countByGenderAndStatusNotActive(Gender.MAN));
+        statsResponse.setInactivatedMaleUsers(userRepository.countByGenderAndActivated(Gender.MAN, false));
+
+        statsResponse.setTotalFemaleUsers(userRepository.countByGender(Gender.WOMAN));
+        statsResponse.setActivatedFemaleUsers(userRepository.countByGenderAndActivated(Gender.WOMAN, true));
+        statsResponse.setNewFemaleUsers(userRepository.countByGenderAndCreatedAtAfter(Gender.WOMAN, LocalDateTime.now().minusDays(30)));
+        statsResponse.setStopFemaleUsers(userRepository.countByGenderAndStatusNotActive(Gender.WOMAN));
+        statsResponse.setInactivatedFemaleUsers(userRepository.countByGenderAndActivated(Gender.WOMAN, false));
+
+
+        return statsResponse;
     }
 }

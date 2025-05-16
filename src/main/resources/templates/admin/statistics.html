@@ -61,32 +61,36 @@
           <tr>
             <th>구분</th>
             <th>총 회원 수</th>
-            <th>활성 회원</th>
+            <th>현재 회원</th>
             <th>신규 가입자 (30일)</th>
-            <th>평균 접속 시간</th>
+            <th>정지 회원</th>
+            <th>탈퇴 회원</th>
           </tr>
           </thead>
           <tbody>
           <tr>
             <td>전체</td>
-            <td th:text="${totalUsers ?: 1245}">1,245</td>
-            <td th:text="${activeUsers ?: 980}">980</td>
-            <td th:text="${newUsers ?: 120}">120</td>
-            <td th:text="${avgSessionTime ?: '25분'}">25분</td>
+            <td th:text="${userStats.totalUsers}"></td>
+            <td th:text="${userStats.activatedUsers}"></td>
+            <td th:text="${userStats.newUsers}"></td>
+            <td th:text="${userStats.stopUsers}"></td>
+            <td th:text="${userStats.inactivatedUsers}"></td>
           </tr>
           <tr>
             <td>남성</td>
-            <td th:text="${totalMaleUsers ?: 685}">685</td>
-            <td th:text="${activeMaleUsers ?: 540}">540</td>
-            <td th:text="${newMaleUsers ?: 65}">65</td>
-            <td th:text="${avgMaleSessionTime ?: '28분'}">28분</td>
+            <td th:text="${userStats.totalMaleUsers}"></td>
+            <td th:text="${userStats.activatedMaleUsers}"></td>
+            <td th:text="${userStats.newMaleUsers}"></td>
+            <td th:text="${userStats.stopMaleUsers}"></td>
+            <td th:text="${userStats.inactivatedMaleUsers}"></td>
           </tr>
           <tr>
             <td>여성</td>
-            <td th:text="${totalFemaleUsers ?: 560}">560</td>
-            <td th:text="${activeFemaleUsers ?: 440}">440</td>
-            <td th:text="${newFemaleUsers ?: 55}">55</td>
-            <td th:text="${avgFemaleSessionTime ?: '22분'}">22분</td>
+            <td th:text="${userStats.totalFemaleUsers}"></td>
+            <td th:text="${userStats.activatedFemaleUsers}"></td>
+            <td th:text="${userStats.newFemaleUsers}"></td>
+            <td th:text="${userStats.stopFemaleUsers}"></td>
+            <td th:text="${userStats.inactivatedFemaleUsers}"></td>
           </tr>
           </tbody>
         </table>
