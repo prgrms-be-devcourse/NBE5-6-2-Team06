@@ -549,6 +549,57 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // AI 추천 누적 Top 5 식당 차트
+  const topRecommendedCtx = document.getElementById('topRecommendedChart');
+  if (topRecommendedCtx) {
+    fetch('/api/admin/restaurant/statistics/top-recommended')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const result = data.data;
+      const labels = result.map(item => item.name);
+      const values = result.map(item => item.recommendedCount);
+
+      new Chart(topRecommendedCtx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '추천 수',
+            data: values,
+            backgroundColor: 'rgba(255, 206, 86, 0.7)',
+            borderColor: 'rgba(255, 206, 86, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 10
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'AI 추천 누적 Top 5 식당'
+            }
+          }
+        }
+      });
+    });
+  }
+
   // 기간 필터 변경 이벤트
   const periodFilter = document.getElementById('period-filter');
   if (periodFilter) {

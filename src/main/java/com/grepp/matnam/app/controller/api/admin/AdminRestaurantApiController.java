@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.controller.api.admin;
 
+import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRankingResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
 import com.grepp.matnam.app.controller.api.admin.validator.RestaurantRequestValidator;
 import com.grepp.matnam.app.model.restaurant.RestaurantService;
@@ -9,6 +10,7 @@ import com.grepp.matnam.infra.response.ApiResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import jakarta.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +96,11 @@ public class AdminRestaurantApiController {
     public ResponseEntity<ApiResponse<Map<String, Long>>> getRestaurantMoodPreference() {
         Map<String, Long> moodPreference = restaurantService.getRestaurantMoodPreference();
         return ResponseEntity.ok(ApiResponse.success(moodPreference));
+    }
+
+    @GetMapping("/statistics/top-recommended")
+    public ResponseEntity<ApiResponse<List<RestaurantRankingResponse>>> getTop5Recommended() {
+        List<RestaurantRankingResponse> top5Restaurants = restaurantService.getTop5RecommendedRestaurants();
+        return ResponseEntity.ok(ApiResponse.success(top5Restaurants));
     }
 }

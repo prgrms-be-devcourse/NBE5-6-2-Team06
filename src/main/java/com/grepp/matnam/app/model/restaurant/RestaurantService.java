@@ -113,4 +113,11 @@ public class RestaurantService {
         return moodCounts;
     }
 
+    public List<RestaurantRankingResponse> getTop5RecommendedRestaurants() {
+        Pageable top10 = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "recommendedCount"));
+        List<Restaurant> topRestaurants = restaurantRepository.findAll(top10).getContent();
+        return topRestaurants.stream()
+            .map(restaurant -> new RestaurantRankingResponse(restaurant.getName(), restaurant.getRecommendedCount()))
+            .collect(Collectors.toList());
+    }
 }
