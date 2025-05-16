@@ -11,7 +11,6 @@ import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
-import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
@@ -43,6 +42,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
 
     private final ParticipantRepository participantRepository;
+
     private final MymapRepository mymapRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -53,7 +53,7 @@ public class TeamService {
         // 1. ChatRoom 생성
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setTeam(team);         // ChatRoom → Team 연결
-        chatRoom.setName(team.getTeamId()+"번 채팅방");
+        chatRoom.setName(team.getTeamId() + "번 채팅방");
         chatRoomRepository.save(chatRoom);
 
     }
@@ -70,7 +70,7 @@ public class TeamService {
             participant.setTeam(team);
             participant.setUser(user);
 
-            if(user.getUserId().equals(team.getUser().getUserId())) {
+            if (user.getUserId().equals(team.getUser().getUserId())) {
                 participant.setParticipantStatus(ParticipantStatus.APPROVED);
                 participant.setRole(Role.LEADER);
 
@@ -114,39 +114,24 @@ public class TeamService {
         teamRepository.save(team);
     }
 
+    // 모임 업데이트
     public void updateTeam(Long teamId, Team updatedTeam) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("Team not found"));
 
-//        team.setRestaurant(updatedTeam.getRestaurant());
-
-//        // 날짜와 시간 처리 (teamDate만 사용)
-//        if (updatedTeam.getTeamDate() != null && updatedTeam.getTime() != null) {
-//            String dateTimeString = updatedTeam.getTeamDate() + "T" + updatedTeam.getTime() + ":00";
-//            try {
-//                team.setTeamDate(LocalDateTime.parse(dateTimeString));
-//            } catch (Exception e) {
-//                team.setTeamDate(LocalDateTime.now());
-//            }
-//        } else {
-//            team.setTeamDate(LocalDateTime.now());
-//        }
-
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
-        team.setMeetDate(updatedTeam.getMeetDate());
         team.setRestaurantName(updatedTeam.getRestaurantName());
         team.setTeamDate(updatedTeam.getTeamDate());
         team.setMaxPeople(updatedTeam.getMaxPeople());
         team.setImageUrl(updatedTeam.getImageUrl());
         team.setNowPeople(updatedTeam.getNowPeople());
         team.setStatus(updatedTeam.getStatus());
-        team.setRestaurantAddress(updatedTeam.getRestaurantAddress()); // 추가
-        team.setCategory(updatedTeam.getCategory()); // 추가
+        team.setRestaurantAddress(updatedTeam.getRestaurantAddress());
+        team.setCategory(updatedTeam.getCategory());
 
         teamRepository.save(team);
     }
-
 
 
 
@@ -190,7 +175,8 @@ public class TeamService {
 
     //참여자로서의 팀 조회 (APPROVED 상태)
     public List<Team> getTeamsByParticipant(String userId) {
-        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatus(userId, ParticipantStatus.APPROVED);
+        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatus(userId,
+            ParticipantStatus.APPROVED);
     }
 
     // 사용자의 모든 참여 정보 조회 (PENDING, APPROVED, REJECTED)
@@ -287,13 +273,15 @@ public class TeamService {
 
     @Transactional
     public void updateTeamStatus(Long teamId, Status status) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
     }
 
     @Transactional
     public void unActivatedById(Long teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         log.info("team {}", team);
         team.unActivated();
     }
@@ -301,7 +289,8 @@ public class TeamService {
     public NewTeamResponse getNewTeamStats() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(),
+            today.plusDays(1).atStartOfDay());
         long totalTeamCount = teamRepository.count();
         long yesterdayTotalTeamCount = totalTeamCount - newTeams;
         String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
@@ -319,7 +308,9 @@ public class TeamService {
 
     private String calculateGrowthRate(long today, long yesterday) {
         if (yesterday == 0) {
-            if (today == 0) return "+0%";
+            if (today == 0) {
+                return "+0%";
+            }
             return "+100%"; // 또는 "N/A"
         }
         long diff = today - yesterday;
@@ -329,7 +320,8 @@ public class TeamService {
     }
 
     public List<Map<String, String>> getMonthlyMeetingSuccessRate() {
-        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Map<String, Long>> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
 
         return monthlyStats.stream().map(stat -> {
