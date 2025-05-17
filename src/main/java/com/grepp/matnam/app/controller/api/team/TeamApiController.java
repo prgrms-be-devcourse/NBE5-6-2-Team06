@@ -54,14 +54,10 @@ public class TeamApiController {
     }
 
     // 모임 상태 변경 - 모임 취소
-    @PatchMapping("/{teamId}/cancel")
-    public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId, @AuthenticationPrincipal User currentUser) {
-//        if (currentUser == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-//                .body(new ApiResponse(ResponseCode.UNAUTHORIZED.code(), "사용자가 인증되지 않았습니다.", null));
-//        }
+    @PostMapping("/{teamId}/cancel")
+    public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId) {
         try {
-            teamService.cancelTeam(teamId, currentUser);
+            teamService.cancelTeam(teamId);
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "모임이 취소되었습니다.", null));
         } catch (Exception e) {
             log.error("모임 취소 처리 실패: {}", e.getMessage());

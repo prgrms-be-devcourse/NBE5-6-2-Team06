@@ -188,13 +188,9 @@ public class TeamService {
 
     // 모임 상태 변경 - 모임 취소
     @Transactional
-    public void cancelTeam(Long teamId, User currentUser) {
+    public void cancelTeam(Long teamId) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
-
-        if (!team.getUser().getUserId().equals(currentUser.getUserId())) {
-            throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
-        }
+                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         if (team.getStatus() == Status.COMPLETED) {
             throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
@@ -257,7 +253,7 @@ public class TeamService {
     @Transactional
     public void completeTeam(Long teamId) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         if (team.getTeamDate().isBefore(LocalDateTime.now())
             && team.getStatus() != Status.COMPLETED) {
@@ -306,7 +302,7 @@ public class TeamService {
     @Transactional
     public void updateTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
@@ -319,7 +315,7 @@ public class TeamService {
     @Transactional
     public void unActivatedById(Long teamId) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
         log.info("team {}", team);
         team.unActivated();
     }
@@ -554,12 +550,12 @@ public class TeamService {
     //주최자 모임 삭제
     @Transactional
     public void unActivatedTeamByLeader(Long teamId) {
-//        Team team = teamRepository.findById(teamId)
-//            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
-//        team.setStatus(Status.CANCELED);
+        team.setStatus(Status.CANCELED);
         unActivatedById(teamId);
 
-//        teamRepository.save(team);
+        teamRepository.save(team);
     }
 }

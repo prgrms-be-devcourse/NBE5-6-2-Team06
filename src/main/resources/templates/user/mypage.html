@@ -611,7 +611,9 @@
           </button>
 
           <!-- 모임 취소 버튼-->
-          <form th:if="${team.user.userId == user.userId}" th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}" method="patch" style="display: inline;">
+          <form th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}"
+                th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                method="post" style="display: inline;">
             <button type="submit" class="btn-primary">모임 취소</button>
           </form>
 
@@ -657,6 +659,8 @@
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
 
+          <hr>
+
           <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
@@ -664,10 +668,10 @@
           </button>
 
           <!-- 모임 취소 버튼-->
-          <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
-            <button type="submit"
-                    th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELED && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
-                    class="cancel-btn">모임 취소</button>
+         <form th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}"
+                th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                method="post" style="display: inline;">
+            <button type="submit" class="btn-primary">모임 취소</button>
           </form>
 
           <div id="application-info-${teamId}" class="application-info" style="display: none;">
@@ -823,6 +827,27 @@
       return;
     }
     switchTab('all');
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // 모임 취소 버튼 클릭 시 AJAX 처리
+    $('form').submit(function(event) {
+      event.preventDefault();
+      var form = $(this);
+      var teamId = form.data('team-id');
+
+      $.ajax({
+        type: 'PATCH',
+        url: '/api/team/' + teamId + '/cancel',
+        success: function(response) {
+          alert(response.message);
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          alert('모임 취소 처리에 실패했습니다.');
+        }
+      });
+    });
   });
 
   // 모임 목록 탭 전환
