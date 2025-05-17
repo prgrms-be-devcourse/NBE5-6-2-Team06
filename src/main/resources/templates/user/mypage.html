@@ -602,6 +602,7 @@
 
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+          <hr>
 
           <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"

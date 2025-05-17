@@ -168,35 +168,25 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-    // 모임 상태 변경
-//    @Transactional
-//    public void changeTeamStatus(Long teamId, Status status) {
-//        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
-//        Team team = teamRepository.findById(teamId)
-//            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
-//        Status prevStatus = team.getStatus();
-//        team.setStatus(status);
-//
-//        // 모집완료 상태 처리
-//        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
-//            team.setStatus(Status.FULL);
-//        }
-//
-//        if (team.getTeamDate().isBefore(LocalDateTime.now())
-//            && team.getStatus() != Status.COMPLETED) {
-//            team.setStatus(Status.COMPLETED);
-//        }
-//
-//        // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
-//        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
-//            increaseTemperatureForCompletedTeam(team);
-//        }
-//
-//        teamRepository.save(team);
-//        log.info("팀 상태 변경 완료: {}", team.getStatus());
-//    }
+    // 모임 상태 변경 - 모임 완료
+    @Transactional
+    public void completeTeam(Long teamId, Status status) {
+        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+        Status prevStatus = team.getStatus();
+        team.setStatus(status);
 
-    // 모임 취소
+        // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
+        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
+            increaseTemperatureForCompletedTeam(team);
+        }
+
+        teamRepository.save(team);
+        log.info("팀 상태 변경 완료: {}", team.getStatus());
+    }
+
+    // 모임 상태 변경 - 모임 취소
     @Transactional
     public void cancelTeam(Long teamId, User currentUser) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
@@ -572,7 +562,4 @@ public class TeamService {
     public void unActivatedTeamByLeader(Long teamId) {
         unActivatedById(teamId);
     }
-    // 모임 수정
-//    public TeamDto getTeamDetails(Long teamId) {
-//    }
 }

@@ -40,11 +40,12 @@ public class TeamApiController {
     private final UserService userService;
 
 
+    // 모임 상태 변경 - 모임 완료
     @PutMapping("/{teamId}/complete")
-    public ResponseEntity<String> completeTeam(@PathVariable Long teamId) {
+    public ResponseEntity<String> completeTeam(@PathVariable Long teamId, @RequestParam Status status) {
         try {
 
-            teamService.completeTeam(teamId);
+            teamService.completeTeam(teamId, status);
             return ResponseEntity.ok("모임이 성공적으로 완료 처리되었습니다.");
         } catch (Exception e) {
             log.error("모임 완료 처리 실패: {}", e.getMessage());
@@ -52,23 +53,7 @@ public class TeamApiController {
         }
     }
 
-    // 모임 상태 변경
-//    @PatchMapping("/{teamId}/status")
-//    public ResponseEntity<?> changeTeamStatus(@PathVariable Long teamId,
-//        @RequestParam Status status) {
-//        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
-//
-//        try {
-//            teamService.changeTeamStatus(teamId, status);
-//            return ResponseEntity.ok().build();
-//        } catch (Exception e) {
-//            log.error("팀 상태 변경 실패: {}", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body("팀 상태 변경 실패");
-//        }
-//    }
-
-    // 모임 취소
+    // 모임 상태 변경 - 모임 취소
     @PostMapping("/{teamId}/cancel")
     public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId, @AuthenticationPrincipal User currentUser) {
         if (currentUser == null) {
@@ -84,15 +69,6 @@ public class TeamApiController {
                 .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "모임 취소 실패", e.getMessage()));
         }
     }
-
-
-    // 참여자 상태 변경
-//    @PatchMapping("/{participantId}/participantStatus")
-//    public ResponseEntity<?> changeParticipantStatus(@PathVariable Long participantId,
-//        @RequestParam ParticipantStatus status) {
-//        teamService.changeParticipantStatus(participantId, status);
-//        return ResponseEntity.ok().build();
-//    }
 
     // 참여 신청
     @PostMapping("/{teamId}/apply/{userId}")
