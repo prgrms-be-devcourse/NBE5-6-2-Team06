@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.controller.web.user;
 
+import com.grepp.matnam.app.model.mymap.MymapService;
 import com.grepp.matnam.app.model.team.TeamReviewService;
 import com.grepp.matnam.app.model.team.TeamService;
 import com.grepp.matnam.app.model.team.code.Status;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -32,6 +34,8 @@ public class UserController {
     private final UserService userService;
     private final TeamService teamService;
     private final TeamReviewService teamReviewService;
+    private final MymapService mymapService;
+
 
     @GetMapping("/signup")
     public String signupPage() {
@@ -68,6 +72,11 @@ public class UserController {
 
             User user = userService.getUserById(userId);
             log.info("사용자 정보 조회 성공: {}", user.getUserId());
+
+            // 맛집 저장 수
+            Map<String, Long> placeCounts = mymapService.getPlaceCounts(user);
+            model.addAttribute("visiblePlaceCount", placeCounts.get("visible"));
+            model.addAttribute("hiddenPlaceCount", placeCounts.get("hidden"));
 
             // 통계 데이터
             model.addAttribute("stats", teamService.getUserStats(userId));
