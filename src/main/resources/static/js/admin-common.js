@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function () {
-  document.getElementById(
-      'profile-name').textContent = auth.getUserInfo().userId + "님";
+  if (auth.isLoggedIn()){
+    document.getElementById(
+        'profile-name').textContent = auth.getUserInfo().userId + "님";
+  }
+
   // 탭 처리
   const tabs = document.querySelectorAll('.tab');
 

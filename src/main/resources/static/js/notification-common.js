@@ -307,5 +307,7 @@ class NotificationHandler {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    new NotificationHandler();
+    if (auth.isLoggedIn()) {
+        new NotificationHandler();
+    }
 });
