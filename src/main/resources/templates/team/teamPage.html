@@ -12,77 +12,42 @@
       background-color: #f9f9f9;
       color: #333;
     }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
       background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     nav a {
       margin-right: 1rem;
       text-decoration: none;
       color: #333;
       font-size: 0.9rem;
     }
+
     .container {
       max-width: 1200px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
+
     .section {
       background: #fff;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
     .section h2 {
       margin-bottom: 1rem;
       font-size: 1.4rem;
       border-bottom: 2px solid #eee;
       padding-bottom: 0.5rem;
-    }
-
-    .participant-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .participant {
-      flex: 1 1 200px;
-      background: #f0f0f0;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .chat-box, .recommendation-box {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 1rem;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-    .input-group {
-      display: flex;
-      margin-top: 1rem;
-    }
-    .input-group input {
-      flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .input-group button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
-      border: none;
-      background-color: #000;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
     }
 
     .participant-list {
@@ -131,9 +96,86 @@
     .preference-tag:hover {
       background-color: #e0e0e0;
     }
+
+    .chat-box,
+    #chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .chat-message {
+      display: flex;
+      flex-direction: column;
+      max-width: 60%;
+      margin: 0.5rem;
+    }
+
+    .my-message {
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .other-message {
+      align-self: flex-start;
+      text-align: left;
+    }
+
+    .nickname {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+
+    .bubble {
+      background-color: #f1f0f0;
+      padding: 0.6rem 1rem;
+      border-radius: 16px;
+      display: inline-block;
+      word-break: break-word;
+    }
+
+    .my-message .bubble {
+      background-color: #DCF8C6;
+    }
+
+    .time {
+      font-size: 0.7rem;
+      color: #999;
+      margin-top: 0.3rem;
+    }
+
+    .input-group {
+      display: flex;
+      margin-top: 1rem;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .input-group button {
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
     .card-wrapper {
       display: flex;
-      flex-wrap: nowrap; /* 한 줄 고정 */
+      flex-wrap: nowrap;
       gap: 20px;
       justify-content: space-between;
     }
@@ -144,7 +186,7 @@
       border-radius: 8px;
       padding: 15px;
       background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .recommend-reason-box {
@@ -169,8 +211,11 @@
       .participant-list {
         grid-template-columns: 1fr;
       }
-    }
 
+      .chat-message {
+        max-width: 85%;
+      }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -287,7 +332,7 @@
     </div>
   </div>
 
-
+  <!-- ====================== 채팅 ======================== -->
   <div class="section">
     <h2>채팅</h2>
     <div class="chat-box" id="chat-box">
@@ -298,6 +343,7 @@
       <button type="button" onclick="sendMessage()">전송</button>
     </div>
   </div>
+  <!-- ================== 추천 ========================== -->
 <div class="section">
   <h2>2차 장소 추천</h2>
 
@@ -372,7 +418,8 @@
       // 팀 채팅방 구독
       stompClient.subscribe('/room/' + teamId, function (chat) {
         const message = JSON.parse(chat.body);
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
+        const isMyMessage = message.senderId === senderId;
+        showMessage(message, isMyMessage);
       });
     });
   }
@@ -399,14 +446,35 @@
 
 
   // 보낸 내용을 채팅방에 보여줌 ( 자동스크롤 방식)
-  function showMessage(message) {
+  function showMessage(message, isMyMessage) {
     const chatBox = document.getElementById('chat-box');
-    const messageElement = document.createElement('div');
-    messageElement.textContent = message;
-    chatBox.appendChild(messageElement);
+
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('chat-message', isMyMessage ? 'my-message' : 'other-message');
+
+    // 닉네임 (위)
+    const nicknameEl = document.createElement('div');
+    nicknameEl.className = 'nickname';
+    nicknameEl.textContent = message.senderNickname;
+
+    // 말풍선
+    const bubbleEl = document.createElement('div');
+    bubbleEl.className = 'bubble';
+    bubbleEl.textContent = message.message;
+
+    // 시간 (아래)
+    const timeEl = document.createElement('div');
+    timeEl.className = 'time';
+    timeEl.textContent = message.time;
+
+    // 조립
+    messageWrapper.appendChild(nicknameEl);
+    messageWrapper.appendChild(bubbleEl);
+    messageWrapper.appendChild(timeEl);
+
+    chatBox.appendChild(messageWrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-
   // 페이지 로드 후 연결
   connect();
 
@@ -429,7 +497,8 @@
 
       // 채팅 (닉네임 : 메시지 ) 형태
       data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
+        const isMyMessage = message.senderId === senderId;
+        showMessage(message, isMyMessage);
       });
     })
     .catch(error => {

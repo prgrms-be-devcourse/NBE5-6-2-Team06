@@ -25,7 +25,6 @@ public class ChatController {
         messagingTemplate.convertAndSend("/room/" + teamId, message);
         System.out.println("======/room/" + teamId+"메시지 전송 완료======");
 
-
     }
 }
 

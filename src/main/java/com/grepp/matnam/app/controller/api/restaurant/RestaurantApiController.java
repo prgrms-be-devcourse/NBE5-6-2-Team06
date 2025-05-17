@@ -26,6 +26,7 @@ public class RestaurantApiController {
     private final TeamService teamService;
     private final RestaurantService restaurantService;
 
+    // LLM 간단한 테스트 채팅 메시지[LLM 연결 확인용]
     @GetMapping("chat")
     public String chat(String message){return restaurantAiService.chat(message);}
 
