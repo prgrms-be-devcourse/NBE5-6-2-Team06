@@ -458,6 +458,11 @@ public class TeamService {
         return stats;
     }
 
+    //주최자 모임 삭제
+    @Transactional
+    public void unActivatedTeamByLeader(Long teamId) {
+        unActivatedById(teamId);
+    }
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }
