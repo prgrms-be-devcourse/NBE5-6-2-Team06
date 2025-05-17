@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.controller.api.mymap;
 
+import com.grepp.matnam.app.model.mymap.MymapService;
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
 import com.grepp.matnam.app.model.user.UserService;
@@ -18,21 +19,21 @@ import java.util.List;
 @RequestMapping("/api/mymap")
 public class MymapApiController {
 
-    private final MymapRepository mymapRepository;
+    private final MymapService mymapService;
     private final UserService userService;
 
     @GetMapping("/mine")
     public List<Mymap> getMyPinnedPlaces() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserById(userId);
-        return mymapRepository.findByUserAndPinnedTrue(user);
+        return mymapService.getPinnedPlaces(user);
     }
 
     @GetMapping("/activated")
     public List<Mymap> getMyActivatedPlaces() {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userService.getUserById(userId);
-        return user != null ? mymapRepository.findByUserAndActivatedTrue(user) : List.of();
+        return mymapService.getActivatedPlaces(user);
     }
 
     @PostMapping
@@ -42,25 +43,26 @@ public class MymapApiController {
         mymap.setUser(user);
         mymap.setActivated(true);
         mymap.setPinned(true);
-        mymapRepository.save(mymap);
+        mymapService.savePlace(mymap);
         return "저장 완료";
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<String> updatePlace(@PathVariable Long id, @RequestBody Mymap request) {
-        Mymap existing = mymapRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 장소를 찾을 수 없습니다."));
+        Mymap existing = mymapService.findById(id);
+        if (existing == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 장소를 찾을 수 없습니다.");
+        }
 
         if (request.getPinned() != null) {
             existing.setPinned(request.getPinned());
         }
-
         if (request.getActivated() != null) {
             existing.setActivated(request.getActivated());
         }
 
-        mymapRepository.save(existing);
+        mymapService.savePlace(existing);
         return ResponseEntity.ok("업데이트 완료");
     }
-
 }
+

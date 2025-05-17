@@ -10,12 +10,15 @@ import java.util.List;
 @Repository
 public interface MymapRepository extends JpaRepository<Mymap, Long> {
 
-    // pinned = true
     List<Mymap> findByUserAndPinnedTrue(User user);
 
-    // activated = true
     List<Mymap> findByUserAndActivatedTrue(User user);
 
-    // 팀페이지용 공개, 활성화 핀
     List<Mymap> findByUserAndActivatedTrueAndPinnedTrue(User user);
+
+    long countByUserAndActivatedTrue(User user);
+
+    long countByUserAndActivatedTrueAndPinnedTrue(User user);
+
+    long countByUserAndActivatedTrueAndPinnedFalse(User user);
 }
