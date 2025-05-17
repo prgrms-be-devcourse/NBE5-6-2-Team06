@@ -12,76 +12,42 @@
       background-color: #f9f9f9;
       color: #333;
     }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
       background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
+
     nav a {
       margin-right: 1rem;
       text-decoration: none;
       color: #333;
       font-size: 0.9rem;
     }
+
     .container {
       max-width: 1200px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
+
     .section {
       background: #fff;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
+
     .section h2 {
       margin-bottom: 1rem;
       font-size: 1.4rem;
       border-bottom: 2px solid #eee;
       padding-bottom: 0.5rem;
-    }
-    .participant-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .participant {
-      flex: 1 1 200px;
-      background: #f0f0f0;
-      padding: 1rem;
-      border-radius: 8px;
-      text-align: center;
-    }
-    .chat-box, .recommendation-box {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 1rem;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-    .input-group {
-      display: flex;
-      margin-top: 1rem;
-    }
-    .input-group input {
-      flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .input-group button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
-      border: none;
-      background-color: #000;
-      color: #fff;
-      border-radius: 4px;
-      cursor: pointer;
     }
 
     .participant-list {
@@ -131,6 +97,110 @@
       background-color: #e0e0e0;
     }
 
+    .chat-box,
+    #chat-box {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    .chat-message {
+      display: flex;
+      flex-direction: column;
+      max-width: 60%;
+      margin: 0.5rem;
+    }
+
+    .my-message {
+      align-self: flex-end;
+      text-align: right;
+    }
+
+    .other-message {
+      align-self: flex-start;
+      text-align: left;
+    }
+
+    .nickname {
+      font-size: 0.75rem;
+      color: #666;
+      margin-bottom: 0.3rem;
+    }
+
+    .bubble {
+      background-color: #f1f0f0;
+      padding: 0.6rem 1rem;
+      border-radius: 16px;
+      display: inline-block;
+      word-break: break-word;
+    }
+
+    .my-message .bubble {
+      background-color: #DCF8C6;
+    }
+
+    .time {
+      font-size: 0.7rem;
+      color: #999;
+      margin-top: 0.3rem;
+    }
+
+    .input-group {
+      display: flex;
+      margin-top: 1rem;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .input-group button {
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .card-wrapper {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 20px;
+      justify-content: space-between;
+    }
+
+    .recommend-card {
+      flex: 1;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .recommend-reason-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: #fcfcfc;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      font-size: 1rem;
+      color: #444;
+      line-height: 1.6;
+    }
+
     @media (max-width: 768px) {
       .participant-list {
         grid-template-columns: repeat(2, 1fr);
@@ -141,8 +211,11 @@
       .participant-list {
         grid-template-columns: 1fr;
       }
-    }
 
+      .chat-message {
+        max-width: 85%;
+      }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
@@ -275,7 +348,9 @@
       </div>
     </div>
   </div>
-    <div class="section">
+
+  <!-- ====================== 채팅 ======================== -->
+  <div class="section">
     <h2>채팅</h2>
     <div class="chat-box" id="chat-box">
       <!-- 채팅 메시지 표시 영역 -->
@@ -285,19 +360,53 @@
       <button type="button" onclick="sendMessage()">전송</button>
     </div>
   </div>
+  <!-- ================== 추천 ========================== -->
+<div class="section">
+  <h2>2차 장소 추천</h2>
 
-  <div class="section">
-    <h2>추천 받기</h2>
-    <div class="recommendation-box">
-      <!-- 추천 내용 표시 -->
-      <p>추천 결과가 여기에 표시됩니다.</p>
-    </div>
-    <div class="input-group">
-      <input type="text" placeholder="추천 키워드를 입력하세요...">
-      <button type="button">추천 요청</button>
+  <!-- 안내 메시지 + 추천 버튼 -->
+  <div
+      style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+    <p style="margin-bottom: 1rem; font-size: 1.05rem; line-height: 1.6;">
+      🍽️ <strong>오늘의 2차 장소</strong>, 고민하지 마세요!<br>
+      <span style="color: #555;">우리 팀을 위해 AI가 분위기 좋은 맛집을 추천해드려요.</span><br>
+      아래 버튼을 눌러 <strong style="color: #4CAF50;">맞춤 추천</strong>을 받아보세요! ✨
+    </p>
+    <button type="button" id="recommend-button"
+            style="padding: 0.75rem 1.6rem; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+      👍 추천받기
+    </button>
+  </div>
+
+    <!-- 추천 결과 카드 (처음엔 숨김) -->
+    <div id="recommendation-result-section" style="display: none;">
+      <h3 style="margin-bottom: 1.2rem; font-size: 1.3rem;">✨ AI가 추천한 2차 장소 TOP 3</h3>
+
+      <!--  로딩 표시 -->
+      <div id="loading-message" style="text-align:center; padding: 1rem; font-size: 1.1rem; color: #888; display: none;">
+        ⏳ AI가 추천 중입니다... 잠시만 기다려주세요!
+      </div>
+
+      <!--  카드 3개 수평으로 나열 -->
+      <div class="card-wrapper" id="recommendation-cards" style="display: flex; gap: 15px; flex-wrap: wrap;">
+
+      </div>
+
+      <!--  추천 이유 (꾸며진 박스) -->
+      <div class="recommend-reason-box" id="recommendation-reason" style="display: none;">
+        <h4 style="margin-top: 0; margin-bottom: 0.8rem;">✨ 추천 이유</h4>
+        <div id="reason-text"></div>
+      </div>
+
+      <!--  재추천 버튼 -->
+      <div style=" margin-top: 2rem;">
+        <button type="button" id="retry-button"
+                style="padding: 0.8rem 1.8rem; background-color: #333; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+          🔁 재추천받기
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
 <script th:inline="javascript">
   let stompClient;
@@ -306,7 +415,7 @@
   const senderId = [[${userId}]]; // 로그인된 사용자 ID
   const senderNickname = [[${userNickname}]]; // 로그인된 사용자 닉네임
 
-
+  //=============================== 채팅 ===================================
   function connect() {
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
@@ -326,7 +435,8 @@
       // 팀 채팅방 구독
       stompClient.subscribe('/room/' + teamId, function (chat) {
         const message = JSON.parse(chat.body);
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
+        const isMyMessage = message.senderId === senderId;
+        showMessage(message, isMyMessage);
       });
     });
   }
@@ -353,14 +463,35 @@
 
 
   // 보낸 내용을 채팅방에 보여줌 ( 자동스크롤 방식)
-  function showMessage(message) {
+  function showMessage(message, isMyMessage) {
     const chatBox = document.getElementById('chat-box');
-    const messageElement = document.createElement('div');
-    messageElement.textContent = message;
-    chatBox.appendChild(messageElement);
+
+    const messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('chat-message', isMyMessage ? 'my-message' : 'other-message');
+
+    // 닉네임 (위)
+    const nicknameEl = document.createElement('div');
+    nicknameEl.className = 'nickname';
+    nicknameEl.textContent = message.senderNickname;
+
+    // 말풍선
+    const bubbleEl = document.createElement('div');
+    bubbleEl.className = 'bubble';
+    bubbleEl.textContent = message.message;
+
+    // 시간 (아래)
+    const timeEl = document.createElement('div');
+    timeEl.className = 'time';
+    timeEl.textContent = message.time;
+
+    // 조립
+    messageWrapper.appendChild(nicknameEl);
+    messageWrapper.appendChild(bubbleEl);
+    messageWrapper.appendChild(timeEl);
+
+    chatBox.appendChild(messageWrapper);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
-
   // 페이지 로드 후 연결
   connect();
 
@@ -379,15 +510,99 @@
     .then(data => {
       console.log("불러온 채팅 이력:", data);
       const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = ''; // 기존 내용 초기화
+      chatBox.innerHTML = '';
 
-      // 채팅 (닉네임 : 메시지 ) 형태
-      data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`);
+      const messages = data.data;
+
+      if (!Array.isArray(messages)) {
+        console.error("채팅 이력 형식이 잘못되었습니다:", messages);
+        return;
+      }
+
+      messages.forEach(message => {
+        const isMyMessage = message.senderId === senderId;
+        showMessage(message, isMyMessage);
       });
     })
     .catch(error => {
       console.error("채팅 이력 로딩 오류:", error);
+    });
+  }
+
+  // ====================================== 추천 ========================================
+  document.getElementById("recommend-button").addEventListener("click", () => {
+    fetchRecommendations(`/api/ai/recommend/restaurant/${teamId}`);
+  });
+
+  document.getElementById("retry-button").addEventListener("click", () => {
+    fetchRecommendations(`/api/ai/reRecommend/restaurant`);
+  });
+
+  // 먼저 데이터 가져오기
+  function fetchRecommendations(url) {
+    const wrapper = document.getElementById("recommendation-cards");
+    const section = document.getElementById("recommendation-result-section");
+    const loading = document.getElementById("loading-message");
+    const reasonBox = document.getElementById("recommendation-reason");
+
+    wrapper.innerHTML = "";
+    reasonBox.innerText = "";
+    section.style.display = "block";
+    loading.style.display = "block";
+
+    fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('추천 실패');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log("📦 받아온 추천 데이터:", data);
+      const restaurants = data.restaurants;
+      const reason = data.reason;
+      let completed = 0;
+
+      restaurants.forEach(name => {
+        fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
+        .then(res => res.json())
+        .then(dbItem => {
+          const card = document.createElement("div");
+          card.className = "recommend-card";
+
+          card.innerHTML = `
+              <div>
+                <h3 style="margin-top: 0; font-size: 1.2rem;">🍽️ ${dbItem.restaurantName}</h3>
+                <p><strong>📍 위치:</strong> ${dbItem.address}</p>
+                <p><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
+                <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
+                <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
+                <p><strong>📝 소개:</strong> ${dbItem.description}</p>
+                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
+              </div>
+            `;
+          wrapper.appendChild(card);
+        })
+        .catch(err => {
+          console.error("식당 정보 조회 실패", err);
+        })
+        .finally(() => {
+          completed++;
+          if (completed === restaurants.length) {
+            loading.style.display = "none";
+
+            reasonBox.innerHTML = `
+                <h2 style="margin-top: 0; margin-bottom: 0.8rem;">💬 추천 이유</h2>
+                <div>${reason}</div>
+              `;
+            reasonBox.style.display = "block";
+          }
+        });
+      });
+    })
+    .catch(err => {
+      console.error("추천 요청 실패", err);
+      loading.style.display = "none";
     });
   }
 </script>
