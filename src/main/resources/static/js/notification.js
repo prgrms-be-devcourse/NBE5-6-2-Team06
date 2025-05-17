@@ -1,117 +1,310 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // 새 공지 작성 버튼 클릭 이벤트
-    const addNotificationBtn = document.getElementById('add-notification-btn');
-    if (addNotificationBtn) {
-        addNotificationBtn.addEventListener('click', function() {
-            // 모달 제목 설정
-            document.getElementById('notification-modal-title').textContent = '새 공지 작성';
-            
-            // 폼 초기화
-            document.getElementById('notificationForm').reset();
-            document.getElementById('notification-id').value = '';
-            document.getElementById('notification-status').value = 'active';
-            
-            // 모달 표시
-            document.getElementById('notificationModal').style.display = 'block';
+class NotificationHandler {
+    constructor() {
+        this.eventSource = null;
+        this.unreadCount = 0;
+        this.notificationBell = document.getElementById('notification-bell');
+        this.badge = this.notificationBell ? this.notificationBell.querySelector('.badge') : null;
+        this.notificationModal = document.getElementById('notification-modal');
+        this.notificationList = this.notificationModal ? this.notificationModal.querySelector('.notification-list') : null;
+        this.tabs = document.querySelectorAll('.notification-tab');
+        this.currentTab = 'all';
+        this.notifications = [];
+        this.markAllReadButton = this.notificationModal ? this.notificationModal.querySelector('.mark-all-read') : null;
+
+        this.initialize();
+    }
+
+    async initialize() {
+        await this.fetchUnreadCount();
+        this.connectSSE();
+        await this.fetchNotifications(this.currentTab);
+        this.setupTabEventListeners();
+        this.setupModalToggle();
+        this.setupMarkAllReadButton();
+    }
+
+    setupModalToggle() {
+        if (this.notificationBell && this.notificationModal) {
+            this.notificationBell.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.notificationModal.style.display = this.notificationModal.style.display === 'block' ? 'none' : 'block';
+            });
+
+            this.notificationModal.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            document.addEventListener('click', (event) => {
+                if (this.notificationModal && this.notificationModal.style.display === 'block' && !this.notificationModal.contains(event.target) && event.target !== this.notificationBell) {
+                    this.notificationModal.style.display = 'none';
+                }
+            });
+
+            const closeButton = this.notificationModal.querySelector('.close-notification');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    this.notificationModal.style.display = 'none';
+                });
+            }
+        }
+    }
+
+    setupTabEventListeners() {
+        this.tabs.forEach(tab => {
+            tab.addEventListener('click', async () => {
+                this.tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                this.currentTab = tab.getAttribute('data-tab');
+                await this.fetchNotifications(this.currentTab);
+            });
         });
     }
-    
-    // 공지 수정 버튼 클릭 이벤트
-    const editButtons = document.querySelectorAll('.action-btn.edit');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const notificationId = this.getAttribute('data-id');
-            
-            // 실제 구현에서는 서버에서 데이터를 가져와야 함
-            // 여기서는 예시 데이터로 모달 채우기
-            document.getElementById('notification-modal-title').textContent = '공지 수정';
-            document.getElementById('notification-id').value = notificationId;
-            document.getElementById('notification-title').value = '시스템 점검 안내';
-            document.getElementById('notification-content').value = '2023년 7월 1일 오전 2시부터 4시까지 시스템 점검이 있을 예정입니다.';
-            document.getElementById('notification-status').value = 'active';
-            
-            // 모달 표시
-            document.getElementById('notificationModal').style.display = 'block';
-        });
-    });
-    
-    // 공지 상세 보기 버튼 클릭 이벤트
-    const viewButtons = document.querySelectorAll('.action-btn.view');
-    viewButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const notificationId = this.getAttribute('data-id');
-            
-            // 실제 구현에서는 서버에서 데이터를 가져와야 함
-            // 여기서는 예시 데이터로 모달 채우기
-            document.getElementById('notification-modal-title').textContent = '공지 상세 보기';
-            document.getElementById('notification-id').value = notificationId;
-            document.getElementById('notification-title').value = '시스템 점검 안내';
-            document.getElementById('notification-content').value = '2023년 7월 1일 오전 2시부터 4시까지 시스템 점검이 있을 예정입니다.';
-            document.getElementById('notification-status').value = 'active';
-            
-            // 읽기 전용으로 설정
-            document.getElementById('notification-title').readOnly = true;
-            document.getElementById('notification-content').readOnly = true;
-            document.getElementById('notification-status').disabled = true;
-            
-            // 저장 버튼 숨기기
-            document.querySelector('#notificationModal .save-btn').style.display = 'none';
-            
-            // 모달 표시
-            document.getElementById('notificationModal').style.display = 'block';
-        });
-    });
-    
-    // 공지 삭제 버튼 클릭 이벤트
-    const deleteButtons = document.querySelectorAll('.action-btn.delete');
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const notificationId = this.getAttribute('data-id');
-            
-            if (confirm('정말로 이 공지를 삭제하시겠습니까?')) {
-                // 실제 구현에서는 서버로 삭제 요청을 보내야 함
-                // 여기서는 예시로 알림만 표시
-                alert('공지가 삭제되었습니다.');
-                
-                // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-                // window.location.reload();
+
+    setupMarkAllReadButton() {
+        if (this.markAllReadButton) {
+            this.markAllReadButton.addEventListener('click', async () => {
+                const unreadNotifications = this.notifications.filter(n => !n.isRead);
+                if (unreadNotifications.length > 0) {
+                    const unreadIds = unreadNotifications.map(n => n.id);
+                    try {
+                        const response = await window.auth.fetchWithAuth(`/api/notification/mark-read`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ notificationIds: unreadIds })
+                        });
+                        if (response && response.ok) {
+                            this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+                            this.unreadCount = 0;
+                            this.updateBadge();
+                            this.renderNotifications();
+                        } else {
+                            console.error('모두 읽음 처리 실패:', response ? await response.text() : 'Network error');
+                        }
+                    } catch (error) {
+                        console.error('모두 읽음 처리 요청 실패:', error);
+                    }
+                }
+            });
+        }
+    }
+
+    async fetchUnreadCount() {
+        try {
+            const response = await window.auth.fetchWithAuth('/api/notification/unread-count');
+            if (response && response.ok) {
+                this.unreadCount = await response.json();
+                this.updateBadge();
             }
-        });
-    });
-    
-    // 공지 저장 버튼 클릭 이벤트
-    const saveBtn = document.querySelector('#notificationModal .save-btn');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', function() {
-            // 폼 유효성 검사
-            const title = document.getElementById('notification-title').value;
-            const content = document.getElementById('notification-content').value;
-            
-            if (!title || !content) {
-                alert('제목과 내용을 모두 입력해주세요.');
-                return;
+        } catch (error) {
+            console.error('읽지 않은 알림 개수 가져오기 실패:', error);
+        }
+    }
+
+    async fetchNotifications(tab) {
+        let url = '/api/notification';
+        if (tab === 'unread') {
+            url = '/api/notification/unread';
+        } else if (tab === 'system') {
+            url = '/api/notification/system';
+        }
+
+        try {
+            const response = await window.auth.fetchWithAuth(url);
+            if (response && response.ok) {
+                const data = await response.json();
+                console.log(data);
+                this.notifications = data;
+                this.renderNotifications();
             }
-            
-            // 실제 구현에서는 서버로 데이터 전송
-            // 여기서는 모달 닫기만 수행
-            document.getElementById('notificationModal').style.display = 'none';
-            
-            // 성공 메시지 (실제 구현에서는 서버 응답 후 표시)
-            alert('공지가 저장되었습니다.');
-            
-            // 페이지 새로고침 (실제 구현에서는 필요에 따라 수행)
-            // window.location.reload();
+        } catch (error) {
+            console.error('알림 목록 가져오기 실패:', error);
+        }
+    }
+
+    renderNotifications() {
+        if (this.notificationList) {
+            console.log('this.notifications:', this.notifications);
+            this.notificationList.innerHTML = '';
+            const unreadNotifications = this.notifications.filter(n => !n.isRead);
+            const readNotifications = this.notifications.filter(n => n.isRead);
+
+            // 읽지 않은 알림 렌더링
+            unreadNotifications.forEach(notification => {
+                const notificationItem = this.createNotificationItemElement(notification);
+                this.notificationList.appendChild(notificationItem);
+                this.setupNotificationItemEventListeners(notificationItem);
+            });
+
+            // 읽은 알림 렌더링
+            readNotifications.forEach(notification => {
+                const notificationItem = this.createNotificationItemElement(notification);
+                notificationItem.classList.add('read');
+                this.notificationList.appendChild(notificationItem);
+                // 읽은 알림에는 삭제 버튼만 표시 (읽음 버튼 제거)
+                const deleteButton = notificationItem.querySelector('.delete-notification');
+                if (deleteButton) {
+                    this.setupDeleteButton(deleteButton);
+                }
+            });
+        }
+    }
+
+    // 알림 아이템 엘리먼트 생성 함수
+    createNotificationItemElement(notification) {
+        const notificationItem = document.createElement('div');
+        notificationItem.classList.add('notification-item', notification.type.toLowerCase());
+        if (notification.isRead) {
+            notificationItem.classList.add('read');
+        } else {
+            notificationItem.classList.add('unread');
+        }
+        notificationItem.innerHTML = `
+            <div class="notification-icon"> 
+              ${this.getNotificationIcon(notification.type)}
+            </div>
+            <div class="notification-content">
+                <p class="notification-text">${notification.message}</p>
+                <span class="notification-time">${this.formatTimeAgo(notification.createdAt)}</span>
+            </div>
+            <div class="notification-actions">
+                ${notification.isRead ? `<button class="delete-notification" data-id="${notification.id}" title="삭제"><i class="fas fa-trash"></i></button>` : `<button class="mark-read" data-id="${notification.id}" title="읽음 표시"><i class="fas fa-check"></i></button>`}
+            </div>
+        `;
+        return notificationItem;
+    }
+
+    // 알림 아이템 이벤트 리스너 설정 함수
+    setupNotificationItemEventListeners(notificationItem) {
+        const markReadButton = notificationItem.querySelector('.mark-read');
+        if (markReadButton) {
+            this.setupMarkReadButton(markReadButton);
+        }
+        const deleteButton = notificationItem.querySelector('.delete-notification');
+        if (deleteButton) {
+            this.setupDeleteButton(deleteButton);
+        }
+    }
+
+    formatTimeAgo(dateTimeString) {
+        const now = new Date();
+        const past = new Date(dateTimeString);
+        const diffInSeconds = Math.floor((now - past) / 1000);
+
+        if (diffInSeconds < 60) return `${diffInSeconds}초 전`;
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) return `${diffInMinutes}분 전`;
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) return `${diffInHours}시간 전`;
+        return `${Math.floor(diffInHours / 24)}일 전`;
+    }
+
+    connectSSE() {
+        this.eventSource = new EventSource('/api/sse/notification/subscribe', {
+            withCredentials: true,
+            headers: window.auth.getAuthHeaders()
+        });
+
+        this.eventSource.onopen = () => {
+            console.log('SSE 연결 성공');
+        };
+
+        this.eventSource.onerror = (error) => {
+            console.error('SSE 연결 오류:', error);
+            setTimeout(() => this.connectSSE(), 3000);
+        };
+
+        this.eventSource.addEventListener('unreadCount', (event) => {
+            this.unreadCount = parseInt(event.data);
+            this.updateBadge();
+        });
+
+        this.eventSource.addEventListener('newMessage', (event) => {
+            const newNotification = JSON.parse(event.data);
+            this.notifications.unshift(newNotification);
+            this.renderNotifications();
+            this.unreadCount++;
+            this.updateBadge();
         });
     }
-    
-    // 모달이 닫힐 때 읽기 전용 해제 및 저장 버튼 표시
-    const closeButtons = document.querySelectorAll('#notificationModal .close-modal, #notificationModal .cancel-btn');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('notification-title').readOnly = false;
-            document.getElementById('notification-content').readOnly = false;
-            document.getElementById('notification-status').disabled = false;
-            document.querySelector('#notificationModal .save-btn').style.display = 'inline-block';
+
+    getNotificationIcon(type) {
+        switch (type) {
+            case 'USER_STATUS': return '<i class="fas fa-user-check"></i>';
+            case 'TEAM_STATUS': return '<i class="fas fa-users"></i>';
+            case 'NOTICE': return '<i class="fas fa-bullhorn"></i>';
+            case 'PARTICIPANT_STATUS': return '<i class="fas fa-user-plus"></i>';
+            case 'REVIEW_REQUEST': return '<i class="fas fa-star"></i>';
+            case 'REVIEW_RECEIVED': return '<i class="fas fa-reply"></i>';
+            case 'REPORT': return '<i class="fas fa-flag"></i>';
+            default: return '<i class="fas fa-bell"></i>';
+        }
+    }
+
+    updateBadge() {
+        if (this.badge) {
+            this.badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+            this.badge.style.display = this.unreadCount > 0 ? 'flex' : 'none';
+        }
+    }
+
+    setupMarkReadButton(button) {
+        button.addEventListener('click', async (event) => {
+            event.stopPropagation();
+            const notificationItem = button.closest('.notification-item');
+            const notificationId = button.dataset.id;
+
+            try {
+                const response = await window.auth.fetchWithAuth(`/api/notification/mark-read`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ notificationIds: [parseInt(notificationId)] })
+                });
+                if (response && response.ok) {
+                    this.notifications = this.notifications.map(n =>
+                        n.id.toString() === notificationId ? { ...n, isRead: true } : n
+                    );
+                    this.renderNotifications();
+                    this.unreadCount--;
+                    this.updateBadge();
+                } else {
+                    console.error('읽음 처리 실패:', response ? await response.text() : 'Network error');
+                }
+            } catch (error) {
+                console.error('읽음 처리 요청 실패:', error);
+            }
         });
-    });
+    }
+
+    setupDeleteButton(button) {
+        button.addEventListener('click', async (event) => {
+            event.stopPropagation();
+            const notificationItem = button.closest('.notification-item');
+            const notificationId = button.dataset.id;
+
+            try {
+                const response = await window.auth.fetchWithAuth(`/api/notification/${notificationId}`, {
+                    method: 'DELETE'
+                });
+                if (response && response.ok) {
+                    this.notifications = this.notifications.filter(n => n.id.toString() !== notificationId);
+                    this.renderNotifications();
+                    if (!notificationItem.classList.contains('unread')) {
+                        this.fetchUnreadCount(); // 삭제 후 읽지 않은 개수 다시 가져오기
+                    }
+                } else {
+                    console.error('알림 삭제 실패:', response ? await response.text() : 'Network error');
+                }
+            } catch (error) {
+                console.error('알림 삭제 요청 실패:', error);
+            }
+        });
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new NotificationHandler();
 });

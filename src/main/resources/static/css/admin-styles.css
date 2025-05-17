@@ -1594,6 +1594,11 @@ h1 {
     background-color: var(--light-color);
 }
 
+.notification-item.read {
+    background-color: #f0f0f0; /* 읽은 알림 배경색 */
+    color: #888; /* 읽은 알림 글자색 (선택 사항) */
+}
+
 .notification-item.unread {
     background-color: rgba(74, 108, 247, 0.05);
 }

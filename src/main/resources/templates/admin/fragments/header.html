@@ -33,67 +33,7 @@
           <button class="notification-tab" data-tab="system">시스템</button>
         </div>
         <div class="notification-list">
-          <!-- 알림 항목들 -->
-          <div class="notification-item unread system">
-            <div class="notification-icon system">
-              <i class="fas fa-cog"></i>
-            </div>
-            <div class="notification-content">
-              <p class="notification-text">시스템 점검 안내: 2023년 7월 1일 오전 2시부터 4시까지 시스템 점검이 있을 예정입니다.</p>
-              <span class="notification-time">10분 전</span>
-            </div>
-            <div class="notification-actions">
-              <button class="mark-read" title="읽음 표시"><i class="fas fa-check"></i></button>
-            </div>
-          </div>
-          <div class="notification-item unread">
-            <div class="notification-icon report">
-              <i class="fas fa-flag"></i>
-            </div>
-            <div class="notification-content">
-              <p class="notification-text">새로운 신고가 접수되었습니다: 부적절한 채팅</p>
-              <span class="notification-time">30분 전</span>
-            </div>
-            <div class="notification-actions">
-              <button class="mark-read" title="읽음 표시"><i class="fas fa-check"></i></button>
-            </div>
-          </div>
-          <div class="notification-item">
-            <div class="notification-icon user">
-              <i class="fas fa-user-plus"></i>
-            </div>
-            <div class="notification-content">
-              <p class="notification-text">새로운 회원 가입: 김철수</p>
-              <span class="notification-time">1시간 전</span>
-            </div>
-            <div class="notification-actions">
-              <button class="delete-notification" title="삭제"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>
-          <div class="notification-item">
-            <div class="notification-icon team">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="notification-content">
-              <p class="notification-text">새로운 모임이 생성되었습니다: 강남 맛집 탐방</p>
-              <span class="notification-time">2시간 전</span>
-            </div>
-            <div class="notification-actions">
-              <button class="delete-notification" title="삭제"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>
-          <div class="notification-item system">
-            <div class="notification-icon system">
-              <i class="fas fa-cog"></i>
-            </div>
-            <div class="notification-content">
-              <p class="notification-text">시스템 업데이트가 완료되었습니다.</p>
-              <span class="notification-time">1일 전</span>
-            </div>
-            <div class="notification-actions">
-              <button class="delete-notification" title="삭제"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>
+          
         </div>
         <div class="notification-footer">
           <a th:href="@{/admin/notification}" class="view-all-notifications">모든 알림 보기</a>
@@ -109,6 +49,7 @@
       <span id="profile-name">관리자</span>
     </div>
   </div>
+  <script th:src="@{/js/notification.js}"></script>
 </header>
 </body>
 </html>
