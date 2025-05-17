@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#error-description').textContent = errorMessages.summary;
                 document.querySelector('#error-mood').textContent = errorMessages.mood;
                 document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
-                alert('필수 항목을 모두 입력해주세요.');
+                alert('필수 항목을 확인해주세요.');
             }
         })
         .catch(err => {

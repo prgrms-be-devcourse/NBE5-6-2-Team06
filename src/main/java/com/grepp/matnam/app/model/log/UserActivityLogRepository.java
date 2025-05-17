@@ -23,4 +23,13 @@ public interface UserActivityLogRepository extends JpaRepository<UserActivityLog
         "GROUP BY FUNCTION('DATE_FORMAT', u.activityDate, '%Y-%m') " +
         "ORDER BY FUNCTION('DATE_FORMAT', u.activityDate, '%Y-%m')")
     List<Map<String, Object>> findMonthlyUserActivity(@Param("startDate") LocalDate startDate);
+
+    @Query("SELECT " +
+        "FUNCTION('DATE_FORMAT', u.activityDate, '%m-%d') AS activityDay, " +
+        "COUNT(DISTINCT u.userId) AS uniqueUserCount " +
+        "FROM UserActivityLog u " +
+        "WHERE u.activityDate >= :startDate " +
+        "GROUP BY FUNCTION('DATE_FORMAT', u.activityDate, '%m-%d') " +
+        "ORDER BY FUNCTION('DATE_FORMAT', u.activityDate, '%m-%d')")
+    List<Map<String, Object>> findWeekUserActivity(LocalDate startDate);
 }

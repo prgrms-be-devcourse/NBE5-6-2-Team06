@@ -3,6 +3,8 @@ package com.grepp.matnam.app.model.user;
 import com.grepp.matnam.app.controller.api.user.payload.PreferenceRequest;
 import com.grepp.matnam.app.model.user.entity.Preference;
 import com.grepp.matnam.app.model.user.entity.User;
+import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,10 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @Slf4j
+@RequiredArgsConstructor
 public class PreferenceService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final PreferenceRepository preferenceRepository;
 
     public void savePreference(String userId, PreferenceRequest request) {
         log.info("사용자 ID로 취향 저장 시도: " + userId);
@@ -108,5 +113,9 @@ public class PreferenceService {
         if (request.isGoodMenu()) selectedPrefs.append("메뉴가 다양한, ");
         if (request.isLongStay()) selectedPrefs.append("오래 머물 수 있는, ");
         if (request.isBigStore()) selectedPrefs.append("매장이 넓은, ");
+    }
+
+    public Map<String, Long> getPreferenceCounts() {
+        return preferenceRepository.getPreferenceCounts();
     }
 }

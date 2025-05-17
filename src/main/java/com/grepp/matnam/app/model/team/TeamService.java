@@ -2,6 +2,8 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
+import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
+import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
@@ -17,10 +19,13 @@ import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -316,6 +321,49 @@ public class TeamService {
                 "successRate", String.format("%.2f", successRate)
             );
         }).collect(Collectors.toList());
+    }
+
+    public Map<String, Long> getTeamParticipantDistribution() {
+        Map<String, Long> distribution = new HashMap<>();
+        distribution.put("2-3명", teamRepository.countByNowPeopleBetween(2, 3));
+        distribution.put("4-5명", teamRepository.countByNowPeopleBetween(4, 5));
+        distribution.put("6-7명", teamRepository.countByNowPeopleBetween(6, 7));
+        distribution.put("8-10명", teamRepository.countByNowPeopleBetween(8, 10));
+        return distribution;
+    }
+
+    public Map<String, Long> getDailyNewTeamCountsLast7Days() {
+        LocalDate today = LocalDate.now();
+        Map<LocalDate, Long> dailyCounts = IntStream.rangeClosed(0, 6)
+            .mapToObj(today::minusDays)
+            .collect(Collectors.toMap(
+                date -> date,
+                date -> teamRepository.countByCreatedAtBetween(
+                    LocalDateTime.of(date, LocalTime.MIN),
+                    LocalDateTime.of(date, LocalTime.MAX)
+                ),
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
+
+        return dailyCounts.entrySet().stream()
+            .collect(Collectors.toMap(
+                entry -> entry.getKey().toString().substring(5),
+                Map.Entry::getValue,
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
+    }
+
+    public TeamStatsResponse getTeamStatistics() {
+        TeamStatsResponse statsDto = new TeamStatsResponse();
+        statsDto.setTotalTeams(teamRepository.count());
+        statsDto.setActiveTeams(teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(Status.FULL));
+        statsDto.setCompletedTeams(teamRepository.countByStatus(Status.COMPLETED));
+        statsDto.setNewTeamsLast30Days(teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+        Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
+        statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
+        return statsDto;
     }
 
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기

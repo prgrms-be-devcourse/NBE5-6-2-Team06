@@ -151,7 +151,7 @@
         .toggle-text.inactive {
             color: #888;
         }
-        .notification {
+        .notice {
             margin: 10px 0;
             padding: 10px 15px;
             border-radius: 4px;
@@ -159,18 +159,18 @@
             border-left: 4px solid #6c757d;
             color: #495057;
         }
-        .notification.info {
+        .notice.info {
             background-color: #e8f4fd;
             border-left-color: #3498db;
             color: #2c80b9;
         }
-        .notification.warning {
+        .notice.warning {
             background-color: #fff8e8;
             border-left-color: #f39c12;
             color: #d35400;
         }
 
-        .notification i {
+        .notice i {
             margin-right: 8px;
         }
     </style>
@@ -184,7 +184,7 @@
     <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"></div>
 
     <!-- 활성화 제한 알림 메시지 -->
-    <div class="notification info">
+    <div class="notice info">
         <i class="fas fa-info-circle"></i>
         <span>활성화 상태의 랭킹은 한 개만 설정할 수 있습니다. 새로운 랭킹을 활성화하면 기존 활성화된 랭킹은 자동으로 비활성화됩니다.</span>
     </div>

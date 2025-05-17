@@ -50,4 +50,12 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
         "GROUP BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') " +
         "ORDER BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m')")
     List<Map<String, Long>> findMonthlyMeetingStats(@Param("startDate") LocalDateTime startDate);
+
+    Long countByNowPeopleBetween(int start, int end);
+
+    long countByStatus(Status status);
+    long countByCreatedAtAfter(LocalDateTime dateTime);
+
+    @Query("SELECT AVG(t.maxPeople) FROM Team t WHERE t.status IN ('RECRUITING', 'FULL')")
+    Double averageMaxPeopleForActiveTeams();
 }
