@@ -160,6 +160,10 @@ public class TeamController {
             .toList();
         model.addAttribute("participants", approvedParticipants);
 
+        // 주최자인지 확인
+        boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
+        model.addAttribute("isLeader", isLeader);
+
         return "team/teamPage";
     }
 
