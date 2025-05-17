@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.model.auth.code.Role;
 import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
@@ -36,4 +37,6 @@ public interface UserRepository extends JpaRepository<User, String>, UserReposit
     long countByStatusNotActive();
     @Query("SELECT COUNT(u) FROM User u WHERE u.gender = :gender AND u.status <> 'ACTIVE'")
     long countByGenderAndStatusNotActive(Gender gender);
+
+    List<User> findByRoleEqualsAndActivatedIsTrue(Role role);
 }

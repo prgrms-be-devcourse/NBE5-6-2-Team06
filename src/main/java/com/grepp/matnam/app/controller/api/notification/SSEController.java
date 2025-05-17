@@ -23,7 +23,7 @@ public class SSEController {
     @GetMapping(value = "/api/sse/notification/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe() {
         String userId = AuthenticationUtils.getCurrentUserId();
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        SseEmitter emitter = new SseEmitter(3600000L);
 
         emitters.put(userId, emitter);
         log.info("SSE 연결 수립 - 사용자 ID: {}", userId);

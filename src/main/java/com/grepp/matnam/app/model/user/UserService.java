@@ -2,6 +2,10 @@ package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.controller.api.notification.SSEController;
+import com.grepp.matnam.app.model.notification.code.NotificationType;
+import com.grepp.matnam.app.model.notification.entity.Notification;
+import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
@@ -37,6 +41,8 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
+    private final SSEController sseController;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
 
@@ -294,5 +300,25 @@ public class UserService {
 
 
         return statsResponse;
+    }
+
+    @Transactional
+    public void sendBroadcastNotification(String content) {
+        // ROLE_USER 이고 활성화된 사용자만 조회
+        List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
+
+        for (User user : usersToSend) {
+            Notification notification = new Notification();
+            notification.setUserId(user.getUserId());
+            notification.setType(NotificationType.NOTICE);
+            notification.setMessage(content);
+            notification.setLink(null);
+            notification.setRead(false);
+            notification.setActivated(true);
+            notificationRepository.save(notification);
+
+            sseController.sendNotificationToUser(user.getUserId(), "newMessage", notification);
+            sseController.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
+        }
     }
 }
