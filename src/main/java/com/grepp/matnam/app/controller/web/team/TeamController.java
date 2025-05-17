@@ -71,15 +71,15 @@ public class TeamController {
         if (teamRequest.getDate() != null && teamRequest.getTime() != null) {
             String dateTimeString = teamRequest.getDate() + "T" + teamRequest.getTime() + ":00";
             try {
-                team.setMeetDate(LocalDateTime.parse(dateTimeString));
+                team.setTeamDate(LocalDateTime.parse(dateTimeString));
             } catch (Exception e) {
-                team.setMeetDate(LocalDateTime.now());
+                team.setTeamDate(LocalDateTime.now());
             }
         } else {
-            team.setMeetDate(LocalDateTime.now());
+            team.setTeamDate(LocalDateTime.now());
         }
 
-        team.setTeamDate(LocalDateTime.now());
+//        team.setTeamDate(LocalDateTime.now());
 
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);

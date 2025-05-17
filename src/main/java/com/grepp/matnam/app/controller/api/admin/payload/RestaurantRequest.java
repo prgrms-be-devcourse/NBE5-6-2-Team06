@@ -66,7 +66,6 @@ public class RestaurantRequest {
         restaurant.setLongStay(longStay);
         restaurant.setBigStore(bigStore);
         restaurant.setGoogleRating(googleRating);
-        restaurant.setRecommendedCount(0);
 
         return restaurant;
     }

@@ -33,10 +33,6 @@ public class Restaurant extends BaseEntity {
 
     private String category;
 
-    private Integer recommendedCount;
-
-    private String mood;
-
     private Float googleRating;
 
     // 각 식당 대표 분위기 추가
@@ -58,7 +54,6 @@ public class Restaurant extends BaseEntity {
             ", summary='" + summary + '\'' +
             ", mainFood='" + mainFood + '\'' +
             ", category='" + category + '\'' +
-            ", mood='" + mood + '\'' +
             '}';
     }
 

@@ -53,7 +53,6 @@ public interface RestaurantAiService {
     당신은 팀에게 최적의 식당을 추천해주는 전문가입니다.
     팀원들에게 추천해주면 좋을 만한 식당을 추천해주세요.
     모든 키워드는 영어가 아닌 한글로 표현해주세요. (예: clean → 청결)
-    키워드를 나열하는 방식('~키워드를 충족합니다' 같은 표현)은 사용하지 말고, 키워드를 자연스럽게 문장 속에 녹여서 설명해주세요.
     각 식당의 소개를 잘 활용해서 이유를 자세하게 작성해주세요.
     응답은 반드시 JSON 형식이어야 하며, `restaurants`, `reason` 필드를 포함하세요.
     `reason`은 자세하게 작성해줘
@@ -61,8 +60,8 @@ public interface RestaurantAiService {
     """)
 
     @UserMessage("""
-    3개 식당 추천해주고 왜 추천되었는지 이유를 작성해줘
-    한번 추천된 내용은 다시 추천안해줬으면 좋겠어
+    분식 관련 3개 식당 추천해주고 왜 추천되었는지 이유를 작성해줘
+    한번 추천된 내용은 다시 추천 안해줬으면 좋겠어
     """)
     RestaurantRecommendResponse reRecommendRestaurant();
 

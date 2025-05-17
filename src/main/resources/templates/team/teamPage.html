@@ -311,7 +311,7 @@
     </p>
     <button type="button" id="recommend-button"
             style="padding: 0.75rem 1.6rem; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">
-      👉 추천받기
+      👍 추천받기
     </button>
   </div>
 
@@ -483,7 +483,7 @@
                 <h3 style="margin-top: 0; font-size: 1.2rem;">🍽️ ${dbItem.restaurantName}</h3>
                 <p><strong>📍 위치:</strong> ${dbItem.address}</p>
                 <p><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
-                <p><strong>🍗 메인메뉴:</strong> ${dbItem.mainFood}</p>
+                <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
                 <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
                 <p><strong>📝 소개:</strong> ${dbItem.description}</p>
                 <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
@@ -499,9 +499,8 @@
           if (completed === restaurants.length) {
             loading.style.display = "none";
 
-            // ✨ 추천 이유 삽입
             reasonBox.innerHTML = `
-                <h2 style="margin-top: 0; margin-bottom: 0.8rem;">✨ 추천 이유</h2>
+                <h2 style="margin-top: 0; margin-bottom: 0.8rem;">💬 추천 이유</h2>
                 <div>${reason}</div>
               `;
             reasonBox.style.display = "block";
