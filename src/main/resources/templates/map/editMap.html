@@ -14,6 +14,11 @@
             margin: 0 0 1rem;
         }
 
+        .info-item {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
         #map {
             width: 100%;
             height: 400px;
@@ -71,7 +76,12 @@
 </head>
 <body>
 <h4>저장된 맛집 리스트를 조회하고 삭제 또는 공개여부를 선택해주세요</h4>
-<h5>등록 시 공개 상태로 저장됩니다. 💙파란핀: 공개 | 💛노란핀 : 비공개</h5>
+<h5>
+    최초 등록 시 공개 상태로 저장됩니다.
+    🔵파란핀: 공개 (<span th:text="${visiblePlaceCount}">0</span>곳) |
+    🟡노란핀: 숨김 (<span th:text="${hiddenPlaceCount}">0</span>곳)
+</h5>
+
 <div id="map"></div>
 <div id="placeList"></div>
 
@@ -119,9 +129,9 @@
             });
 
             const overlayContent = `
-                    <div style="padding:5px 10px; background:#fff; border:1px solid #ccc; border-radius:4px;">
-                        ${place.placeName}
-                    </div>`;
+                <div style="padding:5px 10px; background:#fff; border:1px solid #ccc; border-radius:4px;">
+                    ${place.placeName}
+                </div>`;
             const overlay = new kakao.maps.CustomOverlay({
                 content: overlayContent,
                 position: pos,
@@ -188,10 +198,10 @@
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'place-actions';
             actionsDiv.innerHTML = `
-                    <button onclick="updatePlace(${place.mapId}, true)">공개</button>
-                    <button onclick="updatePlace(${place.mapId}, false)">숨김</button>
-                    <button onclick="deletePlace(${place.mapId})">삭제</button>
-                `;
+                <button onclick="updatePinnedStatus(${place.mapId}, true)">공개</button>
+                <button onclick="updatePinnedStatus(${place.mapId}, false)">숨김</button>
+                <button onclick="updateActivatedStatus(${place.mapId})">삭제</button>
+            `;
 
             item.appendChild(infoDiv);
             item.appendChild(actionsDiv);
@@ -199,7 +209,7 @@
         });
     }
 
-    function updatePlace(id, isPinned) {
+    function updatePinnedStatus(id, isPinned) {
         const item = document.querySelector(`.place-item[data-id="${id}"]`);
         if (!item) {
             alert("장소 정보를 찾을 수 없습니다.");
@@ -212,7 +222,7 @@
             return;
         }
 
-        fetch('/api/mymap/' + id, {
+        fetch(`/api/mymap/${id}/pinned`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -224,19 +234,19 @@
         }).catch(err => alert("에러: " + err.message));
     }
 
-    function deletePlace(id) {
+    function updateActivatedStatus(id) {
         if (!confirm("정말로 이 장소를 삭제하시겠습니까?")) return;
 
         fetch('/api/mymap/' + id, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
-            body: JSON.stringify({ activated: false })
-        }).then(res => {
-            if (!res.ok) throw new Error("삭제 실패");
-            alert("삭제되었습니다.");
-            location.reload();
-        }).catch(err => alert("에러: " + err.message));
+            method: 'DELETE',
+            credentials: 'include'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("삭제 실패");
+                alert("삭제되었습니다.");
+                location.reload();
+            })
+            .catch(err => alert("에러: " + err.message));
     }
 
     fetch('/api/mymap/activated', {

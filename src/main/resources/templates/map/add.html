@@ -198,7 +198,7 @@
             <input type="text" id="roadAddress" placeholder="주소" required>
             <input type="hidden" id="latitude">
             <input type="hidden" id="longitude">
-            <textarea id="memo" placeholder="메모 (선택)"></textarea>
+            <textarea id="memo" placeholder="메모 (내용은 공개되지 않습니다. 자유롭게 작성해주세요)"></textarea>
             <button type="submit">저장하기</button>
         </form>
 
@@ -446,7 +446,7 @@
                     myPlaceMarkers.push(marker);
                 });
 
-                // 저장된 장소가 하나 이상일 경우 해당 영역 중심으로 지도 확대 및 이동
+
                 if (!bounds.isEmpty()) {
                     map.setBounds(bounds);
                 }
