@@ -54,7 +54,9 @@ public class UserController {
 
     @Transactional
     @GetMapping("/mypage")
-    public String mypage(Model model) {
+    public String mypage(Model model,
+                         @RequestParam(defaultValue = "0") int page,
+                         @RequestParam(defaultValue = "5") int size) {
         log.info("마이페이지 접근 시도");
 
         if (!AuthenticationUtils.isAuthenticated()) {
@@ -73,12 +75,11 @@ public class UserController {
             model.addAttribute("stats", teamService.getUserStats(userId));
 
             // 리뷰 정보
-            List<Team> teamsWithoutReview = new ArrayList<>();
-
             List<Team> completedTeams = teamService.getTeamsByParticipant(userId).stream()
                     .filter(team -> team.getStatus() == Status.COMPLETED)
                     .toList();
 
+            List<Team> teamsWithoutReview = new ArrayList<>();
             for (Team team : completedTeams) {
                 boolean hasCompletedAllReviews = teamReviewService.hasUserCompletedAllReviews(team.getTeamId(), userId);
                 if (!hasCompletedAllReviews) {
@@ -86,9 +87,20 @@ public class UserController {
                 }
             }
 
+            int totalTeamsWithoutReview = teamsWithoutReview.size();
+            int totalPages = (int) Math.ceil((double) totalTeamsWithoutReview / size);
+
+            int start = page * size;
+            int end = Math.min(start + size, totalTeamsWithoutReview);
+
+            List<Team> paginatedTeamsWithoutReview =
+                    start < totalTeamsWithoutReview ? teamsWithoutReview.subList(start, end) : new ArrayList<>();
+
             // 모델에 데이터 추가
             model.addAttribute("user", user);
-            model.addAttribute("teamsWithoutReview", teamsWithoutReview);
+            model.addAttribute("teamsWithoutReview", paginatedTeamsWithoutReview);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", totalPages);
 
             // 주최한 모임 조회
             List<Team> hostingTeams = teamService.getTeamsByLeader(userId);

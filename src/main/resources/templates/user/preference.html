@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>취향 설정 | 맛남</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:src="@{/js/common-toast.js}"></script>
+    <script th:src="@{/js/auth.js}"></script>
     <style>
         body {
             font-family: 'Noto Sans KR', sans-serif;
@@ -178,8 +182,6 @@
             border-top: 1px solid #eee;
         }
     </style>
-    <!-- auth.js 포함 -->
-    <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 
@@ -348,7 +350,7 @@
 
         submitBtn.addEventListener('click', async function() {
             if (selectedCount === 0) {
-                alert('적어도 하나 이상의 취향을 선택해주세요.');
+                showToastNow('적어도 하나 이상의 취향을 선택해주세요.', 'warning');
                 return;
             }
 
@@ -373,14 +375,13 @@
                 console.log('응답 결과:', result);
 
                 if (response.ok) {
-                    alert('취향 설정이 완료되었습니다!');
-                    window.location.href = '/';
+                    redirectWithSessionToast('/', '취향 설정이 완료되었습니다!', 'success');
                 } else {
-                    alert(result.message || '취향 설정 중 오류가 발생했습니다.');
+                    showToast(result.message || '취향 설정 중 오류가 발생했습니다.', 'error');
                 }
             } catch (error) {
                 console.error('Error setting preferences:', error);
-                alert('서버와 통신 중 오류가 발생했습니다.');
+                showToast('서버와 통신 중 오류가 발생했습니다.', 'error');
             }
         });
     });

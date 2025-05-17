@@ -38,29 +38,20 @@ public class UserApiController {
             @Validated @RequestBody UserSignupRequest request,
             HttpServletResponse response) {
 
-        User user = new User();
-        user.setUserId(request.getUserId());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
-        user.setAddress(request.getAddress());
-        user.setNickname(request.getNickname());
-        user.setAge(request.getAge());
-        user.setGender(request.getGender());
+        User user = userService.signup(request.toEntity());
 
-        User savedUser = userService.signup(user);
-
-        String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
+        String token = jwtTokenProvider.generateToken(user.getUserId(), user.getRole().name());
 
         int maxAge = 86400;
         CookieUtils.addJwtCookie(response, token, maxAge);
-        CookieUtils.addUserIdCookie(response, savedUser.getUserId(), maxAge);
-        CookieUtils.addUserRoleCookie(response, savedUser.getRole().name(), maxAge);
+        CookieUtils.addUserIdCookie(response, user.getUserId(), maxAge);
+        CookieUtils.addUserRoleCookie(response, user.getRole().name(), maxAge);
 
         JwtResponse jwtResponse = JwtResponse.builder()
                 .token(token)
                 .type("Bearer")
-                .userId(savedUser.getUserId())
-                .role(savedUser.getRole().name())
+                .userId(user.getUserId())
+                .role(user.getRole().name())
                 .expiration(maxAge)
                 .build();
 
