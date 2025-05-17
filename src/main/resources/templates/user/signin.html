@@ -277,24 +277,30 @@
       console.log('응답 데이터:', result);
 
       if (response.ok) {
-        if (result.data && result.data.token) {
-          auth.setCookie('userId', result.data.userId);
-          auth.setCookie('userRole', result.data.role);
-        }
-
         alert('로그인에 성공했습니다!');
         window.location.href = '/';
       } else {
         if (result.data) {
-          if (result.data.includes('아이디')) {
-            document.getElementById('userIdError').textContent = result.data;
-          } else if (result.data.includes('비밀번호')) {
-            document.getElementById('passwordError').textContent = result.data;
-          } else {
-            document.getElementById('userIdError').textContent = result.data;
+          if (typeof result.data === 'string') {
+            if (result.data.includes('아이디')) {
+              document.getElementById('userIdError').textContent = result.data;
+            } else if (result.data.includes('비밀번호')) {
+              document.getElementById('passwordError').textContent = result.data;
+            } else {
+              document.getElementById('userIdError').textContent = result.data;
+            }
+          } else if (typeof result.data === 'object') {
+            for (const field in result.data) {
+              const errorElement = document.getElementById(`${field}Error`);
+              if (errorElement) {
+                errorElement.textContent = result.data[field];
+              }
+            }
           }
         } else if (result.message) {
           document.getElementById('userIdError').textContent = result.message;
+        } else {
+          document.getElementById('userIdError').textContent = '로그인 중 오류가 발생했습니다.';
         }
       }
     } catch (error) {

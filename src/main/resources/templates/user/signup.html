@@ -193,7 +193,13 @@
       padding: 1rem 0;
       border-top: 1px solid #eee;
     }
+    .password-info {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.3rem;
+    }
   </style>
+  <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 
@@ -221,11 +227,11 @@
     <p>맛남에 오신 것을 환영합니다! 계정을 만들어 다양한 모임에 참여해보세요.</p>
 
     <div class="social-signup">
-        <a href="/oauth2/authorization/google" class="google-btn">
-          <span class="google-icon">G</span>
-          <span class="btn-text">Google로 회원가입</span>
-        </a>
-      </div>
+      <a href="/oauth2/authorization/google" class="google-btn">
+        <span class="google-icon">G</span>
+        <span class="btn-text">Google로 회원가입</span>
+      </a>
+    </div>
     <div class="divider">
       <span>또는 직접 입력</span>
     </div>
@@ -240,6 +246,7 @@
       <div class="form-group">
         <label for="password">비밀번호</label>
         <input type="password" id="password" name="password" placeholder="********" required>
+        <div class="password-info">비밀번호는 8~20자의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.</div>
         <div class="error-message" id="passwordError"></div>
       </div>
 
@@ -312,6 +319,12 @@
       return;
     }
 
+    const passwordPattern = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\S+$).{8,20}$/;
+    if (!passwordPattern.test(password)) {
+      document.getElementById('passwordError').textContent = '비밀번호는 8~20자의 영문 대/소문자, 숫자, 특수문자를 포함해야 합니다.';
+      return;
+    }
+
     const signupData = {
       userId: formData.get('userId'),
       password: password,
@@ -323,6 +336,7 @@
     };
 
     try {
+      console.log('회원가입 시도:', signupData);
       const response = await fetch('/api/user/signup', {
         method: 'POST',
         headers: {
@@ -331,22 +345,49 @@
         body: JSON.stringify(signupData)
       });
 
+      console.log('응답 상태:', response.status);
       const result = await response.json();
+      console.log('응답 데이터:', result);
 
       if (response.ok) {
         alert('회원가입이 완료되었습니다!');
-
         window.location.href = '/user/preference';
       } else {
-        if (result.message && result.message.includes('이메일')) {
-          document.getElementById('emailError').textContent = result.message;
-        } else if (result.message && result.message.includes('아이디')) {
-          document.getElementById('userIdError').textContent = result.message;
+        if (result.data) {
+          if (typeof result.data === 'string') {
+            if (result.data.includes('이메일')) {
+              document.getElementById('emailError').textContent = result.data;
+            } else if (result.data.includes('아이디')) {
+              document.getElementById('userIdError').textContent = result.data;
+            } else if (result.data.includes('비밀번호')) {
+              document.getElementById('passwordError').textContent = result.data;
+            } else {
+              alert(result.data || '회원가입 중 오류가 발생했습니다.');
+            }
+          } else if (typeof result.data === 'object') {
+            for (const field in result.data) {
+              const errorElement = document.getElementById(`${field}Error`);
+              if (errorElement) {
+                errorElement.textContent = result.data[field];
+              }
+            }
+          }
+        } else if (result.message) {
+          if (result.message.includes('이메일')) {
+            document.getElementById('emailError').textContent = result.message;
+          } else if (result.message.includes('아이디')) {
+            document.getElementById('userIdError').textContent = result.message;
+          } else if (result.message.includes('비밀번호')) {
+            document.getElementById('passwordError').textContent = result.message;
+          } else {
+            alert(result.message || '회원가입 중 오류가 발생했습니다.');
+          }
         } else {
-          alert(result.message || '회원가입 중 오류가 발생했습니다.');
+          alert('회원가입 중 오류가 발생했습니다.');
         }
       }
     } catch (error) {
+      console.error('회원가입 오류 상세:', error);
       alert('서버와 통신 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   });

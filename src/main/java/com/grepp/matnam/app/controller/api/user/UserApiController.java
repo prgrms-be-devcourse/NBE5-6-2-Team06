@@ -1,22 +1,22 @@
 package com.grepp.matnam.app.controller.api.user;
 
 import com.grepp.matnam.app.controller.api.user.payload.*;
+import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.model.log.UserActivityLogService;
 import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import com.grepp.matnam.infra.auth.AuthenticationUtils;
+import com.grepp.matnam.infra.auth.CookieUtils;
 import com.grepp.matnam.infra.jwt.JwtTokenProvider;
 import com.grepp.matnam.infra.response.ApiResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,17 +24,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @Tag(name = "User API", description = "사용자 관리 API")
 @RequiredArgsConstructor
+@Slf4j
 public class UserApiController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private PreferenceService preferenceService;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
+    private final UserService userService;
+    private final PreferenceService preferenceService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserActivityLogService userActivityLogService;
 
     @PostMapping("/signup")
@@ -42,187 +37,109 @@ public class UserApiController {
     public ResponseEntity<ApiResponse> signup(
             @Validated @RequestBody UserSignupRequest request,
             HttpServletResponse response) {
-        try {
-            User user = new User();
-            user.setUserId(request.getUserId());
-            user.setPassword(request.getPassword());
-            user.setEmail(request.getEmail());
-            user.setAddress(request.getAddress());
-            user.setNickname(request.getNickname());
-            user.setAge(request.getAge());
-            user.setGender(request.getGender());
 
-            User savedUser = userService.signup(user);
+        User user = new User();
+        user.setUserId(request.getUserId());
+        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        user.setAddress(request.getAddress());
+        user.setNickname(request.getNickname());
+        user.setAge(request.getAge());
+        user.setGender(request.getGender());
 
-            String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
+        User savedUser = userService.signup(user);
 
-            Cookie jwtCookie = new Cookie("jwtToken", token);
-            jwtCookie.setMaxAge(86400); // 24시간
-            jwtCookie.setPath("/");
-            response.addCookie(jwtCookie);
+        String token = jwtTokenProvider.generateToken(savedUser.getUserId(), savedUser.getRole().name());
 
-            Cookie userIdCookie = new Cookie("userId", savedUser.getUserId());
-            userIdCookie.setMaxAge(86400);
-            userIdCookie.setPath("/");
-            response.addCookie(userIdCookie);
+        int maxAge = 86400;
+        CookieUtils.addJwtCookie(response, token, maxAge);
+        CookieUtils.addUserIdCookie(response, savedUser.getUserId(), maxAge);
+        CookieUtils.addUserRoleCookie(response, savedUser.getRole().name(), maxAge);
 
-            Cookie roleCookie = new Cookie("userRole", savedUser.getRole().name());
-            roleCookie.setMaxAge(86400);
-            roleCookie.setPath("/");
-            response.addCookie(roleCookie);
+        JwtResponse jwtResponse = JwtResponse.builder()
+                .token(token)
+                .type("Bearer")
+                .userId(savedUser.getUserId())
+                .role(savedUser.getRole().name())
+                .expiration(maxAge)
+                .build();
 
-            JwtResponse jwtResponse = JwtResponse.builder()
-                    .token(token)
-                    .type("Bearer")
-                    .userId(savedUser.getUserId())
-                    .role(savedUser.getRole().name())
-                    .expiration(86400)
-                    .build();
-
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원가입 성공", jwtResponse));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "회원가입 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "회원가입 중 서버 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_SIGNUP, jwtResponse));
     }
 
     @PostMapping("/signin")
     @Operation(summary = "로그인", description = "사용자 로그인 후 JWT 토큰을 발급합니다.")
-    public ResponseEntity<ApiResponse> signin(@Validated @RequestBody UserSigninRequest request,
-                                              HttpServletResponse response) {
-        try {
-            User user = userService.signin(request.getUserId(), request.getPassword());
+    public ResponseEntity<ApiResponse> signin(
+            @Validated @RequestBody UserSigninRequest request,
+            HttpServletResponse response) {
 
-            String token = jwtTokenProvider.generateToken(user.getUserId(), user.getRole().name());
+        User user = userService.signin(request.getUserId(), request.getPassword());
 
-            Cookie jwtCookie = new Cookie("jwtToken", token);
-            jwtCookie.setMaxAge(86400);
-            jwtCookie.setPath("/");
-            response.addCookie(jwtCookie);
+        String token = jwtTokenProvider.generateToken(user.getUserId(), user.getRole().name());
 
-            JwtResponse jwtResponse = JwtResponse.builder()
-                    .token(token)
-                    .type("Bearer")
-                    .userId(user.getUserId())
-                    .role(user.getRole().name())
-                    .expiration(86400)
-                    .build();
+        int maxAge = 86400;
+        CookieUtils.addJwtCookie(response, token, maxAge);
+        CookieUtils.addUserIdCookie(response, user.getUserId(), maxAge);
+        CookieUtils.addUserRoleCookie(response, user.getRole().name(), maxAge);
 
-            userActivityLogService.logIfFirstToday(user.getUserId());
+        JwtResponse jwtResponse = JwtResponse.builder()
+                .token(token)
+                .type("Bearer")
+                .userId(user.getUserId())
+                .role(user.getRole().name())
+                .expiration(maxAge)
+                .build();
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "로그인 성공", jwtResponse));
+        userActivityLogService.logIfFirstToday(user.getUserId());
 
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "로그인 중 서버 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_SIGNIN, jwtResponse));
     }
 
     @PostMapping("/preference")
     @Operation(summary = "취향 설정", description = "사용자의 취향을 설정합니다.")
     public ResponseEntity<ApiResponse> setPreference(@Validated @RequestBody PreferenceRequest request) {
-        try {
-            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUserId = AuthenticationUtils.getCurrentUserId();
 
-            preferenceService.savePreference(currentUserId, request);
+        preferenceService.savePreference(currentUserId, request);
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "취향 설정 성공", null));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "취향 설정 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "취향 설정 중 서버 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PREFERENCE, null));
     }
 
     @PutMapping("/preference")
     @Operation(summary = "취향 변경", description = "사용자의 취향을 변경합니다.")
     public ResponseEntity<ApiResponse> updatePreference(@Validated @RequestBody PreferenceRequest request) {
-        try {
-            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUserId = AuthenticationUtils.getCurrentUserId();
 
-            preferenceService.updatePreference(currentUserId, request);
+        preferenceService.updatePreference(currentUserId, request);
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "취향 변경 성공", null));
-
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "취향 변경 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "취향 변경 중 서버 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PREFERENCE_UPDATE, null));
     }
 
     @DeleteMapping
     @Operation(summary = "회원 탈퇴", description = "사용자 계정을 비활성화(탈퇴) 처리합니다.")
     public ResponseEntity<ApiResponse> deactivateAccount(@Validated @RequestBody UserDeactivateRequest request) {
-        try {
-            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUserId = AuthenticationUtils.getCurrentUserId();
 
-            userService.deactivateAccount(currentUserId, request.getPassword());
+        userService.deactivateAccount(currentUserId, request.getPassword());
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "회원 탈퇴 성공", null));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "회원 탈퇴 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "회원 탈퇴 중 서버 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_DEACTIVATE, null));
     }
 
     @PutMapping("/password")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
     public ResponseEntity<ApiResponse> changePassword(@Validated @RequestBody PasswordChangeRequest request) {
-        try {
-            String currentUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String currentUserId = AuthenticationUtils.getCurrentUserId();
 
-            userService.changePassword(currentUserId, request.getCurrentPassword(), request.getNewPassword());
+        userService.changePassword(currentUserId, request.getCurrentPassword(), request.getNewPassword());
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "비밀번호 변경 성공", null));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "비밀번호 변경 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "비밀번호 변경 중 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PASSWORD_CHANGE, null));
     }
 
     @GetMapping("{userId}/temperature")
     @Operation(summary = "사용자 매너온도 조회", description = "특정 사용자의 매너 온도를 조회합니다.")
     public ResponseEntity<ApiResponse> getUserTemperature(@PathVariable String userId) {
-        try {
-            User user = userService.getUserById(userId);
+        User user = userService.getUserById(userId);
 
-            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "매너온도 조회 성공", user.getTemperature()));
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest()
-                    .body(new ApiResponse(ResponseCode.BAD_REQUEST.code(), "매너온도 조회 실패", e.getMessage()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "매너온도 조회 중 오류가 발생했습니다.", e.getMessage()));
-        }
+        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_TEMPERATURE, user.getTemperature()));
     }
 }

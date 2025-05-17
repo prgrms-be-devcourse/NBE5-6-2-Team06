@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -395,6 +396,25 @@ public class TeamService {
                 })
                 .toList();
     }
+    
+    public Map<String, Integer> getUserStats(String userId) {
+        Map<String, Integer> stats = new HashMap<>();
+
+        List<Team> leaderTeams = getTeamsByLeader(userId);
+        stats.put("leaderCount", leaderTeams.size());
+
+        List<Team> participatingTeams = getTeamsByParticipant(userId);
+        participatingTeams.removeAll(leaderTeams);
+        stats.put("participatingCount", participatingTeams.size());
+
+        List<Team> completedTeams = getAllTeamsForUser(userId).stream()
+                .filter(team -> team.getStatus() == Status.COMPLETED)
+                .collect(Collectors.toList());
+        stats.put("completedCount", completedTeams.size());
+
+        return stats;
+    }
+
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }
