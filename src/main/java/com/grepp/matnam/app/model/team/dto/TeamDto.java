@@ -10,7 +10,7 @@ import lombok.ToString;
 public class TeamDto {
     private String teamTitle;
     private String teamDetails;
-    private LocalDateTime meetDate;
+    private LocalDateTime teamDate;
     private String restaurantName;
     private String restaurantAddress;
     private Integer maxPeople;

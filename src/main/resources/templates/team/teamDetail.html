@@ -156,8 +156,8 @@
         <i class="bi bi-flag"></i> 신고하기
       </button>
       <p>
-        📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
-        🕖 <span th:text="${#temporals.format(team.meetDate, 'a h시 m분')}">오후 7시</span> |
+        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        🕖 <span th:text="${#temporals.format(team.teamDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
@@ -195,24 +195,36 @@
       <h4>참여자 정보</h4>
       <div class="participant-list">
         <h5>참여 요청</h5>
-        <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING}">
+        <div class="participant" th:each="participant : ${team.participants}"
+             th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING}">
           <div class="participant-info" th:if="${participant.user != null}">
             <div class="info-item">
               <strong>👤:</strong>
-              <span th:text="${participant.user.nickname}">참여자 닉네임</span> -
+              <span th:text="${participant.user.nickname}">참여자 닉네임</span> :
               <span th:text="${participant.user.temperature}">매너온도</span> °C
+
+              <!-- 수락 버튼 -->
               <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display: inline;">
                 <button type="submit" class="approve-button"
                         th:data-team-id="${team.teamId}"
                         th:data-participant-id="${participant.participantId}">수락</button>
               </form>
+
+              <!-- 거절 버튼 -->
+              <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/reject/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display: inline;">
+                <button type="submit" class="reject-button"
+                        th:data-team-id="${team.teamId}"
+                        th:data-participant-id="${participant.participantId}">거절</button>
+              </form>
+
             </div>
           </div>
+
           <div class="participant-info" th:unless="${participant.user != null}">
             <span>탈퇴한 사용자</span>
           </div>
         </div>
-        <hr/>
+    <hr/>
         <h5>현재 참여자</h5>
         <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and participant.role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER}">
           <div class="participant-info" th:if="${participant.user != null}">
@@ -282,13 +294,13 @@
       $.ajax({
         type: 'POST',
         url: '/api/team/' + teamId + '/apply/' + userId,
-        dataType: 'json', // 서버 응답을 JSON으로 처리
+        dataType: 'json',
         success: function(response) {
           $('#notificationMessage').text(response.message);
           $('#notificationArea').fadeIn();
           $('#notificationButton').click(function() {
             $('#notificationArea').fadeOut();
-            location.reload(); // 성공 시 페이지 리로드
+            location.reload();
           });
         },
         error: function(xhr, status, error) {
@@ -311,22 +323,58 @@
       var teamId = $(this).data('team-id');
       var participantId = $(this).data('participant-id');
       var form = $(this).closest('form');
-      var url = form.attr('action'); // 폼의 action 속성에서 URL 가져오기
+      var url = form.attr('action');
 
       $.ajax({
         type: 'POST',
         url: url,
-        dataType: 'json', // 서버 응답을 JSON으로 처리
+        dataType: 'json',
         success: function(response) {
           $('#notificationMessage').text(response.message);
           $('#notificationArea').fadeIn();
           $('#notificationButton').click(function() {
             $('#notificationArea').fadeOut();
-            location.reload(); // 성공 시 페이지 리로드
+            location.reload();
           });
         },
         error: function(xhr, status, error) {
           var errorMessage = "승인 처리에 실패했습니다.";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage += " (" + xhr.responseJSON.message + ")";
+          }
+          $('#notificationMessage').text(errorMessage);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+        }
+      });
+    });
+
+    // 참여자 거절 처리
+    $('.reject-button').click(function(event) {
+      event.preventDefault();
+      var teamId = $(this).data('team-id');
+      var participantId = $(this).data('participant-id');
+      var form = $(this).closest('form');
+      var url = form.attr('action').replace('approve', 'reject');
+
+      $.ajax({
+        type: 'POST',
+        url: url,
+        data: JSON.stringify({teamId: teamId, participantId: participantId}),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(response) {
+          $('#notificationMessage').text(response.message);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+            location.reload();
+          });
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = "거절 처리에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage += " (" + xhr.responseJSON.message + ")";
           }
