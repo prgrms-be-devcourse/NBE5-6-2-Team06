@@ -537,6 +537,11 @@
       <div class="info-item">
         <strong>가입일:</strong> <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2023-01-01</span>
       </div>
+      <div class="info-item" style="white-space: nowrap;">
+      <strong style="margin-right: 4px;">저장 맛집 수:</strong>
+      공개  <span th:text="${visiblePlaceCount}">0</span>
+      숨김  <span th:text="${hiddenPlaceCount}">0</span>
+    </div>
 
       <div class="preference-section">
         <h4>
