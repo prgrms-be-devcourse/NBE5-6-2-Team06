@@ -44,7 +44,6 @@ public class AdminRestaurantApiController {
     public ResponseEntity<ApiResponse<Restaurant>> getRestaurant(@PathVariable Long restaurantId) {
         Restaurant restaurant = restaurantService.findById(restaurantId)
             .orElseThrow(() -> new CommonException(ResponseCode.BAD_REQUEST));
-        log.info("{}", restaurant);
         return ResponseEntity.ok(ApiResponse.success(restaurant));
     }
 

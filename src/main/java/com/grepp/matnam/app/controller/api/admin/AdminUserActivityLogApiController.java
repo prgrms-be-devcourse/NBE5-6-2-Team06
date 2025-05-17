@@ -18,7 +18,7 @@ public class AdminUserActivityLogApiController {
     private final UserActivityLogService userActivityLogService;
 
     @GetMapping("/statistics/monthly")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMonthlyUserActivityData() {
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMonthlyUserActivity() {
         return ResponseEntity.ok(ApiResponse.success(userActivityLogService.getMonthlyUserActivity()));
     }
 

@@ -52,19 +52,19 @@ public class AdminUserApiController {
     }
 
     @GetMapping("/report/team/{teamId}")
-    public ResponseEntity<ApiResponse<ReportTeamResponse>> getTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ApiResponse<ReportTeamResponse>> getReportTeam(@PathVariable Long teamId) {
         ReportTeamResponse reportTeamResponse = reportService.getTeamByTeamId(teamId);
         return ResponseEntity.ok(ApiResponse.success(reportTeamResponse));
     }
 
     @GetMapping("/report/chat/{chatId}")
-    public ResponseEntity<ApiResponse<ReportChatResponse>> getChat(@PathVariable Long chatId) {
+    public ResponseEntity<ApiResponse<ReportChatResponse>> getReportChat(@PathVariable Long chatId) {
         ReportChatResponse reportChatResponse = reportService.getChatByChatId(chatId);
         return ResponseEntity.ok(ApiResponse.success(reportChatResponse));
     }
 
     @GetMapping("/statistics/age-distribution")
-    public ResponseEntity<ApiResponse<List<AgeDistributionResponse>>> getAgeDistributionData() {
+    public ResponseEntity<ApiResponse<List<AgeDistributionResponse>>> getAgeDistribution() {
         List<AgeDistributionResponse> ageDistribution = userService.getAgeDistribution();
         return ResponseEntity.ok(ApiResponse.success(ageDistribution));
     }
