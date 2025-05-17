@@ -121,24 +121,24 @@
 
 <div class="container">
   <h1>모임 수정</h1>
-  <form th:action="@{|/team/edit/${teamId}}|"] method="post" enctype="multipart/form-data">
-    <input type="hidden" name="id" th:value="${team.id}">
+  <form th:action="@{/team/edit/{teamId}(teamId=${team.teamId})}" method="post">
 
     <div class="section">
       <label>모임 제목</label>
-      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.title}" required>
+      <input type="text" name="title" placeholder="모임 제목을 입력하세요" th:value="${team.teamTitle}" required>
 
       <label>모임 설명</label>
-      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.description}" required></textarea>
+      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" th:text="${team.teamDetails}" required></textarea>
 
       <label>날짜</label>
-      <input type="date" name="date" th:value="${#dates.format(team.date, 'yyyy-MM-dd')}" required>
+      <input type="date" name="date" th:value="${#temporals.format(team.teamDate, 'yyyy-MM-dd')}" required>
+
 
       <label>시간</label>
-      <input type="time" name="time" th:value="${#dates.format(team.time, 'HH:mm')}" required>
+      <input type="time" name="time" th:value="${#temporals.format(team.teamDate, 'HH:mm')}" required>
 
       <label>음식 카테고리</label>
-      <select name="category" required>
+      <select th:field="*{team.category}" required>
         <option value="">카테고리 선택</option>
         <option value="한식" th:selected="${team.category == '한식'}">한식</option>
         <option value="일식" th:selected="${team.category == '일식'}">일식</option>
@@ -149,17 +149,17 @@
       </select>
 
       <label>최대 인원</label>
-      <select name="capacity" required>
-        <option value="1" th:selected="${team.capacity == 1}">1명</option>
-        <option value="2" th:selected="${team.capacity == 2}">2명</option>
-        <option value="3" th:selected="${team.capacity == 3}">3명</option>
-        <option value="4" th:selected="${team.capacity == 4}">4명</option>
-        <option value="5" th:selected="${team.capacity == 5}">5명</option>
-        <option value="6" th:selected="${team.capacity == 6}">6명</option>
-        <option value="7" th:selected="${team.capacity == 7}">7명</option>
-        <option value="8" th:selected="${team.capacity == 8}">8명</option>
-        <option value="9" th:selected="${team.capacity == 9}">9명</option>
-        <option value="10" th:selected="${team.capacity == 10}">10명</option>
+      <select th:field="*{team.maxPeople}" required>
+        <option value="1" th:selected="${team.maxPeople == 1}">1명</option>
+        <option value="2" th:selected="${team.maxPeople == 2}">2명</option>
+        <option value="3" th:selected="${team.maxPeople == 3}">3명</option>
+        <option value="4" th:selected="${team.maxPeople == 4}">4명</option>
+        <option value="5" th:selected="${team.maxPeople == 5}">5명</option>
+        <option value="6" th:selected="${team.maxPeople == 6}">6명</option>
+        <option value="7" th:selected="${team.maxPeople == 7}">7명</option>
+        <option value="8" th:selected="${team.maxPeople == 8}">8명</option>
+        <option value="9" th:selected="${team.maxPeople == 9}">9명</option>
+        <option value="10" th:selected="${team.maxPeople == 10}">10명</option>
       </select>
     </div>
 

@@ -225,7 +225,8 @@
       </button>
     </div>
     <div class="participant-list">
-      <div class="participant" th:each="participant : ${participants}">
+      <div class="participant" th:each="participant : ${participants}"
+           th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED}">
         <div class="participant-info">
           <!-- 사용자 닉네임 -->
           <div class="info-item">

@@ -24,7 +24,7 @@ public class TeamUpdateRequest {
     private LocalDateTime meetDate;
 
     @NotNull(message = "최대 인원은 필수입니다.")
-    private Integer capacity;
+    private Integer maxPeople;
 
     private String category;
 

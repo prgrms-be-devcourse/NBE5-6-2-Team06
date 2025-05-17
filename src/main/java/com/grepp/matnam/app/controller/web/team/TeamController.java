@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.web.team;
 
 import com.grepp.matnam.app.controller.api.team.payload.TeamRequest;
+import com.grepp.matnam.app.controller.api.team.payload.UpdatedTeamRequest;
 import com.grepp.matnam.app.model.team.ParticipantRepository;
 import com.grepp.matnam.app.model.team.TeamReviewRepository;
 import com.grepp.matnam.app.model.team.TeamService;
@@ -51,18 +52,9 @@ public class TeamController {
         return "team/teamCreate";
     }
 
-    // 모임 수정
-//    @GetMapping("/edit/{teamId}")
-//    public String getTeamEditPage(@PathVariable Long teamId, Model model) {
-//        TeamDto teamDto = teamService.getTeamDetails(teamId);
-//        model.addAttribute("teamDto", teamDto);
-//        return "team/teamCreate";
-//    }
-
-
     // 모임 생성
     @PostMapping("/create")
-    public String createTeam(@ModelAttribute TeamRequest teamRequest, Model model) {
+    public String createTeam(@ModelAttribute TeamRequest teamRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
@@ -71,20 +63,36 @@ public class TeamController {
         if (teamRequest.getDate() != null && teamRequest.getTime() != null) {
             String dateTimeString = teamRequest.getDate() + "T" + teamRequest.getTime() + ":00";
             try {
-                team.setMeetDate(LocalDateTime.parse(dateTimeString));
+                team.setTeamDate(LocalDateTime.parse(dateTimeString));
             } catch (Exception e) {
-                team.setMeetDate(LocalDateTime.now());
+                team.setTeamDate(LocalDateTime.now());
             }
         } else {
-            team.setMeetDate(LocalDateTime.now());
+            team.setTeamDate(LocalDateTime.now());
         }
-
-        team.setTeamDate(LocalDateTime.now());
 
         teamService.saveTeam(team);
         teamService.addParticipant(team.getTeamId(), user);
 
         return "redirect:/team/detail/" + team.getTeamId();
+    }
+
+    // 모임 수정 페이지
+    @GetMapping("/edit/{teamId}")
+    public String getTeamEditPage(@PathVariable Long teamId, Model model) {
+        Team team = teamService.getTeamById(teamId);
+        model.addAttribute("team", team);
+        return "team/teamEdit";
+    }
+
+    // 모임 수정
+    @PostMapping("/edit/{teamId}")
+    public String updateTeam(@PathVariable Long teamId, @ModelAttribute UpdatedTeamRequest updatedTeamRequest) {
+        Team team = updatedTeamRequest.toTeam();
+        team.setTeamId(teamId);
+
+        teamService.updateTeam(teamId, team);
+        return "redirect:/team/detail/" + teamId;
     }
 
     // 모임 검색 페이지
