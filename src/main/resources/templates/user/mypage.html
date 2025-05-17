@@ -611,7 +611,7 @@
           </button>
 
           <!-- 모임 취소 버튼-->
-          <form th:if="${team.user.userId == user.userId}" th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
+          <form th:if="${team.user.userId == user.userId}" th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}" method="patch" style="display: inline;">
             <button type="submit" class="btn-primary">모임 취소</button>
           </form>
 

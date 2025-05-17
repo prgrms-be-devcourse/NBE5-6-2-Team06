@@ -196,14 +196,14 @@ public class TeamService {
             throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
         }
 
-        if (team.getStatus() != Status.COMPLETED) {
-            team.setStatus(Status.CANCELED);
-            teamRepository.save(team);
-        } else {
+        if (team.getStatus() == Status.COMPLETED) {
             throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
         }
-    }
+        team.setStatus(Status.CANCELED);
+        unActivatedById(teamId);
 
+        teamRepository.save(team);
+    }
 
     //조회 부분
     // 주최자로서의 팀 조회
@@ -223,7 +223,7 @@ public class TeamService {
         return participantRepository.findByUser_UserId(userId);
     }
 
-    // 사용자가 참여한 모든 모임 조회 (상태 무관)
+    // 사용자가 참여한 모든 모임 조회(비활성화 제외)
     public List<Team> getAllTeamsForUser(String userId) {
         List<Participant> participants = getAllParticipantsForUser(userId);
         return participants.stream()
@@ -232,12 +232,6 @@ public class TeamService {
             .distinct()
             .collect(Collectors.toList());
     }
-
-    // 참여자 조회(참여 목록)
-    public List<Participant> getParticipant(Long teamId) {
-        return participantRepository.findByTeam_TeamId(teamId);
-    }
-
 
     // 참여자 상세 정보 조회(참여 상태)
     public Team getTeamById(Long teamId) {
@@ -560,6 +554,12 @@ public class TeamService {
     //주최자 모임 삭제
     @Transactional
     public void unActivatedTeamByLeader(Long teamId) {
+//        Team team = teamRepository.findById(teamId)
+//            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+
+//        team.setStatus(Status.CANCELED);
         unActivatedById(teamId);
+
+//        teamRepository.save(team);
     }
 }
