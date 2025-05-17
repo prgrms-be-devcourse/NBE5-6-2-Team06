@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>로그인 | 맛남</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
+  <script th:src="@{/js/auth.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -186,7 +190,6 @@
       flex-grow: 1;
     }
   </style>
-  <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 
@@ -251,56 +254,63 @@
 </footer>
 
 <script>
-  document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
 
-    document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+      document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
 
-    const formData = new FormData(this);
-    const loginData = {
-      userId: formData.get('userId'),
-      password: formData.get('password')
-    };
+      const formData = new FormData(this);
+      const loginData = {
+        userId: formData.get('userId'),
+        password: formData.get('password')
+      };
 
-    try {
-      console.log('로그인 시도:', loginData);
-      const response = await fetch('/api/user/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(loginData)
-      });
+      try {
+        console.log('로그인 시도:', loginData);
+        const response = await fetch('/api/user/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(loginData)
+        });
 
-      console.log('응답 상태:', response.status);
-      const result = await response.json();
-      console.log('응답 데이터:', result);
+        console.log('응답 상태:', response.status);
+        const result = await response.json();
+        console.log('응답 데이터:', result);
 
-      if (response.ok) {
-        if (result.data && result.data.token) {
-          auth.setCookie('userId', result.data.userId);
-          auth.setCookie('userRole', result.data.role);
-        }
-
-        alert('로그인에 성공했습니다!');
-        window.location.href = '/';
-      } else {
-        if (result.data) {
-          if (result.data.includes('아이디')) {
-            document.getElementById('userIdError').textContent = result.data;
-          } else if (result.data.includes('비밀번호')) {
-            document.getElementById('passwordError').textContent = result.data;
+        if (response.ok) {
+          redirectWithSessionToast('/', '로그인에 성공했습니다!', 'success');
+        } else {
+          if (result.data) {
+            if (typeof result.data === 'string') {
+              if (result.data.includes('아이디')) {
+                document.getElementById('userIdError').textContent = result.data;
+              } else if (result.data.includes('비밀번호')) {
+                document.getElementById('passwordError').textContent = result.data;
+              } else {
+                document.getElementById('userIdError').textContent = result.data;
+              }
+            } else if (typeof result.data === 'object') {
+              for (const field in result.data) {
+                const errorElement = document.getElementById(`${field}Error`);
+                if (errorElement) {
+                  errorElement.textContent = result.data[field];
+                }
+              }
+            }
+          } else if (result.message) {
+            document.getElementById('userIdError').textContent = result.message;
           } else {
-            document.getElementById('userIdError').textContent = result.data;
+            showToastNow("로그인 중 오류가 발생했습니다.", 'error');
           }
-        } else if (result.message) {
-          document.getElementById('userIdError').textContent = result.message;
         }
+      } catch (error) {
+        console.error('로그인 오류 상세:', error);
+        showToastNow("서버와 통신 중 오류가 발생했습니다.", 'error');
       }
-    } catch (error) {
-      console.error('로그인 오류 상세:', error);
-      document.getElementById('userIdError').textContent = '서버와 통신 중 오류가 발생했습니다.';
-    }
+    });
   });
 </script>
 

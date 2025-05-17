@@ -35,7 +35,7 @@ public class TeamResponse {
         this.imageUrl = team.getImageUrl();
         this.teamDate = team.getTeamDate().format(dateFormatter);
         this.teamTime = team.getTeamDate().format(timeFormatter);
-        this.meetDate = team.getMeetDate();
+//        this.meetDate = team.getMeetDate();
         this.maxPeople = team.getMaxPeople();
         this.nowPeople = team.getNowPeople();
         this.status = team.getStatus().name();

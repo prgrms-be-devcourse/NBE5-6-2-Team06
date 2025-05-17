@@ -55,9 +55,21 @@ public class AdminTeamApiController {
         return ResponseEntity.ok("모임이 비활성화되었습니다.");
     }
 
-    @GetMapping("/success-rate/monthly")
+    @GetMapping("/statistics/success-rate/monthly")
     public ResponseEntity<ApiResponse<List<Map<String, String>>>> getMonthlyMeetingSuccessRateData() {
         return ResponseEntity.ok(ApiResponse.success(teamService.getMonthlyMeetingSuccessRate()));
+    }
+
+    @GetMapping("/statistics/participant-distribution")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getTeamParticipantDistribution() {
+        Map<String, Long> participantDistribution = teamService.getTeamParticipantDistribution();
+        return ResponseEntity.ok(ApiResponse.success(participantDistribution));
+    }
+
+    @GetMapping("/statistics/daily-new-teams")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getDailyNewTeamCounts() {
+        Map<String, Long> dailyNewTeamCounts = teamService.getDailyNewTeamCountsLast7Days();
+        return ResponseEntity.ok(ApiResponse.success(dailyNewTeamCounts));
     }
 
 }

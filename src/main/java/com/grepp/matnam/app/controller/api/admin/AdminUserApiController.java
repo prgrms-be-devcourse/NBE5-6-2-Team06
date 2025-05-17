@@ -1,11 +1,16 @@
 package com.grepp.matnam.app.controller.api.admin;
 
+import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportChatResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportTeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.ReportService;
 import com.grepp.matnam.app.model.user.UserService;
+import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.infra.response.ApiResponse;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminUserApiController {
     private final UserService userService;
     private final ReportService reportService;
+    private final PreferenceService preferenceService;
 
     @PatchMapping("/list/{userId}")
     public ResponseEntity<?> updateUserStatus(@PathVariable String userId,
@@ -46,15 +52,32 @@ public class AdminUserApiController {
     }
 
     @GetMapping("/report/team/{teamId}")
-    public ResponseEntity<ApiResponse<ReportTeamResponse>> getTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ApiResponse<ReportTeamResponse>> getReportTeam(@PathVariable Long teamId) {
         ReportTeamResponse reportTeamResponse = reportService.getTeamByTeamId(teamId);
         return ResponseEntity.ok(ApiResponse.success(reportTeamResponse));
     }
 
     @GetMapping("/report/chat/{chatId}")
-    public ResponseEntity<ApiResponse<ReportChatResponse>> getChat(@PathVariable Long chatId) {
+    public ResponseEntity<ApiResponse<ReportChatResponse>> getReportChat(@PathVariable Long chatId) {
         ReportChatResponse reportChatResponse = reportService.getChatByChatId(chatId);
         return ResponseEntity.ok(ApiResponse.success(reportChatResponse));
     }
 
+    @GetMapping("/statistics/age-distribution")
+    public ResponseEntity<ApiResponse<List<AgeDistributionResponse>>> getAgeDistribution() {
+        List<AgeDistributionResponse> ageDistribution = userService.getAgeDistribution();
+        return ResponseEntity.ok(ApiResponse.success(ageDistribution));
+    }
+
+    @GetMapping("/statistics/gender-distribution")
+    public ResponseEntity<ApiResponse<Map<Gender, Long>>> getGenderDistribution() {
+        Map<Gender, Long> genderCounts = userService.getGenderDistribution();
+        return ResponseEntity.ok(ApiResponse.success(genderCounts));
+    }
+
+    @GetMapping("/statistics/preference-counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getPreferenceCounts() {
+        Map<String, Long> counts = preferenceService.getPreferenceCounts();
+        return ResponseEntity.ok(ApiResponse.success(counts));
+    }
 }

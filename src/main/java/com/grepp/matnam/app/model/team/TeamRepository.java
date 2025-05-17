@@ -15,25 +15,26 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositoryCustom{
+public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositoryCustom {
 
     // 사용자 ID로 팀 조회 (주최자)
-    List<Team> findTeamsByUser_UserId(String userId);
+    List<Team> findTeamsByUser_UserIdAndActivatedTrue(String userId);
 
-    @Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus")
-    List<Team> findTeamsByParticipantUserIdAndParticipantStatus(@Param("userId") String userId, @Param("participantStatus") ParticipantStatus participantStatus);
+    @Query("SELECT t FROM Team t JOIN t.participants p " +
+            "WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus AND t.activated = true")
+    List<Team> findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
+            @Param("userId") String userId,
+            @Param("participantStatus") ParticipantStatus participantStatus
+    );
 
-    // 사용자 모임 조회
-    //@Query("SELECT t FROM Team t JOIN t.participants p WHERE p.user.userId = :userId")
+    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.activated = true ORDER BY t.createdAt DESC")
+    Page<Team> findAllWithParticipantsAndActivatedTrue(Pageable pageable);
 
-    //List<Team> findTeamsByParticipantUserId(@Param("userId") String userId);
+    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user " +
+            "WHERE t.teamId = :teamId AND t.activated = true")
+    Optional<Team> findByIdWithParticipantsAndUserAndActivatedTrue(@Param("teamId") Long teamId);
 
-
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants ORDER BY t.createdAt DESC")
-    Page<Team> findAllWithParticipants(Pageable pageable);
-
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user WHERE t.teamId = :teamId")
-    Optional<Team> findByIdWithParticipantsAndUser(@Param("teamId") Long teamId);
+    Optional<Team> findByTeamIdAndActivatedTrue(Long teamId);
 
     long countByCreatedAtBetween(LocalDateTime createdAtAfter, LocalDateTime createdAtBefore);
 
@@ -50,4 +51,12 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
         "GROUP BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') " +
         "ORDER BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m')")
     List<Map<String, Long>> findMonthlyMeetingStats(@Param("startDate") LocalDateTime startDate);
+
+    Long countByNowPeopleBetween(int start, int end);
+
+    long countByStatus(Status status);
+    long countByCreatedAtAfter(LocalDateTime dateTime);
+
+    @Query("SELECT AVG(t.maxPeople) FROM Team t WHERE t.status IN ('RECRUITING', 'FULL')")
+    Double averageMaxPeopleForActiveTeams();
 }

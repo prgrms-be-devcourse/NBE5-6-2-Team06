@@ -11,14 +11,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/dashboard")
+@RequestMapping("/api/admin/user-activity")
 @RequiredArgsConstructor
 public class AdminUserActivityLogApiController {
 
     private final UserActivityLogService userActivityLogService;
 
-    @GetMapping("/user/activity/monthly")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMonthlyUserActivityData() {
+    @GetMapping("/statistics/monthly")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getMonthlyUserActivity() {
         return ResponseEntity.ok(ApiResponse.success(userActivityLogService.getMonthlyUserActivity()));
+    }
+
+    @GetMapping("/statistics/week")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getWeekUserActivity() {
+        List<Map<String, Object>> weekUserActivity = userActivityLogService.getWeekUserActivity();
+        return ResponseEntity.ok(ApiResponse.success(weekUserActivity));
     }
 }

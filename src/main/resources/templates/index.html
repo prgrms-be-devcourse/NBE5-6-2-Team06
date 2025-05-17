@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>모임 서비스</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:src="@{/js/common-toast.js}"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/header.js"></script>
     <style>
@@ -162,6 +165,60 @@
             color: #999;
             border-top: 1px solid #eee;
         }
+        .ranking-section {
+            padding: 2rem;
+            background-color: #fff;
+            margin-bottom: 2rem;
+        }
+        .ranking-section h2 {
+            font-size: 1.4rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+        .ranking-section p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .ranking-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background-color: #fcfcfc;
+            transition: transform 0.2s ease;
+        }
+        .ranking-item:hover {
+            transform: translateY(-3px);
+        }
+        .ranking-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000;
+            margin-right: 1.5rem;
+            min-width: 2rem;
+            text-align: center;
+        }
+        .ranking-content {
+            flex: 1;
+        }
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .item-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -183,15 +240,15 @@
 </header>
 
 <message>
-<div id="messageBox" style="display: none;
+    <div id="messageBox" style="display: none;
                            background-color: #4CAF50;
                            color: white;
                            text-align: center;
                            padding: 15px;
                            margin-bottom: 20px;
                            border-radius: 4px;">
-    회원 탈퇴가 완료되었습니다.
-</div>
+        회원 탈퇴가 완료되었습니다.
+    </div>
 </message>
 
 <!-- 메인 배너 -->
@@ -259,6 +316,24 @@
                 <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
                 <div class="meeting-location">📍 서울 강남구</div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/3} + '\''">자세히 보기</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 콘텐츠 랭킹 섹션 -->
+<section class="ranking-section" th:if="${contentRanking != null and not #lists.isEmpty(rankingItems)}">
+    <h2 th:text="${contentRanking.title}">🍽️ 소개팅 때 먹으면 안 되는 음식 TOP 5 🍽️</h2>
+    <p th:text="${contentRanking.subtitle}">맛남이 알려드리는 소개팅 성공률을 높이는 음식 선택 팁!</p>
+    <div class="ranking-list">
+        <!-- 동적으로 랭킹 정보 표시 -->
+        <div th:each="item : ${rankingItems}" class="ranking-item">
+            <div class="ranking-number">
+                <span th:text="${item.ranking}"></span>
+            </div>
+            <div class="ranking-content">
+                <div class="item-name" th:text="${item.itemName}"></div>
+                <div class="item-description" th:text="${item.description}"></div>
             </div>
         </div>
     </div>

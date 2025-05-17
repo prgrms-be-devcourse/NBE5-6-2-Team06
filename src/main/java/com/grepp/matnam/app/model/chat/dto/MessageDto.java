@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class MessageDto {
+    private Long chatId;
     private Long teamId;
     private String senderId;
     private String senderNickname;
@@ -15,6 +16,7 @@ public class MessageDto {
     private String time;
 
     public MessageDto(Chat chat, Long teamId) {
+        this.chatId = chat.getChatId();
         this.teamId = teamId;
         this.senderId = chat.getSenderId();
         this.senderNickname = chat.getSenderNickname();

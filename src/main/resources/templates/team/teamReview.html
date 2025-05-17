@@ -340,7 +340,7 @@
 
         <div class="team-info">
             <h3 th:text="${team.teamTitle}">맛있는 이탈리안 요리 모임</h3>
-            <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">2023년 6월 19일 (월) 오후 7:00</span></p>
+            <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">2023년 6월 19일 (월) 오후 7:00</span></p>
             <p>📍 <span th:text="${team.restaurantName}">트라토리아 식당</span></p>
             <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">5/6</span></p>
         </div>

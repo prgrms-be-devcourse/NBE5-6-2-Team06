@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.user.payload;
 
 import com.grepp.matnam.app.model.user.code.Gender;
+import com.grepp.matnam.app.model.user.entity.User;
 import lombok.Data;
 
 import jakarta.validation.constraints.Email;
@@ -32,4 +33,16 @@ public class UserSignupRequest {
 
     @NotNull(message = "성별은 필수입니다.")
     private Gender gender;
+
+    public User toEntity() {
+        User user = new User();
+        user.setUserId(this.userId);
+        user.setPassword(this.password);
+        user.setEmail(this.email);
+        user.setAddress(this.address);
+        user.setNickname(this.nickname);
+        user.setAge(this.age);
+        user.setGender(this.gender);
+        return user;
+    }
 }

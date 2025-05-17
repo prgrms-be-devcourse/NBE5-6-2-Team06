@@ -377,7 +377,7 @@
     }
 
     .map-container {
-      height: 600px;
+      height: 1000px;
       background-color: transparent;
       border-radius: 8px;
       padding: 0;
@@ -405,6 +405,82 @@
       font-size: 0.8rem;
       color: #000;
       text-decoration: none;
+    }
+
+    .cancel-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #ff4d4d;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .cancel-btn i {
+      font-size: 18px;
+    }
+
+    .cancel-btn:hover {
+      background-color: #ff3333;
+      transform: scale(1.05);
+    }
+
+    /* 버튼 비활성화 상태 */
+    .cancel-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .page-link {
+      display: inline-block;
+      padding: 0.7rem 1rem;
+      color: #333;
+      text-decoration: none;
+      border-right: 1px solid #eee;
+      min-width: 2rem;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+
+    .page-link:last-child {
+      border-right: none;
+    }
+
+    .page-link:hover {
+      background-color: #f5f5f5;
+    }
+
+    .page-link.active {
+      background-color: #000;
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .pagination span:last-child .page-link {
+      border-right: none;
     }
 
     footer {
@@ -461,6 +537,11 @@
       <div class="info-item">
         <strong>가입일:</strong> <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2023-01-01</span>
       </div>
+      <div class="info-item" style="white-space: nowrap;">
+      <strong style="margin-right: 4px;">저장 맛집 수:</strong>
+      공개  <span th:text="${visiblePlaceCount}">0</span>
+      숨김  <span th:text="${hiddenPlaceCount}">0</span>
+    </div>
 
       <div class="preference-section">
         <h4>
@@ -487,9 +568,9 @@
 
     <div class="stats-section">
       <h4>활동 통계</h4>
-      <p>주최한 모임: <span th:text="${stats.hostingCount}">5</span>회</p>
+      <p>주최한 모임: <span th:text="${stats.leaderCount}">5</span>회</p>
       <p>참여한 모임: <span th:text="${stats.participatingCount}">12</span>회</p>
-      <p>함께한 맛집: <span th:text="${stats.restaurantCount}">8</span>곳</p>
+      <p>왼료한 모임: <span th:text="${stats.completedCount}">8</span>곳</p>
     </div>
   </div>
 
@@ -515,7 +596,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge active">주최중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
@@ -528,10 +609,10 @@
             모임 수정
           </button>
 
-          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
-            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          <!-- 모임 취소 버튼-->
+          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
+            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELED}" class="cancel-btn">모임 취소</button>
           </form>
-
 
           <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
@@ -546,7 +627,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -567,7 +648,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge active">주최중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
@@ -580,11 +661,10 @@
             모임 수정
           </button>
 
-          <form action="/api/team/delete/{teamId}" method="POST" onsubmit="return confirm('정말로 모임을 삭제하시겠습니까?');">
-            <button type="button" class="danger" onclick="deleteTeam({teamId})">모임 삭제</button>
+          <!-- 모임 취소 버튼-->
+          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
+            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELED}" class="cancel-btn">모임 취소</button>
           </form>
-
-
 
           <div id="application-info-${teamId}" class="application-info" style="display: none;">
             <h4>신청자 목록</h4>
@@ -607,7 +687,7 @@
             <span th:text="${team.teamTitle}">모임 제목</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -639,22 +719,26 @@
           <div class="map-container">
             <iframe th:src="@{/map/editMap}"
                     width="100%"
-                    height="600px"
+                    height="1000px"
                     style="border: none;
                     border-radius: 8px;
-                    overflow: hidden;">
+                    overflow: auto;">
             </iframe>
           </div>
         </div>
       </div>
-    </div>
+
 
     <!-- 모임 리뷰 -->
-    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview)}">
+    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview) or currentPage > 0}">
       <h2>리뷰 작성이 필요한 모임</h2>
 
       <div class="review-alert">
         <p>완료된 모임에 대해 다른 참여자들의 매너 온도를 매겨주세요!</p>
+      </div>
+
+      <div th:if="${#lists.isEmpty(teamsWithoutReview) and currentPage == 0}" class="empty-state">
+        <p>리뷰 작성이 필요한 모임이 없습니다.</p>
       </div>
 
       <div th:each="team : ${teamsWithoutReview}" class="meeting-item" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
@@ -662,14 +746,23 @@
           <span th:text="${team.teamTitle}">모임 제목</span>
           <span class="badge">완료됨</span>
         </h4>
-        <p>📅 <span th:text="${#temporals.format(team.meetDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+        <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
         <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
         <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
         <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>
       </div>
+
+      <div class="pagination-container" th:if="${totalPages > 1}">
+        <div class="pagination">
+          <a th:if="${currentPage > 0}" th:href="@{/user/mypage(page=${currentPage - 1})}" class="page-link">&laquo; 이전</a>
+          <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:if="${i != currentPage}" th:href="@{/user/mypage(page=${i})}" class="page-link" th:text="${i + 1}">1</a>
+                <span th:if="${i == currentPage}" class="page-link active" th:text="${i + 1}">1</span>
+            </span>
+          <a th:if="${currentPage < totalPages - 1}" th:href="@{/user/mypage(page=${currentPage + 1})}" class="page-link">다음 &raquo;</a>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
 <div id="deactivateModal" class="modal">
   <div class="modal-content">
@@ -753,18 +846,24 @@
     }
   }
 
-  // 모임 수정 요청
-
-
-
-
-
   document.addEventListener('DOMContentLoaded', function () {
     if (!auth.isLoggedIn()) {
       window.location.href = '/user/signin';
       return;
     }
     switchTab('all'); // 초기 로딩 시 "전체" 탭 활성화
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('page')) {
+      const reviewsSection = document.querySelector('.reviews-section');
+      if (reviewsSection) {
+        setTimeout(() => {
+          reviewsSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
   });
 </script>
 </body>

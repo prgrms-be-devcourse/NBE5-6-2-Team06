@@ -3,27 +3,35 @@ package com.grepp.matnam.app.model.team;
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
+import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 import com.grepp.matnam.app.model.preference.repository.PreferenceRepository;
 import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
+import com.grepp.matnam.app.model.mymap.MymapRepository;
+import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
-import com.grepp.matnam.app.model.team.dto.TeamDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.Preference;
 import com.grepp.matnam.app.model.user.entity.User;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,6 +50,7 @@ public class TeamService {
     private final PreferenceRepository preferenceRepository;
 //    private final RestaurantRepository restaurantRepository;
 
+    private final MymapRepository mymapRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
 
@@ -51,7 +60,7 @@ public class TeamService {
         // 1. ChatRoom 생성
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setTeam(team);         // ChatRoom → Team 연결
-        chatRoom.setName(team.getTeamId()+"번 채팅방");
+        chatRoom.setName(team.getTeamId() + "번 채팅방");
         chatRoomRepository.save(chatRoom);
 
     }
@@ -59,7 +68,7 @@ public class TeamService {
     // 참여자 추가
     @Transactional
     public void addParticipant(Long teamId, User user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
             .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
         if (!participantRepository.existsByUser_UserIdAndTeam_TeamId(user.getUserId(), teamId)) {
@@ -68,7 +77,7 @@ public class TeamService {
             participant.setTeam(team);
             participant.setUser(user);
 
-            if(user.getUserId().equals(team.getUser().getUserId())) {
+            if (user.getUserId().equals(team.getUser().getUserId())) {
                 participant.setParticipantStatus(ParticipantStatus.APPROVED);
                 participant.setRole(Role.LEADER);
 
@@ -104,7 +113,6 @@ public class TeamService {
         participant.setParticipantStatus(ParticipantStatus.APPROVED);
         participantRepository.save(participant);
 
-//        team.setNowPeople(team.getNowPeople() + 1);
         if (team.getNowPeople() == null) {
             team.setNowPeople(1);
         } else {
@@ -113,87 +121,98 @@ public class TeamService {
         teamRepository.save(team);
     }
 
-//    // 수정한 필드 저장
-//    @Transactional
-//    public Team updateTeam(Long teamId, TeamUpdateRequest request) {
-//        // 팀 찾기
-//        Team team = teamRepository.findById(teamId)
-//            .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
-//
-//        // 필드 수정
-//        if (request.getTeamTitle() != null) {
-//            team.setTeamTitle(request.getTeamTitle());
-//        }
-//        if (request.getTeamDetails() != null) {
-//            team.setTeamDetails(request.getTeamDetails());
-//        }
-//        if (request.getRestaurantName() != null) {
-//            team.setRestaurantName(request.getRestaurantName());
-//        }
-//        if (request.getTeamDate() != null) {
-//            team.setMeetDate(request.getTeamDate());
-//        }
-//        if (request.getMeetDate() != null) {
-//            team.setMeetDate(request.getMeetDate());
-//        }
-//        if (request.getCapacity() != null) {
-//            team.setMaxPeople(request.getCapacity());
-//        }
-//
-//        if (request.getCategory() != null && team.getRestaurant() != null) {
-//            Restaurant restaurant = team.getRestaurant();
-//            restaurant.setCategory(request.getCategory());
-//            restaurantRepository.save(restaurant); // Restaurant 정보 업데이트
-//        }
-//        if (request.getImageUrl() != null) {
-//            team.setImageUrl(request.getImageUrl());
-//        }
-//
-//        // 수정된 팀 정보 저장
-//        return teamRepository.save(team);
-//    }
-
-    // 참여자 상태 변경
-    public void changeParticipantStatus(Long participantId, ParticipantStatus status) {
+    // 모임 참여 거절
+    @Transactional
+    public void rejectParticipant(Long participantId) {
         Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new RuntimeException("Participant not found")); //예외처리 수정하기
-        participant.setParticipantStatus(status);
-        participantRepository.save(participant);
+            .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
+
+        if (participant.getParticipantStatus() == ParticipantStatus.PENDING) {
+            participant.setParticipantStatus(ParticipantStatus.REJECTED);
+            participantRepository.save(participant);
+        } else {
+            throw new IllegalStateException("대기 중인 참여자만 거절 가능합니다.");
+        }
+    }
+
+
+    // 모임 업데이트
+    @Transactional
+    public void updateTeam(Long teamId, Team updatedTeam) {
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+
+        team.setTeamTitle(updatedTeam.getTeamTitle());
+        team.setTeamDetails(updatedTeam.getTeamDetails());
+        team.setRestaurantName(updatedTeam.getRestaurantName());
+        team.setTeamDate(updatedTeam.getTeamDate());
+        team.setMaxPeople(updatedTeam.getMaxPeople());
+        team.setImageUrl(updatedTeam.getImageUrl());
+        team.setNowPeople(updatedTeam.getNowPeople());
+        team.setStatus(updatedTeam.getStatus());
+        team.setRestaurantAddress(updatedTeam.getRestaurantAddress());
+        team.setCategory(updatedTeam.getCategory());
+
+        teamRepository.save(team);
     }
 
     // 모임 상태 변경
+    @Transactional
     public void changeTeamStatus(Long teamId, Status status) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team not found")); //예외처리 수정하기
+        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status); // 로그 추가
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
         Status prevStatus = team.getStatus();
         team.setStatus(status);
-        teamRepository.save(team);
+
+        // 모집완료 상태 처리
+        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
+            team.setStatus(Status.FULL);
+        }
+
+        if (team.getTeamDate().isBefore(LocalDateTime.now()) && team.getStatus() != Status.COMPLETED) {
+            team.setStatus(Status.COMPLETED);
+        }
 
         // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
         if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
             increaseTemperatureForCompletedTeam(team);
         }
+
+        teamRepository.save(team);
+        log.info("팀 상태 변경 완료: {}", team.getStatus());
     }
 
-    // 팀 삭제
+    // 모임 취소
     @Transactional
-    public void deleteTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+    public void cancelTeam(Long teamId, User currentUser) {
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
-        participantRepository.deleteByTeam_TeamId(teamId);
-        teamRepository.delete(team);
+        if (!team.getUser().getUserId().equals(currentUser.getNickname())) {
+            throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
+        }
+
+        if (team.getStatus() != Status.COMPLETED) {
+            team.setStatus(Status.CANCELED);
+            teamRepository.save(team);
+        } else {
+            throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
+        }
     }
+
 
     //조회 부분
     // 주최자로서의 팀 조회
     public List<Team> getTeamsByLeader(String userId) {
-        return teamRepository.findTeamsByUser_UserId(userId);
+        return teamRepository.findTeamsByUser_UserIdAndActivatedTrue(userId);
     }
 
     //참여자로서의 팀 조회 (APPROVED 상태)
     public List<Team> getTeamsByParticipant(String userId) {
-        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatus(userId, ParticipantStatus.APPROVED);
+        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
+                userId, ParticipantStatus.APPROVED
+        );
     }
 
     // 사용자의 모든 참여 정보 조회 (PENDING, APPROVED, REJECTED)
@@ -206,6 +225,7 @@ public class TeamService {
         List<Participant> participants = getAllParticipantsForUser(userId);
         return participants.stream()
             .map(Participant::getTeam)
+                .filter(Team::isActivated)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -218,8 +238,7 @@ public class TeamService {
 
     // 참여자 상세 정보 조회(참여 상태)
     public Team getTeamById(Long teamId) {
-        return teamRepository.findById(teamId)
-            .orElse(null);
+        return teamRepository.findByTeamIdAndActivatedTrue(teamId).orElse(null);
     }
 
     public Participant getParticipantById(Long participantId) {
@@ -228,20 +247,20 @@ public class TeamService {
 
     // 모임 검색 페이지
     public Page<Team> getAllTeams(Pageable pageable) {
-        return teamRepository.findAllWithParticipants(pageable);
+        return teamRepository.findAllWithParticipantsAndActivatedTrue(pageable);
     }
 
     // 모임 상세 조회
     @Transactional
     public Team getTeamByIdWithParticipants(Long teamId) {
-        return teamRepository.findByIdWithParticipantsAndUser(teamId).orElse(null);
+        return teamRepository.findByIdWithParticipantsAndUserAndActivatedTrue(teamId).orElse(null);
     }
 
     // 모임 완료 처리
     @Transactional
     public void completeTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
         Status prevStatus = team.getStatus();
 
@@ -290,13 +309,15 @@ public class TeamService {
 
     @Transactional
     public void updateTeamStatus(Long teamId, Status status) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
     }
 
     @Transactional
     public void unActivatedById(Long teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         log.info("team {}", team);
         team.unActivated();
     }
@@ -304,7 +325,8 @@ public class TeamService {
     public NewTeamResponse getNewTeamStats() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(), today.plusDays(1).atStartOfDay());
+        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(),
+            today.plusDays(1).atStartOfDay());
         long totalTeamCount = teamRepository.count();
         long yesterdayTotalTeamCount = totalTeamCount - newTeams;
         String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
@@ -322,7 +344,9 @@ public class TeamService {
 
     private String calculateGrowthRate(long today, long yesterday) {
         if (yesterday == 0) {
-            if (today == 0) return "+0%";
+            if (today == 0) {
+                return "+0%";
+            }
             return "+100%"; // 또는 "N/A"
         }
         long diff = today - yesterday;
@@ -332,7 +356,8 @@ public class TeamService {
     }
 
     public List<Map<String, String>> getMonthlyMeetingSuccessRate() {
-        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1)
+            .withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Map<String, Long>> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
 
         return monthlyStats.stream().map(stat -> {
@@ -428,6 +453,102 @@ public class TeamService {
         }
     }
 
+    public Map<String, Long> getTeamParticipantDistribution() {
+        Map<String, Long> distribution = new HashMap<>();
+        distribution.put("2-3명", teamRepository.countByNowPeopleBetween(2, 3));
+        distribution.put("4-5명", teamRepository.countByNowPeopleBetween(4, 5));
+        distribution.put("6-7명", teamRepository.countByNowPeopleBetween(6, 7));
+        distribution.put("8-10명", teamRepository.countByNowPeopleBetween(8, 10));
+        return distribution;
+    }
+
+    public Map<String, Long> getDailyNewTeamCountsLast7Days() {
+        LocalDate today = LocalDate.now();
+        Map<LocalDate, Long> dailyCounts = IntStream.rangeClosed(0, 6)
+            .mapToObj(today::minusDays)
+            .collect(Collectors.toMap(
+                date -> date,
+                date -> teamRepository.countByCreatedAtBetween(
+                    LocalDateTime.of(date, LocalTime.MIN),
+                    LocalDateTime.of(date, LocalTime.MAX)
+                ),
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
+
+        return dailyCounts.entrySet().stream()
+            .collect(Collectors.toMap(
+                entry -> entry.getKey().toString().substring(5),
+                Map.Entry::getValue,
+                (oldValue, newValue) -> oldValue,
+                LinkedHashMap::new
+            ));
+    }
+
+    public TeamStatsResponse getTeamStatistics() {
+        TeamStatsResponse statsDto = new TeamStatsResponse();
+        statsDto.setTotalTeams(teamRepository.count());
+        statsDto.setActiveTeams(teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(Status.FULL));
+        statsDto.setCompletedTeams(teamRepository.countByStatus(Status.COMPLETED));
+        statsDto.setNewTeamsLast30Days(teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+        Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
+        statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
+        return statsDto;
+    }
+
+    // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
+    public List<Map<String, Object>> getParticipantMymapData(Long teamId) {
+        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);
+
+        return participants.stream()
+                .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED) // 승인된 참여자만
+                .map(p -> {
+                    User user = p.getUser();
+                    List<Mymap> mymaps = mymapRepository.findByUserAndActivatedTrueAndPinnedTrue(user); // 맛집 필터링
+                    List<Map<String, Object>> restaurants = mymaps.stream()
+                            .map(m -> {
+                                Map<String, Object> map = new HashMap<>();
+                                map.put("mapId", m.getMapId());
+                                map.put("name", m.getPlaceName());
+                                map.put("roadAddress", m.getRoadAddress());
+                                map.put("latitude", m.getLatitude());
+                                map.put("longitude", m.getLongitude());
+                                map.put("memo", m.getMemo());
+                                return map;
+                            })
+                            .toList();
+                    return Map.of(
+                            "userId", user.getUserId(),
+                            "nickname", user.getNickname(),
+                            "restaurants", restaurants
+                    );
+                })
+                .toList();
+    }
+
+    public Map<String, Integer> getUserStats(String userId) {
+        Map<String, Integer> stats = new HashMap<>();
+
+        List<Team> leaderTeams = getTeamsByLeader(userId);
+        stats.put("leaderCount", leaderTeams.size());
+
+        List<Team> participatingTeams = getTeamsByParticipant(userId);
+        participatingTeams.removeAll(leaderTeams);
+        stats.put("participatingCount", participatingTeams.size());
+
+        List<Team> completedTeams = getAllTeamsForUser(userId).stream()
+                .filter(team -> team.getStatus() == Status.COMPLETED)
+                .collect(Collectors.toList());
+        stats.put("completedCount", completedTeams.size());
+
+        return stats;
+    }
+
+    //주최자 모임 삭제
+    @Transactional
+    public void unActivatedTeamByLeader(Long teamId) {
+        unActivatedById(teamId);
+    }
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 사용자 활동 추이 차트
     const userActivityCtx = document.getElementById('userActivityChart');
     if (userActivityCtx) {
-        fetch('/api/admin/dashboard/user/activity/monthly')
+        fetch('/api/admin/user-activity/statistics/monthly')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 모임 성공률 차트
     const meetingSuccessCtx = document.getElementById('meetingSuccessChart');
     if (meetingSuccessCtx) {
-        fetch('/api/admin/team/success-rate/monthly')
+        fetch('/api/admin/team/statistics/success-rate/monthly')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
