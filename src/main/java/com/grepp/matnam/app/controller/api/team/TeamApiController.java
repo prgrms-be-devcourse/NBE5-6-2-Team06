@@ -115,7 +115,7 @@ public class TeamApiController {
     @Operation(summary = "참여자 승인", description = "모임에 참여한 참가자를 승인합니다.")
     public ResponseEntity<ApiResponse> approveParticipant(@PathVariable Long teamId, @PathVariable Long participantId) {
         try {
-//            teamService.approveParticipant(participantId);
+            teamService.approveParticipant(participantId);
             Team team = teamService.getTeamById(teamId);
             TeamDto teamDto = convertToTeamDto(team);
 
