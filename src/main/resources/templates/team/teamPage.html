@@ -493,10 +493,16 @@
     .then(data => {
       console.log("불러온 채팅 이력:", data);
       const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = ''; // 기존 내용 초기화
+      chatBox.innerHTML = '';
 
-      // 채팅 (닉네임 : 메시지 ) 형태
-      data.forEach(message => {
+      const messages = data.data;
+
+      if (!Array.isArray(messages)) {
+        console.error("채팅 이력 형식이 잘못되었습니다:", messages);
+        return;
+      }
+
+      messages.forEach(message => {
         const isMyMessage = message.senderId === senderId;
         showMessage(message, isMyMessage);
       });

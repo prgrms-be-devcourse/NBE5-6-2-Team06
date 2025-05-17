@@ -2,6 +2,7 @@ package com.grepp.matnam.app.controller.api.chat;
 
 import com.grepp.matnam.app.model.chat.ChatService;
 import com.grepp.matnam.app.model.chat.dto.MessageDto;
+import com.grepp.matnam.infra.response.ApiResponse;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,9 @@ public class ChatApiController {
     private final ChatService chatService;
 
     @GetMapping("/history/{roomId}")
-    public List<MessageDto> getChatHistory(@PathVariable Long roomId) {
-        return chatService.getChatHistory(roomId);
+    public ApiResponse<List<MessageDto>> getChatHistory(@PathVariable Long roomId) {
+        List<MessageDto> chatHistory = chatService.getChatHistory(roomId);
+        return ApiResponse.success(chatHistory);
     }
 }
 
