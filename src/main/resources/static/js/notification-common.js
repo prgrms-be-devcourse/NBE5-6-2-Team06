@@ -226,6 +226,7 @@ class NotificationHandler {
             this.renderNotifications();
             this.unreadCount++;
             this.updateBadge();
+            showToastNow(newNotification.message, 'info');
         });
     }
 
