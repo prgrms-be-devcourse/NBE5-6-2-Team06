@@ -829,26 +829,60 @@
     switchTab('all');
   });
 
-  document.addEventListener('DOMContentLoaded', function () {
-    // 모임 취소 버튼 클릭 시 AJAX 처리
-    $('form').submit(function(event) {
-      event.preventDefault();
-      var form = $(this);
-      var teamId = form.data('team-id');
+  // document.addEventListener('DOMContentLoaded', function () {
+  //   // 모임 취소 버튼 클릭 시 AJAX 처리
+  //   $('form').submit(function(event) {
+  //     event.preventDefault();
+  //     var form = $(this);
+  //     var teamId = form.data('team-id');
+  //
+  //     $.ajax({
+  //       type: 'PATCH',
+  //       url: '/api/team/' + teamId + '/cancel',
+  //       success: function(response) {
+  //         alert(response.message);
+  //         location.reload();
+  //       },
+  //       error: function(xhr, status, error) {
+  //         alert('모임 취소 처리에 실패했습니다.');
+  //       }
+  //     });
+  //   });
+  // });
 
-      $.ajax({
-        type: 'PATCH',
-        url: '/api/team/' + teamId + '/cancel',
-        success: function(response) {
-          alert(response.message);
+  document.addEventListener('DOMContentLoaded', function() {
+    const cancelForm = document.getElementById('cancelForm');
+    if (cancelForm) {
+      cancelForm.addEventListener('submit', function(event) {
+        event.preventDefault(); // 기본 폼 제출 방지
+
+        const teamId = cancelForm.getAttribute('data-team-id');
+
+        if (!confirm("정말로 이 모임을 취소하시겠습니까?")) return;
+
+        fetch(`/api/team/${teamId}/cancel`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(res => {
+          if (!res.ok) {
+            return res.json().then(err => { throw new Error(err.message || '모임 취소 실패'); });
+          }
+          return res.json();
+        })
+        .then(data => {
+          alert(data.message || "모임이 취소되었습니다.");
           location.reload();
-        },
-        error: function(xhr, status, error) {
-          alert('모임 취소 처리에 실패했습니다.');
-        }
+        })
+        .catch(err => {
+          alert(err.message || "모임 취소 중 오류가 발생했습니다.");
+        });
       });
-    });
+    }
   });
+
 
   // 모임 목록 탭 전환
   function switchTab(tabName) {
