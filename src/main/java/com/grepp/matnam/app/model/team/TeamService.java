@@ -61,7 +61,7 @@ public class TeamService {
     // 참여자 추가
     @Transactional
     public void addParticipant(Long teamId, User user) {
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
             .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
         if (!participantRepository.existsByUser_UserIdAndTeam_TeamId(user.getUserId(), teamId)) {
@@ -132,8 +132,8 @@ public class TeamService {
     // 모임 업데이트
     @Transactional
     public void updateTeam(Long teamId, Team updatedTeam) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
@@ -153,8 +153,8 @@ public class TeamService {
     @Transactional
     public void changeTeamStatus(Long teamId, Status status) {
         log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status); // 로그 추가
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
         Status prevStatus = team.getStatus();
         team.setStatus(status);
 
@@ -179,8 +179,8 @@ public class TeamService {
     // 모임 취소
     @Transactional
     public void cancelTeam(Long teamId, User currentUser) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
         if (!team.getUser().getUserId().equals(currentUser.getNickname())) {
             throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
@@ -198,13 +198,14 @@ public class TeamService {
     //조회 부분
     // 주최자로서의 팀 조회
     public List<Team> getTeamsByLeader(String userId) {
-        return teamRepository.findTeamsByUser_UserId(userId);
+        return teamRepository.findTeamsByUser_UserIdAndActivatedTrue(userId);
     }
 
     //참여자로서의 팀 조회 (APPROVED 상태)
     public List<Team> getTeamsByParticipant(String userId) {
-        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatus(userId,
-            ParticipantStatus.APPROVED);
+        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
+                userId, ParticipantStatus.APPROVED
+        );
     }
 
     // 사용자의 모든 참여 정보 조회 (PENDING, APPROVED, REJECTED)
@@ -217,6 +218,7 @@ public class TeamService {
         List<Participant> participants = getAllParticipantsForUser(userId);
         return participants.stream()
             .map(Participant::getTeam)
+                .filter(Team::isActivated)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -229,8 +231,7 @@ public class TeamService {
 
     // 참여자 상세 정보 조회(참여 상태)
     public Team getTeamById(Long teamId) {
-        return teamRepository.findById(teamId)
-            .orElse(null);
+        return teamRepository.findByTeamIdAndActivatedTrue(teamId).orElse(null);
     }
 
     public Participant getParticipantById(Long participantId) {
@@ -239,20 +240,20 @@ public class TeamService {
 
     // 모임 검색 페이지
     public Page<Team> getAllTeams(Pageable pageable) {
-        return teamRepository.findAllWithParticipants(pageable);
+        return teamRepository.findAllWithParticipantsAndActivatedTrue(pageable);
     }
 
     // 모임 상세 조회
     @Transactional
     public Team getTeamByIdWithParticipants(Long teamId) {
-        return teamRepository.findByIdWithParticipantsAndUser(teamId).orElse(null);
+        return teamRepository.findByIdWithParticipantsAndUserAndActivatedTrue(teamId).orElse(null);
     }
 
     // 모임 완료 처리
     @Transactional
     public void completeTeam(Long teamId) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
         Status prevStatus = team.getStatus();
 
@@ -301,8 +302,8 @@ public class TeamService {
 
     @Transactional
     public void updateTeamStatus(Long teamId, Status status) {
-        Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
+        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
+                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
     }
 
@@ -458,6 +459,11 @@ public class TeamService {
         return stats;
     }
 
+    //주최자 모임 삭제
+    @Transactional
+    public void unActivatedTeamByLeader(Long teamId) {
+        unActivatedById(teamId);
+    }
     // 모임 수정
 //    public TeamDto getTeamDetails(Long teamId) {
 //    }

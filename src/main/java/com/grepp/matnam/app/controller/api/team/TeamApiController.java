@@ -12,11 +12,13 @@ import com.grepp.matnam.infra.response.ApiResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -153,6 +155,19 @@ public class TeamApiController {
         }
     }
 
+    //주최자 모임 삭제 (주최자 -> Activated = false, 실제로는 비활성화)
+    @DeleteMapping("/{teamId}/deactivate")
+    @Operation(summary = "모임 비활성화", description = "모임을 비활성화합니다.")
+    public ResponseEntity<ApiResponse> unActivatedTeamByLeader(@PathVariable Long teamId) {
+        try {
+            teamService.unActivatedTeamByLeader(teamId);
+            return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "모임이 삭제되었습니다.", null));
+        } catch (Exception e) {
+            log.error("모임 삭제 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse(ResponseCode.INTERNAL_SERVER_ERROR.code(), "삭제 실패", e.getMessage()));
+        }
+    }
 
     private TeamDto convertToTeamDto(Team team) {
         TeamDto teamDto = new TeamDto();
