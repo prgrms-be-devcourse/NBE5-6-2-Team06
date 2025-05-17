@@ -43,6 +43,7 @@ public class TeamApiController {
     @PutMapping("/{teamId}/complete")
     public ResponseEntity<String> completeTeam(@PathVariable Long teamId) {
         try {
+
             teamService.completeTeam(teamId);
             return ResponseEntity.ok("모임이 성공적으로 완료 처리되었습니다.");
         } catch (Exception e) {
@@ -52,26 +53,29 @@ public class TeamApiController {
     }
 
     // 모임 상태 변경
-    @PatchMapping("/{teamId}/status")
-    public ResponseEntity<?> changeTeamStatus(@PathVariable Long teamId,
-        @RequestParam Status status) {
-        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
+//    @PatchMapping("/{teamId}/status")
+//    public ResponseEntity<?> changeTeamStatus(@PathVariable Long teamId,
+//        @RequestParam Status status) {
+//        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
+//
+//        try {
+//            teamService.changeTeamStatus(teamId, status);
+//            return ResponseEntity.ok().build();
+//        } catch (Exception e) {
+//            log.error("팀 상태 변경 실패: {}", e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body("팀 상태 변경 실패");
+//        }
+//    }
 
-        try {
-            teamService.changeTeamStatus(teamId, status);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("팀 상태 변경 실패: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("팀 상태 변경 실패");
-        }
-    }
-
+    // 모임 취소
     @PostMapping("/{teamId}/cancel")
-    @Operation(summary = "모임 취소", description = "모임을 취소합니다.")
     public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId, @AuthenticationPrincipal User currentUser) {
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse(ResponseCode.UNAUTHORIZED.code(), "사용자가 인증되지 않았습니다.", null));
+        }
         try {
-            // 주최자만 취소 가능
             teamService.cancelTeam(teamId, currentUser);
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "모임이 취소되었습니다.", null));
         } catch (Exception e) {

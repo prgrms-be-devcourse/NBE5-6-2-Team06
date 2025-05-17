@@ -105,7 +105,7 @@ public class TeamService {
     @Transactional
     public void approveParticipant(Long participantId) {
         Participant participant = participantRepository.findById(participantId)
-            .orElseThrow(() -> new RuntimeException("참가자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
 
         if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
             throw new RuntimeException("이미 수락된 참가자입니다.");
@@ -124,6 +124,12 @@ public class TeamService {
         } else {
             team.setNowPeople(team.getNowPeople() + 1);
         }
+
+        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
+            team.setStatus(Status.FULL);
+        }
+
+
         teamRepository.save(team);
     }
 
@@ -163,31 +169,32 @@ public class TeamService {
     }
 
     // 모임 상태 변경
-    @Transactional
-    public void changeTeamStatus(Long teamId, Status status) {
-        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status); // 로그 추가
-        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
-        Status prevStatus = team.getStatus();
-        team.setStatus(status);
-
-        // 모집완료 상태 처리
-        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
-            team.setStatus(Status.FULL);
-        }
-
-        if (team.getTeamDate().isBefore(LocalDateTime.now()) && team.getStatus() != Status.COMPLETED) {
-            team.setStatus(Status.COMPLETED);
-        }
-
-        // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
-        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
-            increaseTemperatureForCompletedTeam(team);
-        }
-
-        teamRepository.save(team);
-        log.info("팀 상태 변경 완료: {}", team.getStatus());
-    }
+//    @Transactional
+//    public void changeTeamStatus(Long teamId, Status status) {
+//        log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
+//        Team team = teamRepository.findById(teamId)
+//            .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다.")); //예외처리 수정하기
+//        Status prevStatus = team.getStatus();
+//        team.setStatus(status);
+//
+//        // 모집완료 상태 처리
+//        if (team.getNowPeople().equals(team.getMaxPeople()) && team.getStatus() != Status.FULL) {
+//            team.setStatus(Status.FULL);
+//        }
+//
+//        if (team.getTeamDate().isBefore(LocalDateTime.now())
+//            && team.getStatus() != Status.COMPLETED) {
+//            team.setStatus(Status.COMPLETED);
+//        }
+//
+//        // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
+//        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
+//            increaseTemperatureForCompletedTeam(team);
+//        }
+//
+//        teamRepository.save(team);
+//        log.info("팀 상태 변경 완료: {}", team.getStatus());
+//    }
 
     // 모임 취소
     @Transactional
@@ -195,7 +202,7 @@ public class TeamService {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
                 .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
-        if (!team.getUser().getUserId().equals(currentUser.getNickname())) {
+        if (!team.getUser().getUserId().equals(currentUser.getUserId())) {
             throw new IllegalStateException("주최자만 모임을 취소할 수 있습니다.");
         }
 
@@ -268,14 +275,13 @@ public class TeamService {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
                 .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
-        Status prevStatus = team.getStatus();
-
-        team.setStatus(Status.COMPLETED);
-        teamRepository.save(team);
-
-        if (prevStatus != Status.COMPLETED) {
-            increaseTemperatureForCompletedTeam(team);
+        if (team.getTeamDate().isBefore(LocalDateTime.now())
+            && team.getStatus() != Status.COMPLETED) {
+            team.setStatus(Status.COMPLETED);
+            teamRepository.save(team);
         }
+
+        increaseTemperatureForCompletedTeam(team);
     }
 
     private void increaseTemperatureForCompletedTeam(Team team) {
@@ -500,9 +506,12 @@ public class TeamService {
     public TeamStatsResponse getTeamStatistics() {
         TeamStatsResponse statsDto = new TeamStatsResponse();
         statsDto.setTotalTeams(teamRepository.count());
-        statsDto.setActiveTeams(teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(Status.FULL));
+        statsDto.setActiveTeams(
+            teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(
+                Status.FULL));
         statsDto.setCompletedTeams(teamRepository.countByStatus(Status.COMPLETED));
-        statsDto.setNewTeamsLast30Days(teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+        statsDto.setNewTeamsLast30Days(
+            teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
         Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
         statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
         return statsDto;
@@ -510,32 +519,34 @@ public class TeamService {
 
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
     public List<Map<String, Object>> getParticipantMymapData(Long teamId) {
-        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);
+        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(
+            teamId);
 
         return participants.stream()
-                .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED) // 승인된 참여자만
-                .map(p -> {
-                    User user = p.getUser();
-                    List<Mymap> mymaps = mymapRepository.findByUserAndActivatedTrueAndPinnedTrue(user); // 맛집 필터링
-                    List<Map<String, Object>> restaurants = mymaps.stream()
-                            .map(m -> {
-                                Map<String, Object> map = new HashMap<>();
-                                map.put("mapId", m.getMapId());
-                                map.put("name", m.getPlaceName());
-                                map.put("roadAddress", m.getRoadAddress());
-                                map.put("latitude", m.getLatitude());
-                                map.put("longitude", m.getLongitude());
-                                map.put("memo", m.getMemo());
-                                return map;
-                            })
-                            .toList();
-                    return Map.of(
-                            "userId", user.getUserId(),
-                            "nickname", user.getNickname(),
-                            "restaurants", restaurants
-                    );
-                })
-                .toList();
+            .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED) // 승인된 참여자만
+            .map(p -> {
+                User user = p.getUser();
+                List<Mymap> mymaps = mymapRepository.findByUserAndActivatedTrueAndPinnedTrue(
+                    user); // 맛집 필터링
+                List<Map<String, Object>> restaurants = mymaps.stream()
+                    .map(m -> {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("mapId", m.getMapId());
+                        map.put("name", m.getPlaceName());
+                        map.put("roadAddress", m.getRoadAddress());
+                        map.put("latitude", m.getLatitude());
+                        map.put("longitude", m.getLongitude());
+                        map.put("memo", m.getMemo());
+                        return map;
+                    })
+                    .toList();
+                return Map.of(
+                    "userId", user.getUserId(),
+                    "nickname", user.getNickname(),
+                    "restaurants", restaurants
+                );
+            })
+            .toList();
     }
 
     public Map<String, Integer> getUserStats(String userId) {
@@ -549,8 +560,8 @@ public class TeamService {
         stats.put("participatingCount", participatingTeams.size());
 
         List<Team> completedTeams = getAllTeamsForUser(userId).stream()
-                .filter(team -> team.getStatus() == Status.COMPLETED)
-                .collect(Collectors.toList());
+            .filter(team -> team.getStatus() == Status.COMPLETED)
+            .collect(Collectors.toList());
         stats.put("completedCount", completedTeams.size());
 
         return stats;
