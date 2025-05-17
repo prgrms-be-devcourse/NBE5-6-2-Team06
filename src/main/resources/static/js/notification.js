@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          alert('공지사항이 성공적으로 발송되었습니다.');
+          response.text().then(message => {alert(message)});
           createNotificationModal.style.display = 'none';
           notificationForm.reset();
           // 선택적: 공지사항 목록을 다시 불러오거나 UI 업데이트

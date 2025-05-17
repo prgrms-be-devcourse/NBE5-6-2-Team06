@@ -2,10 +2,11 @@ package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
-import com.grepp.matnam.app.controller.api.notification.SSEController;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.notification.entity.Notification;
 import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
+import com.grepp.matnam.app.model.notification.service.NotificationService;
+import com.grepp.matnam.app.model.sse.SseService;
 import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
@@ -42,8 +43,9 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
-    private final SSEController sseController;
+    private final SseService sseService;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
     private final ModelMapper mapper;
 
     public User signup(User user) {
@@ -308,17 +310,10 @@ public class UserService {
         List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
 
         for (User user : usersToSend) {
-            Notification notification = new Notification();
-            notification.setUserId(user.getUserId());
-            notification.setType(NotificationType.NOTICE);
-            notification.setMessage(content);
-            notification.setLink(null);
-            notification.setRead(false);
-            notification.setActivated(true);
-            notificationRepository.save(notification);
+            Notification notification = notificationService.createNotification(user.getUserId(), NotificationType.NOTICE, content, null);
 
-            sseController.sendNotificationToUser(user.getUserId(), "newMessage", notification);
-            sseController.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
+            sseService.sendNotificationToUser(user.getUserId(), "newMessage", notification);
+            sseService.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
         }
     }
 }

@@ -201,7 +201,7 @@ class NotificationHandler {
     }
 
     connectSSE() {
-        this.eventSource = new EventSource('/api/sse/notification/subscribe', {
+        this.eventSource = new EventSource('/api/sse/subscribe', {
             withCredentials: true,
             headers: window.auth.getAuthHeaders()
         });

@@ -1,43 +1,47 @@
-package com.grepp.matnam.app.controller.api.notification;
+package com.grepp.matnam.app.model.sse;
 
 import com.grepp.matnam.app.model.notification.service.NotificationService;
-import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
-@Controller
+@Service
 @RequiredArgsConstructor
-public class SSEController {
+public class SseService {
 
     private final NotificationService notificationService;
-    private static final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+    private final SseRepository sseRepository;
 
-    @GetMapping(value = "/api/sse/notification/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe() {
-        String userId = AuthenticationUtils.getCurrentUserId();
-        SseEmitter emitter = new SseEmitter(3600000L);
+    private static final Long DEFAULT_TIMEOUT = 60 * 60 * 1000L; // 1시간
 
-        emitters.put(userId, emitter);
+    /**
+     * SSE 구독
+     */
+    public SseEmitter subscribe(String userId) {
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        sseRepository.save(userId, emitter);
+
         log.info("SSE 연결 수립 - 사용자 ID: {}", userId);
 
+        // 연결 종료 처리
         emitter.onCompletion(() -> {
-            emitters.remove(userId);
+            sseRepository.delete(userId);
             log.info("SSE 연결 완료 - 사용자 ID: {}", userId);
         });
+
         emitter.onTimeout(() -> {
-            emitters.remove(userId);
+            emitter.complete();
+            sseRepository.delete(userId);
             log.info("SSE 연결 타임아웃 - 사용자 ID: {}", userId);
         });
+
         emitter.onError((throwable) -> {
-            emitters.remove(userId);
+            emitter.completeWithError(throwable);
+            sseRepository.delete(userId);
             log.error("SSE 연결 오류 - 사용자 ID: {}, 오류: {}", userId, throwable.getMessage());
         });
 
@@ -46,17 +50,20 @@ public class SSEController {
             long unreadCount = notificationService.getUnreadNotificationCount(userId);
             emitter.send(SseEmitter.event()
                 .name("unreadCount")
-                .data(unreadCount));
-            log.debug("최초 연결 시 읽지 않은 알림 개수 전송 - 사용자 ID: {}, 개수: {}", userId, unreadCount);
+                .data(unreadCount, MediaType.APPLICATION_JSON));
+            log.debug("최초 연결 시 unreadCount 전송 - 사용자 ID: {}, 개수: {}", userId, unreadCount);
         } catch (IOException e) {
-            log.error("최초 연결 시 읽지 않은 알림 개수 전송 실패 - 사용자 ID: {}, 오류: {}", userId, e.getMessage());
+            log.error("초기 unreadCount 전송 실패 - 사용자 ID: {}, 오류: {}", userId, e.getMessage());
         }
 
         return emitter;
     }
 
+    /**
+     * 특정 사용자에게 SSE 이벤트 전송
+     */
     public void sendNotificationToUser(String userId, String eventName, Object data) {
-        SseEmitter emitter = emitters.get(userId);
+        SseEmitter emitter = sseRepository.get(userId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
@@ -64,12 +71,12 @@ public class SSEController {
                     .data(data));
                 log.debug("SSE 이벤트 전송 - 사용자 ID: {}, 이벤트: {}, 데이터: {}", userId, eventName, data);
             } catch (IOException e) {
-                emitters.remove(userId);
-                log.error("SSE 이벤트 전송 실패 (연결 끊김) - 사용자 ID: {}, 이벤트: {}, 오류: {}", userId, eventName,
-                    e.getMessage());
+                sseRepository.delete(userId);
+                log.error("SSE 이벤트 전송 실패 - 사용자 ID: {}, 오류: {}", userId, e.getMessage());
             }
         } else {
-            log.warn("SSE 연결 없음 - 사용자 ID: {}", userId);
+            log.debug("SSE 연결 없음 - 사용자 ID: {}", userId);
         }
     }
+
 }

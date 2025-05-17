@@ -21,6 +21,6 @@ public class AdminNotificationApiController {
     @PostMapping("/broadcast")
     public ResponseEntity<?> broadcastNotification(@RequestBody BroadcastNotificationRequest request) {
         userService.sendBroadcastNotification(request.getContent());
-        return ResponseEntity.ok("공지 완료");
+        return ResponseEntity.ok("공지사항이 성공적으로 발송되었습니다.");
     }
 }
