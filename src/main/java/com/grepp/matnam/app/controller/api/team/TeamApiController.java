@@ -54,7 +54,7 @@ public class TeamApiController {
     }
 
     // 모임 상태 변경 - 모임 취소
-    @PatchMapping("/{teamId}/cancel")
+    @PostMapping("/{teamId}/cancel")
     public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId) {
         try {
             teamService.cancelTeam(teamId);
