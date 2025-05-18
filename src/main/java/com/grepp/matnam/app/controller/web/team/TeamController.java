@@ -161,8 +161,8 @@ public class TeamController {
         model.addAttribute("participants", approvedParticipants);
 
         // 주최자인지 확인
-        model.addAttribute("isLeader", team.getUser().getUserId().equals(currentUser.getUserId()));
-
+        boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
+        model.addAttribute("isLeader", isLeader);
 //        // 모임 완료 상태인지 확인
 //        model.addAttribute("isCompleted", team.getStatus() == Status.COMPLETED);
 
