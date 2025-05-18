@@ -613,8 +613,8 @@
           <!-- 모임 취소 버튼-->
           <form th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}"
                 th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                method="post" style="display: inline;">
-            <button type="submit" class="btn-primary">모임 취소</button>
+                method="post" style="display: inline;"
+                id="cancelForm" th:attr="data-team-id=${team.teamId}"> <button type="submit" class="btn-primary">모임 취소</button>
           </form>
 
 
@@ -829,39 +829,19 @@
     switchTab('all');
   });
 
-  // document.addEventListener('DOMContentLoaded', function () {
-  //   // 모임 취소 버튼 클릭 시 AJAX 처리
-  //   $('form').submit(function(event) {
-  //     event.preventDefault();
-  //     var form = $(this);
-  //     var teamId = form.data('team-id');
-  //
-  //     $.ajax({
-  //       type: 'PATCH',
-  //       url: '/api/team/' + teamId + '/cancel',
-  //       success: function(response) {
-  //         alert(response.message);
-  //         location.reload();
-  //       },
-  //       error: function(xhr, status, error) {
-  //         alert('모임 취소 처리에 실패했습니다.');
-  //       }
-  //     });
-  //   });
-  // });
 
   document.addEventListener('DOMContentLoaded', function() {
     const cancelForm = document.getElementById('cancelForm');
     if (cancelForm) {
       cancelForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // 기본 폼 제출 방지
+        event.preventDefault();
 
         const teamId = cancelForm.getAttribute('data-team-id');
 
         if (!confirm("정말로 이 모임을 취소하시겠습니까?")) return;
 
         fetch(`/api/team/${teamId}/cancel`, {
-          method: 'PATCH',
+          method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
