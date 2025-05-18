@@ -144,6 +144,8 @@ public class TeamService {
         } else {
             throw new IllegalStateException("대기 중인 참여자만 거절 가능합니다.");
         }
+        Team team = participant.getTeam();
+        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 거절되었습니다.", "/team/detail/" + team.getTeamId());
     }
 
 
