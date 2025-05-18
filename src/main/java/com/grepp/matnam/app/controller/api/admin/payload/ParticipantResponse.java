@@ -19,7 +19,7 @@ public class ParticipantResponse {
     private String email;
     private Role role;
     private ParticipantStatus participantStatus;
-    private String createDate;
+    private String createdDate;
 
     public ParticipantResponse(Participant p) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -30,7 +30,7 @@ public class ParticipantResponse {
         this.email = p.getUser().getEmail();
         this.role = p.getRole();
         this.participantStatus = p.getParticipantStatus();
-        this.createDate = p.getCreatedAt().format(dateFormatter);
+        this.createdDate = p.getCreatedAt().format(dateFormatter);
     }
 
 }
