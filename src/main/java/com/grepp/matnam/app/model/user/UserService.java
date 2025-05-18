@@ -44,12 +44,9 @@ import org.springframework.util.StringUtils;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final NotificationRepository notificationRepository;
-    private final SseService sseService;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
     private final NotificationSender notificationSender;
-    private final ModelMapper mapper;
 
     public User signup(User user) {
         log.info("회원가입 시도: {}, 이메일: {}", user.getUserId(), user.getEmail());
