@@ -2,7 +2,6 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
-import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
@@ -33,7 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
@@ -129,7 +127,6 @@ public class TeamService {
             team.setStatus(Status.FULL);
         }
 
-
         teamRepository.save(team);
     }
 
@@ -152,7 +149,7 @@ public class TeamService {
     @Transactional
     public void updateTeam(Long teamId, Team updatedTeam) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
@@ -172,7 +169,7 @@ public class TeamService {
     @Transactional
     public void cancelTeam(Long teamId) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         if (team.getStatus() == Status.COMPLETED) {
             throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
@@ -192,7 +189,7 @@ public class TeamService {
     //참여자로서의 팀 조회 (APPROVED 상태)
     public List<Team> getTeamsByParticipant(String userId) {
         return teamRepository.findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
-                userId, ParticipantStatus.APPROVED
+            userId, ParticipantStatus.APPROVED
         );
     }
 
@@ -206,7 +203,7 @@ public class TeamService {
         List<Participant> participants = getAllParticipantsForUser(userId);
         return participants.stream()
             .map(Participant::getTeam)
-                .filter(Team::isActivated)
+            .filter(Team::isActivated)
             .distinct()
             .collect(Collectors.toList());
     }
@@ -236,6 +233,14 @@ public class TeamService {
 
         log.info("현재 상태: {}", team.getStatus());
         Status prevStatus = team.getStatus();
+
+        boolean hasMemberRole = team.getParticipants().stream()
+            .anyMatch(participant -> participant.getRole() == Role.MEMBER);
+
+        if (!hasMemberRole) {
+            throw new IllegalStateException("참여자가 없는 모임은 완료 처리할 수 없습니다.");
+        }
+
         team.setStatus(status);
 
         teamRepository.save(team);
@@ -286,7 +291,7 @@ public class TeamService {
     @Transactional
     public void updateTeamStatus(Long teamId, Status status) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);

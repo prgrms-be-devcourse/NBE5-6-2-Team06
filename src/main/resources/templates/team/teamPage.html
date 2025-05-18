@@ -683,14 +683,14 @@
       var url = form.attr('action');
       var button = $(this);
 
-      button.prop('disabled', true).text('모임 완료 중...');
+      button.prop('disabled', true).text('모임 완료');
 
       $.ajax({
         type: 'PUT',
         url: url,
         data: { status: status },
         success: function(response) {
-          $('#notificationMessage').text(response.message);
+          $('#notificationMessage').text(response.message  || '모임이 성공적으로 완료 처리되었습니다.');
           $('#notificationArea').fadeIn();
           $('#notificationButton').click(function() {
             $('#notificationArea').fadeOut();
@@ -700,7 +700,9 @@
         error: function(xhr, status, error) {
           var errorMessage = "모임 완료에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
-            errorMessage += " (" + xhr.responseJSON.message + ")";
+            errorMessage = xhr.responseJSON.message; // 서버에서 보낸 오류 메시지 사용
+          } else if (xhr.responseText) {
+            errorMessage = xhr.responseText; // 서버에서 단순 텍스트 오류 응답을 받은 경우
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();
