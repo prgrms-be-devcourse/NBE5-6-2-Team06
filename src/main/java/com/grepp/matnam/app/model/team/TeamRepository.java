@@ -2,6 +2,7 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto;
 import com.grepp.matnam.app.model.team.entity.Team;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,4 +60,9 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
 
     @Query("SELECT AVG(t.maxPeople) FROM Team t WHERE t.status IN ('RECRUITING', 'FULL')")
     Double averageMaxPeopleForActiveTeams();
+
+    @Query("SELECT new com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto(p.participantId, u.userId) " +
+        "FROM Participant p JOIN p.user u " +
+        "WHERE p.team.teamId = :teamId AND p.team.activated = true")
+    List<ParticipantWithUserIdDto> findAllDtoByTeamId(@Param("teamId") Long teamId);
 }

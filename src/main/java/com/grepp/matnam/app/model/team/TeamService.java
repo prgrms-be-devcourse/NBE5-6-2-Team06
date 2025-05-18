@@ -4,6 +4,7 @@ import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
+import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
 
@@ -11,9 +12,11 @@ import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
+import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.PreferenceRepository;
@@ -54,6 +57,8 @@ public class TeamService {
     private final MymapRepository mymapRepository;
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
+
+    private final NotificationSender notificationSender;
 
     // 모임 생성
     public void saveTeam(Team team) {
@@ -313,6 +318,12 @@ public class TeamService {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
                 .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
         team.setStatus(status);
+
+        List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
+        for (ParticipantWithUserIdDto dto : participants) {
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "");
+        }
+
     }
 
     @Transactional
