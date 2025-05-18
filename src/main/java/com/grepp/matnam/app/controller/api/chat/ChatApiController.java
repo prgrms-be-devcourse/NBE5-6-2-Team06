@@ -18,9 +18,9 @@ public class ChatApiController {
     private final ChatService chatService;
 
     @GetMapping("/history/{roomId}")
-    public ApiResponse<List<MessageDto>> getChatHistory(@PathVariable Long roomId) {
+    public List<MessageDto> getChatHistory(@PathVariable Long roomId) {
         List<MessageDto> chatHistory = chatService.getChatHistory(roomId);
-        return ApiResponse.success(chatHistory);
+        return chatHistory;
     }
 }
 

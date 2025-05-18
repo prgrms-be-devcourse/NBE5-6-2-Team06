@@ -12,42 +12,76 @@
       background-color: #f9f9f9;
       color: #333;
     }
-
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 1rem 2rem;
       background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-
     nav a {
       margin-right: 1rem;
       text-decoration: none;
       color: #333;
       font-size: 0.9rem;
     }
-
     .container {
       max-width: 1200px;
       margin: 2rem auto;
       padding: 0 1rem;
     }
-
     .section {
       background: #fff;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
-
     .section h2 {
       margin-bottom: 1rem;
       font-size: 1.4rem;
       border-bottom: 2px solid #eee;
       padding-bottom: 0.5rem;
+    }
+    .participant-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .participant {
+      flex: 1 1 200px;
+      background: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .chat-box, .recommendation-box {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+    .input-group {
+      display: flex;
+      margin-top: 1rem;
+    }
+    .input-group input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .input-group button {
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      border: none;
+      background-color: #000;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     .participant-list {
@@ -96,81 +130,128 @@
     .preference-tag:hover {
       background-color: #e0e0e0;
     }
-
-    .chat-box,
-    #chat-box {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #ddd;
-      padding: 1rem;
-      border-radius: 8px;
-      background: #fafafa;
-    }
-
     .chat-message {
-      display: flex;
-      flex-direction: column;
-      max-width: 60%;
-      margin: 0.5rem;
-    }
-
-    .my-message {
-      align-self: flex-end;
-      text-align: right;
-    }
-
-    .other-message {
-      align-self: flex-start;
-      text-align: left;
-    }
-
-    .nickname {
-      font-size: 0.75rem;
-      color: #666;
-      margin-bottom: 0.3rem;
-    }
-
-    .bubble {
-      background-color: #f1f0f0;
-      padding: 0.6rem 1rem;
-      border-radius: 16px;
-      display: inline-block;
-      word-break: break-word;
-    }
-
-    .my-message .bubble {
-      background-color: #DCF8C6;
-    }
-
-    .time {
-      font-size: 0.7rem;
-      color: #999;
-      margin-top: 0.3rem;
-    }
-
-    .input-group {
-      display: flex;
-      margin-top: 1rem;
-    }
-
-    .input-group input {
-      flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
+      position: relative;
+      padding: 10px;
+      margin-bottom: 8px;
       border-radius: 4px;
     }
-
-    .input-group button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
+    .chat-message:hover {
+      background-color: #f0f0f0;
+    }
+    .report-btn {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+      background-color: #ff5c5c;
+      color: white;
       border: none;
-      background-color: #000;
-      color: #fff;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 12px;
+      cursor: pointer;
+      display: none;
+    }
+    .chat-message:hover .report-btn {
+      display: block;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 400px;
+      max-width: 90%;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .modal-title {
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .modal-body {
+      margin-bottom: 1.5rem;
+    }
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+    .modal-footer button {
+      padding: 0.7rem 1rem;
       border-radius: 4px;
       cursor: pointer;
+      font-weight: 500;
+    }
+    .modal-footer .cancel {
+      background-color: #f5f5f5;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+    .modal-footer .submit {
+      background-color: #ff5c5c;
+      color: #fff;
+      border: none;
+    }
+    .modal-footer .submit:disabled {
+      background-color: #ffadad;
+      cursor: not-allowed;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .form-group textarea {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      resize: vertical;
+      min-height: 120px;
+      font-family: inherit;
+    }
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #ff5c5c;
+      box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.1);
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #333;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      z-index: 2000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .toast.success {
+      background-color: #4CAF50;
+    }
+    .toast.error {
+      background-color: #f44336;
     }
 
     .card-wrapper {
@@ -210,10 +291,6 @@
     @media (max-width: 480px) {
       .participant-list {
         grid-template-columns: 1fr;
-      }
-
-      .chat-message {
-        max-width: 85%;
       }
     }
   </style>
@@ -285,9 +362,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h2>참여자 정보</h2>
       <button
-              class="btn"
-              th:onclick="|location.href='/team/map/${teamId}'|"
-              style="padding: 0.4rem 1rem;
+          class="btn"
+          th:onclick="|location.href='/team/map/${teamId}'|"
+          style="padding: 0.4rem 1rem;
               font-size: 0.9rem;
               border: none;
               border-radius: 4px;
@@ -349,7 +426,6 @@
     </div>
   </div>
 
-  <!-- ====================== 채팅 ======================== -->
   <div class="section">
     <h2>채팅</h2>
     <div class="chat-box" id="chat-box">
@@ -360,35 +436,60 @@
       <button type="button" onclick="sendMessage()">전송</button>
     </div>
   </div>
-  <!-- ================== 추천 ========================== -->
-<div class="section">
-  <h2>2차 장소 추천</h2>
+  <div id="reportModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">채팅 신고하기</h3>
+      <div class="modal-body">
+        <input type="hidden" id="userId" th:value="${#authentication.name}">
+        <input type="hidden" id="reportedId" value="">
+        <input type="hidden" id="chatId" value="">
+        <input type="hidden" id="teamId" th:value="${teamId}">
 
-  <!-- 안내 메시지 + 추천 버튼 -->
-  <div
-      style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
-    <p style="margin-bottom: 1rem; font-size: 1.05rem; line-height: 1.6;">
-      🍽️ <strong>오늘의 2차 장소</strong>, 고민하지 마세요!<br>
-      <span style="color: #555;">우리 팀을 위해 AI가 분위기 좋은 맛집을 추천해드려요.</span><br>
-      아래 버튼을 눌러 <strong style="color: #4CAF50;">맞춤 추천</strong>을 받아보세요! ✨
-    </p>
-    <button type="button" id="recommend-button"
-            style="padding: 0.75rem 1.6rem; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">
-      👍 추천받기
-    </button>
+        <div class="form-group">
+          <label for="reason">신고 사유</label>
+          <textarea id="reason" placeholder="불건전한 내용, 욕설, 광고 등 구체적인 이유를 작성해주세요." required></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="cancel" onclick="closeReportModal()">취소</button>
+        <button type="button" class="submit" id="submitReport" disabled>신고하기</button>
+      </div>
+    </div>
   </div>
+
+  <div id="toast" class="toast"></div>
+
+  <!-- ================== 추천 ========================== -->
+  <div class="section">
+    <h2>2차 장소 추천</h2>
+
+    <!-- 안내 메시지 + 추천 버튼 -->
+    <div
+        style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+      <p style="margin-bottom: 1rem; font-size: 1.05rem; line-height: 1.6;">
+        🍽️ <strong>오늘의 2차 장소</strong>, 고민하지 마세요!<br>
+        <span style="color: #555;">우리 팀을 위해 AI가 분위기 좋은 맛집을 추천해드려요.</span><br>
+        아래 버튼을 눌러 <strong style="color: #4CAF50;">맞춤 추천</strong>을 받아보세요! ✨
+      </p>
+      <button type="button" id="recommend-button"
+              style="padding: 0.75rem 1.6rem; background-color: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem;">
+        👍 추천받기
+      </button>
+    </div>
 
     <!-- 추천 결과 카드 (처음엔 숨김) -->
     <div id="recommendation-result-section" style="display: none;">
       <h3 style="margin-bottom: 1.2rem; font-size: 1.3rem;">✨ AI가 추천한 2차 장소 TOP 3</h3>
 
       <!--  로딩 표시 -->
-      <div id="loading-message" style="text-align:center; padding: 1rem; font-size: 1.1rem; color: #888; display: none;">
+      <div id="loading-message"
+           style="text-align:center; padding: 1rem; font-size: 1.1rem; color: #888; display: none;">
         ⏳ AI가 추천 중입니다... 잠시만 기다려주세요!
       </div>
 
       <!--  카드 3개 수평으로 나열 -->
-      <div class="card-wrapper" id="recommendation-cards" style="display: flex; gap: 15px; flex-wrap: wrap;">
+      <div class="card-wrapper" id="recommendation-cards"
+           style="display: flex; gap: 15px; flex-wrap: wrap;">
 
       </div>
 
@@ -408,6 +509,7 @@
     </div>
   </div>
 
+
 <script th:inline="javascript">
   let stompClient;
 
@@ -415,7 +517,6 @@
   const senderId = [[${userId}]]; // 로그인된 사용자 ID
   const senderNickname = [[${userNickname}]]; // 로그인된 사용자 닉네임
 
-  //=============================== 채팅 ===================================
   function connect() {
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
@@ -435,12 +536,11 @@
       // 팀 채팅방 구독
       stompClient.subscribe('/room/' + teamId, function (chat) {
         const message = JSON.parse(chat.body);
-        const isMyMessage = message.senderId === senderId;
-        showMessage(message, isMyMessage);
+
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
       });
     });
   }
-
 
   //실질적인 메시지 전송 (팀id, 보내는 사람 id, 보내는 사람 닉네임, 보내는 내용)
   function sendMessage() {
@@ -461,43 +561,46 @@
     }
   }
 
-
-  // 보낸 내용을 채팅방에 보여줌 ( 자동스크롤 방식)
-  function showMessage(message, isMyMessage) {
+  function showMessage(messageText, messageSenderId, chatId) {
     const chatBox = document.getElementById('chat-box');
+    const messageElement = document.createElement('div');
 
-    const messageWrapper = document.createElement('div');
-    messageWrapper.classList.add('chat-message', isMyMessage ? 'my-message' : 'other-message');
+    messageElement.className = 'chat-message';
 
-    // 닉네임 (위)
-    const nicknameEl = document.createElement('div');
-    nicknameEl.className = 'nickname';
-    nicknameEl.textContent = message.senderNickname;
+    messageElement.textContent = messageText;
 
-    // 말풍선
-    const bubbleEl = document.createElement('div');
-    bubbleEl.className = 'bubble';
-    bubbleEl.textContent = message.message;
+    if (messageSenderId && messageSenderId !== senderId) {
+      const messagePattern = /\[(.*?)\] (.*?): (.*)/;
+      const match = messageText.match(messagePattern);
 
-    // 시간 (아래)
-    const timeEl = document.createElement('div');
-    timeEl.className = 'time';
-    timeEl.textContent = message.time;
+      if (match) {
+        const time = match[1];
+        const nickname = match[2];
+        const content = match[3];
 
-    // 조립
-    messageWrapper.appendChild(nicknameEl);
-    messageWrapper.appendChild(bubbleEl);
-    messageWrapper.appendChild(timeEl);
+        const reportButton = document.createElement('button');
+        reportButton.className = 'report-btn';
+        reportButton.textContent = '신고';
+        reportButton.title = '이 메시지 신고하기';
 
-    chatBox.appendChild(messageWrapper);
+        reportButton.onclick = function(e) {
+          e.stopPropagation();
+          openReportModal(messageSenderId, nickname, chatId);
+        };
+
+        messageElement.appendChild(reportButton);
+      }
+    }
+
+    chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight;
   }
+
   // 페이지 로드 후 연결
   connect();
 
   loadChatHistory();
 
-  // 채팅 이력 불러오기 db에 restapi 를 통해 db에 저장된 값을 가져와서 기록 유지
   function loadChatHistory() {
     console.log("채팅 이력 불러오기 시도...");
     fetch(`/api/chat/history/${teamId}`)
@@ -508,20 +611,12 @@
       return response.json();
     })
     .then(data => {
-      console.log("불러온 채팅 이력:", data);
       const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = '';
+      chatBox.innerHTML = ''; // 기존 내용 초기화
 
-      const messages = data.data;
-
-      if (!Array.isArray(messages)) {
-        console.error("채팅 이력 형식이 잘못되었습니다:", messages);
-        return;
-      }
-
-      messages.forEach(message => {
-        const isMyMessage = message.senderId === senderId;
-        showMessage(message, isMyMessage);
+      // 채팅 메시지 표시
+      data.forEach(message => {
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
       });
     })
     .catch(error => {
@@ -529,6 +624,110 @@
     });
   }
 
+  function openReportModal(reportedUserId, reportedUserNickname, chatId) {
+    const reportModal = document.getElementById('reportModal');
+    const reasonTextarea = document.getElementById('reason');
+    const submitBtn = document.getElementById('submitReport');
+
+    document.getElementById('reportedId').value = reportedUserId;
+    document.getElementById('chatId').value = chatId || '';
+
+    const modalTitle = document.querySelector('.modal-title');
+    modalTitle.textContent = `${reportedUserNickname}님의 메시지 신고하기`;
+
+    reportModal.style.display = 'block';
+
+    reasonTextarea.value = '';
+    submitBtn.disabled = true;
+  }
+
+  function closeReportModal() {
+    const reportModal = document.getElementById('reportModal');
+    reportModal.style.display = 'none';
+  }
+
+  function showToast(message, type = '') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast ' + type;
+
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const chatInput = document.getElementById('chat-input');
+    chatInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+
+    const reasonTextarea = document.getElementById('reason');
+    const submitBtn = document.getElementById('submitReport');
+
+    window.addEventListener('click', function(event) {
+      const reportModal = document.getElementById('reportModal');
+      if (event.target === reportModal) {
+        closeReportModal();
+      }
+    });
+
+    reasonTextarea.addEventListener('input', function() {
+      submitBtn.disabled = this.value.trim().length < 5;
+    });
+
+    document.getElementById('submitReport').addEventListener('click', function() {
+      if (reasonTextarea.value.trim().length < 5) {
+        reasonTextarea.focus();
+        return;
+      }
+
+      const userId = document.getElementById('userId').value;
+      const reportedId = document.getElementById('reportedId').value;
+      const chatId = document.getElementById('chatId').value;
+      const teamId = document.getElementById('teamId').value;
+      const reason = reasonTextarea.value;
+
+      const reportData = {
+        userId: userId,
+        reportedId: reportedId,
+        reason: reason,
+        reportType: 'CHAT',
+        teamId: parseInt(teamId)
+      };
+
+      if (chatId && chatId.trim() !== '') {
+        reportData.chatId = parseInt(chatId);
+      }
+
+      fetch('/api/reports', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reportData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.code === 'SUCCESS' || data.code === '0000') {
+          closeReportModal();
+          showToast('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
+        } else {
+          showToast('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('신고 처리 중 오류가 발생했습니다.', 'error');
+      });
+    });
+  });
   // ====================================== 추천 ========================================
   document.getElementById("recommend-button").addEventListener("click", () => {
     fetchRecommendations(`/api/ai/recommend/restaurant/${teamId}`);
@@ -578,7 +777,8 @@
                 <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
                 <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
                 <p><strong>📝 소개:</strong> ${dbItem.description}</p>
-                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
+                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url
+          || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
               </div>
             `;
           wrapper.appendChild(card);
@@ -606,7 +806,5 @@
     });
   }
 </script>
-</body>
-</html>
 </body>
 </html>

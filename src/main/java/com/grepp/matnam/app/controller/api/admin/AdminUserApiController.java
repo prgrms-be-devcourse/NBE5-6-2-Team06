@@ -45,7 +45,7 @@ public class AdminUserApiController {
         return ResponseEntity.ok("사용자가 비활성화되었습니다.");
     }
 
-    @DeleteMapping("/report/{reportId}")
+    @PatchMapping("/report/{reportId}")
     public ResponseEntity<?> unActivatedReport(@PathVariable Long reportId) {
         reportService.unActivatedById(reportId);
         return ResponseEntity.ok("신고 처리가 완료되었습니다.");

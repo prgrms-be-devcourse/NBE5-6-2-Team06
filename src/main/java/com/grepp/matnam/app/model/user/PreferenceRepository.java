@@ -1,11 +1,14 @@
 package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.model.user.entity.Preference;
+import com.grepp.matnam.app.model.user.entity.User;
 import java.util.Map;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PreferenceRepository extends JpaRepository<Preference, Long> {
+
+    Preference findByUser(User user);
 
     @Query(value = "SELECT " +
         "SUM(CASE p.bigStore WHEN true THEN 1 ELSE 0 END) AS bigStoreCount, " +

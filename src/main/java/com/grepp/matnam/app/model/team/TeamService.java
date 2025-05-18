@@ -6,7 +6,7 @@ import com.grepp.matnam.app.controller.api.team.payload.TeamUpdateRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
-import com.grepp.matnam.app.model.preference.repository.PreferenceRepository;
+
 import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
@@ -16,6 +16,7 @@ import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
+import com.grepp.matnam.app.model.user.PreferenceRepository;
 import com.grepp.matnam.app.model.user.UserRepository;
 import com.grepp.matnam.app.model.user.entity.Preference;
 import com.grepp.matnam.app.model.user.entity.User;
