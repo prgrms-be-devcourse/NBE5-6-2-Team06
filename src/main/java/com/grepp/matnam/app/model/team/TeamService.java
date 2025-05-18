@@ -255,6 +255,13 @@ public class TeamService {
             increaseTemperatureForCompletedTeam(team);
         }
         log.info("팀 상태 변경 완료: {}", team.getStatus());
+        List<Participant> participants = team.getParticipants();
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!", null);
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.REVIEW_REQUEST, "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!", "/team/" + team.getTeamId() + "/reviews");
+            }
+        }
     }
 
     private void increaseTemperatureForCompletedTeam(Team team) {
