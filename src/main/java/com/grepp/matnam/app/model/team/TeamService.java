@@ -314,7 +314,7 @@ public class TeamService {
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
-            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "/team/page/" + teamId);
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해 [" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "/team/page/" + teamId);
         }
 
     }
@@ -325,6 +325,10 @@ public class TeamService {
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
         log.info("team {}", team);
         team.unActivated();
+        List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
+        for (ParticipantWithUserIdDto dto : participants) {
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해  [" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
+        }
     }
 
     public NewTeamResponse getNewTeamStats() {
