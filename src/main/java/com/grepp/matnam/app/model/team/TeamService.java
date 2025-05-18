@@ -296,7 +296,7 @@ public class TeamService {
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
-            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "");
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "/team/page/" + teamId);
         }
 
     }
