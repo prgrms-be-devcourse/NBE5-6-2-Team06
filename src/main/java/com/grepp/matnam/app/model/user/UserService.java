@@ -308,6 +308,7 @@ public class UserService {
     public void sendBroadcastNotification(String content) {
         // ROLE_USER 이고 활성화된 사용자만 조회
         List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
+        notificationService.saveNotice(content, null);
 
         for (User user : usersToSend) {
             Notification notification = notificationService.createNotification(user.getUserId(), NotificationType.NOTICE, content, null);

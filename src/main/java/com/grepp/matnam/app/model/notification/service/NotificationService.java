@@ -1,7 +1,9 @@
 package com.grepp.matnam.app.model.notification.service;
 
 import com.grepp.matnam.app.model.notification.code.NotificationType;
+import com.grepp.matnam.app.model.notification.entity.Notice;
 import com.grepp.matnam.app.model.notification.entity.Notification;
+import com.grepp.matnam.app.model.notification.repository.NoticeRepository;
 import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final NoticeRepository noticeRepository;
 
     public long getUnreadNotificationCount(String userId) {
         return notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(userId);
@@ -55,5 +58,13 @@ public class NotificationService {
     @Transactional
     public void deactivateNotification(String userId, Long notificationId) {
         notificationRepository.deactivateById(userId, notificationId);
+    }
+
+    @Transactional
+    public void saveNotice(String message, String link) {
+        Notice notice = new Notice();
+        notice.setMessage(message);
+        notice.setLink(link);
+        noticeRepository.save(notice);
     }
 }
