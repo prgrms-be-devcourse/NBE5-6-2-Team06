@@ -180,7 +180,7 @@
       <h3 th:text="${team.teamTitle}"></h3>
       <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy-MM-dd HH:mm')}"></span></p>
       <p>📍 <span th:text="${team.restaurantName}"></span></p>
-      <p>👥 <span th:text="${team.participants.size()}"></span>/ <span th:text="${team.nowPeople}"></span>명 참여중</p>
+      <p>👥 <span th:text="${team.nowPeople}"></span>/ <span th:text="${team.maxPeople}"></span>명 참여중</p>
       <a class="link-button" th:href="@{/team/detail/{teamId}(teamId=${team.teamId})}">자세히 보기</a>
     </div>
     <div th:if="${teams.isEmpty()}">

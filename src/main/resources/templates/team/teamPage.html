@@ -293,7 +293,37 @@
         grid-template-columns: 1fr;
       }
     }
+
+    #notificationArea {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .notification-card {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    #notificationButton {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
 </head>
@@ -310,7 +340,28 @@
 </header>
 <div class="container">
   <div class="section">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>방장 정보</h2>
+<!--    <div style="text-align: right;">-->
+      <form th:if="${isLeader != null && isLeader && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
+            th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
+            method="post" style="display: inline;">
+        <button type="submit" class="complete-button"
+                th:data-team-id="${team.teamId}"
+                th:disabled="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
+                th:text="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED ? '모임 완료된 상태' : '모임 완료하기'}"
+                style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+          모임 완료하기
+        </button>
+      </form>
+
+      <div th:if="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}">
+        <button type="button" class="btn complete-button" disabled
+                style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
+          모임 완료된 상태
+        </button>
+      </div>
+    </div>
     <div class="participant-list">
       <div class="participant" th:if="${leader}">
         <div class="participant-info">
@@ -362,9 +413,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h2>참여자 정보</h2>
       <button
-          class="btn"
-          th:onclick="|location.href='/team/map/${teamId}'|"
-          style="padding: 0.4rem 1rem;
+              class="btn"
+              th:onclick="|location.href='/team/map/${teamId}'|"
+              style="padding: 0.4rem 1rem;
               font-size: 0.9rem;
               border: none;
               border-radius: 4px;
@@ -425,7 +476,6 @@
       </div>
     </div>
   </div>
-
   <div class="section">
     <h2>채팅</h2>
     <div class="chat-box" id="chat-box">
@@ -508,6 +558,8 @@
       </div>
     </div>
   </div>
+
+</div>
 
 
 <script th:inline="javascript">
@@ -623,6 +675,48 @@
       console.error("채팅 이력 로딩 오류:", error);
     });
   }
+
+  // 모임 완료 - 완료 버튼을 비활성화
+  document.addEventListener('DOMContentLoaded', function () {
+    $('.complete-button').on('click', function(event) {
+      event.preventDefault();
+
+      var teamId = $(this).data('team-id');
+      var status = 'COMPLETED';
+      var form = $(this).closest('form');
+      var url = form.attr('action');
+      var button = $(this);
+
+      $.ajax({
+        type: 'PUT',
+        url: url,
+        data: { status: status },
+        success: function(response) {
+          $('#notificationMessage').text(response.message  || '모임이 성공적으로 완료 처리되었습니다.');
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = "모임 완료에 실패했습니다.";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage = xhr.responseJSON.message; // 서버에서 보낸 오류 메시지 사용
+          } else if (xhr.responseText) {
+            errorMessage = xhr.responseText; // 서버에서 단순 텍스트 오류 응답을 받은 경우
+          }
+          $('#notificationMessage').text(errorMessage);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+
+          button.prop('disabled', false).text('모임 완료하기');
+        }
+      });
+    });
+  });
 
   function openReportModal(reportedUserId, reportedUserNickname, chatId) {
     const reportModal = document.getElementById('reportModal');
