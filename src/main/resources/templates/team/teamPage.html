@@ -687,8 +687,6 @@
       var url = form.attr('action');
       var button = $(this);
 
-      button.prop('disabled', true).text('모임 완료');
-
       $.ajax({
         type: 'PUT',
         url: url,
@@ -698,8 +696,8 @@
           $('#notificationArea').fadeIn();
           $('#notificationButton').click(function() {
             $('#notificationArea').fadeOut();
-            location.reload();
           });
+          location.reload();
         },
         error: function(xhr, status, error) {
           var errorMessage = "모임 완료에 실패했습니다.";
