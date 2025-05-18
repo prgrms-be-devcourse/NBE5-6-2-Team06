@@ -78,4 +78,10 @@ public class NotificationService {
             return noticeRepository.findAllNotices(pageable);
         }
     }
+
+    @Transactional
+    public void unActivatedById(Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow(() -> new IllegalArgumentException("공지사항을 찾을 수 없습니다."));
+        notice.setActivated(false);
+    }
 }

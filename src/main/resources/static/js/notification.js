@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
           response.text().then(message => {alert(message)});
           createNotificationModal.style.display = 'none';
           notificationForm.reset();
-          // 선택적: 공지사항 목록을 다시 불러오거나 UI 업데이트
+          window.location.reload(); // 페이지 새로고침
         } else {
           console.error('공지사항 발송 실패:', response.status, response.statusText);
           alert('공지사항 발송에 실패했습니다.');
@@ -70,5 +70,32 @@ document.addEventListener('DOMContentLoaded', () => {
       notificationForm.reset();
     });
   }
+
+  // 공지사항 비활성화(삭제) 버튼 클릭 이벤트
+  document.querySelectorAll('.action-btn.delete').forEach(button => {
+    button.addEventListener('click', function () {
+      const noticeId = this.getAttribute('data-id');
+
+      if (!confirm('정말로 이 공지사항을 비활성화하시겠습니까?')) {
+        return;
+      }
+
+      fetch(`/api/admin/notification/${noticeId}`, {
+        method: 'DELETE',
+      })
+      .then(response => {
+        if (response.ok) {
+          response.text().then(text => { alert(text)});
+          window.location.reload(); // 페이지 새로고침
+        } else {
+          return response.text().then(text => { throw new Error(text) });
+        }
+      })
+      .catch(error => {
+        console.error('에러 발생:', error);
+        alert('공지사항 비활성화 중 문제가 발생했습니다.');
+      });
+    });
+  });
 
 });
