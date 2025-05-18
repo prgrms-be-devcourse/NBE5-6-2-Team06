@@ -598,6 +598,11 @@ h1 {
     color: #0d47a1;
 }
 
+.action-btn.send:hover {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
 .action-btn.delete:hover, .action-btn.suspend:hover {
     background-color: #ffebee;
     color: var(--danger-color);

@@ -7,8 +7,11 @@ import com.grepp.matnam.app.model.notification.repository.NoticeRepository;
 import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +69,13 @@ public class NotificationService {
         notice.setMessage(message);
         notice.setLink(link);
         noticeRepository.save(notice);
+    }
+
+    public Page<Notice> findByFilter(String keyword, Pageable pageable) {
+        if (StringUtils.hasText(keyword)) {
+            return noticeRepository.findByKeywordContaining(keyword, pageable);
+        } else {
+            return noticeRepository.findAllNotices(pageable);
+        }
     }
 }
