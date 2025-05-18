@@ -1274,6 +1274,7 @@ h1 {
     flex-direction: column;
     align-items: center;
     color: #ffc107;
+    min-width: 100px;
 }
 
 .data-table .rating i {
