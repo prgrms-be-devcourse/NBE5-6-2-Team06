@@ -98,4 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 공지사항 발송 버튼 클릭 이벤트
+  document.querySelectorAll('.action-btn.send').forEach(button => {
+    button.addEventListener('click', function () {
+      const noticeId = this.getAttribute('data-id');
+
+      fetch(`/api/admin/notification/${noticeId}`, {
+        method: 'POST',
+      })
+      .then(response => {
+        if (response.ok) {
+          response.text().then(text => { alert(text)});
+          window.location.reload(); // 페이지 새로고침
+        } else {
+          return response.text().then(text => { throw new Error(text) });
+        }
+      })
+      .catch(error => {
+        console.error('에러 발생:', error);
+        alert('공지사항 발송 중 문제가 발생했습니다.');
+      });
+    });
+  });
+
 });

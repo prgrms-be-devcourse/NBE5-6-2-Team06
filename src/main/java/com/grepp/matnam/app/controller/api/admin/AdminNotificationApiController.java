@@ -23,7 +23,7 @@ public class AdminNotificationApiController {
     private final NotificationService notificationService;
 
     @PostMapping("/broadcast")
-    public ResponseEntity<?> broadcastNotification(
+    public ResponseEntity<?> broadcastNotice(
         @RequestBody BroadcastNotificationRequest request) {
         userService.sendBroadcastNotification(request.getContent());
         return ResponseEntity.ok("공지사항이 성공적으로 발송되었습니다.");
@@ -33,5 +33,11 @@ public class AdminNotificationApiController {
     public ResponseEntity<?> unActivatedNotice(@PathVariable Long noticeId) {
         notificationService.unActivatedById(noticeId);
         return ResponseEntity.ok("공지사항이 비활성화되었습니다.");
+    }
+
+    @PostMapping("/{noticeId}")
+    public ResponseEntity<?> resendNotice(@PathVariable Long noticeId) {
+        userService.resendBroadcastNotification(noticeId);
+        return ResponseEntity.ok("공지사항이 성공적으로 발송되었습니다.");
     }
 }

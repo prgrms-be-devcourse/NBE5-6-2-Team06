@@ -3,6 +3,7 @@ package com.grepp.matnam.app.model.user;
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
+import com.grepp.matnam.app.model.notification.entity.Notice;
 import com.grepp.matnam.app.model.notification.entity.Notification;
 import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import com.grepp.matnam.app.model.notification.service.NotificationService;
@@ -314,6 +315,16 @@ public class UserService {
             Notification notification = notificationService.createNotification(user.getUserId(), NotificationType.NOTICE, content, null);
 
             sseService.sendNotificationToUser(user.getUserId(), "newMessage", notification);
+            sseService.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
+        }
+    }
+
+    public void resendBroadcastNotification(Long noticeId) {
+        List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
+        Notice notice = notificationService.getNotice(noticeId);
+
+        for (User user : usersToSend) {
+            sseService.sendNotificationToUser(user.getUserId(), "newMessage", notice);
             sseService.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
         }
     }

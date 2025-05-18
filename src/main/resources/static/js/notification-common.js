@@ -115,7 +115,7 @@ class NotificationHandler {
             const response = await window.auth.fetchWithAuth(url);
             if (response && response.ok) {
                 const data = await response.json();
-                console.log(data);
+                // console.log(data);
                 this.notifications = data;
                 this.renderNotifications();
             }
@@ -126,7 +126,7 @@ class NotificationHandler {
 
     renderNotifications() {
         if (this.notificationList) {
-            console.log('this.notifications:', this.notifications);
+            // console.log('this.notifications:', this.notifications);
             this.notificationList.innerHTML = '';
             const unreadNotifications = this.notifications.filter(n => !n.isRead);
             const readNotifications = this.notifications.filter(n => n.isRead);

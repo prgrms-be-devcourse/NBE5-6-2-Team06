@@ -84,4 +84,8 @@ public class NotificationService {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(() -> new IllegalArgumentException("공지사항을 찾을 수 없습니다."));
         notice.setActivated(false);
     }
+
+    public Notice getNotice(Long noticeId) {
+        return noticeRepository.findById(noticeId).orElseThrow(() -> new IllegalArgumentException("공지사항을 찾을 수 없습니다."));
+    }
 }
