@@ -342,39 +342,6 @@
   <div class="section">
     <h2>방장 정보</h2>
     <div style="text-align: right;">
-<!--      <form th:if="${isLeader != null}"-->
-<!--            th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"-->
-<!--            method="put" style="display: inline;">-->
-<!--        <button id="completeBtn" class="btn"-->
-<!--                style="display: inline-block;-->
-<!--                   margin: 1rem auto;-->
-<!--                   padding: 0.8rem 2rem;-->
-<!--                   font-size: 1.1rem;-->
-<!--                   font-weight: bold;-->
-<!--                   border: 2px solid #a7a7d1;-->
-<!--                   border-radius: 8px;-->
-<!--                   background-color: #6565a5;-->
-<!--                   color: #fff;-->
-<!--                   cursor: pointer;-->
-<!--                   box-shadow: 2px 2px 5px rgba(0,0,0,0.3);-->
-<!--                   transition: background-color 0.3s ease;">-->
-<!--          모임 완료-->
-<!--        </button>-->
-<!--      </form>-->
-
-<!--      <form th:if="${isLeader != null && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"-->
-<!--            th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"-->
-<!--            method="post" style="display: inline;">-->
-<!--        <button type="submit" class="complete-button"-->
-<!--                th:data-team-id="${team.teamId}">-->
-<!--          모임 완료하기-->
-<!--        </button>-->
-<!--      </form>-->
-
-<!--      <div th:if="${team.status == 'COMPLETED'}">-->
-<!--        <button type="button" class="btn complete-button" disabled>모임 완료된 상태</button>-->
-<!--      </div>-->
-
       <form th:if="${isLeader != null && isLeader && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
             method="post" style="display: inline;">
@@ -704,31 +671,6 @@
       console.error("채팅 이력 로딩 오류:", error);
     });
   }
-
-  // 모임 완료
-  // document.addEventListener('DOMContentLoaded', function () {
-  //   $('#completeBtn').click(function(event) {
-  //     event.preventDefault();
-  //     var teamId = [[${team.teamId}]];
-  //     console.log($('#completeBtn'));
-  //
-  //
-  //     $.ajax({
-  //       type: 'PUT',
-  //       url: '/api/team/' + teamId + '/complete',
-  //       data: { status: 'COMPLETED' },
-  //       success: function(response) {
-  //         console.log(response);
-  //         alert('모임이 완료되었습니다.');
-  //         $('#completeBtn').prop('disabled', true);
-  //         $('#completeBtn').css('background-color', '#b0b0b0');
-  //       },
-  //       error: function(xhr, status, error) {
-  //         alert('모임 완료 처리에 실패했습니다.');
-  //       }
-  //     });
-  //   });
-  // });
 
   // 모임 완료 - 완료 버튼을 비활성화
   document.addEventListener('DOMContentLoaded', function () {

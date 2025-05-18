@@ -216,10 +216,6 @@ public class TeamService {
         return teamRepository.findByTeamIdAndActivatedTrue(teamId).orElse(null);
     }
 
-    public Participant getParticipantById(Long participantId) {
-        return participantRepository.findById(participantId).orElse(null);
-    }
-
     // 모임 검색 페이지
     public Page<Team> getAllTeams(Pageable pageable) {
         return teamRepository.findAllWithParticipantsAndActivatedTrue(pageable);
@@ -230,20 +226,6 @@ public class TeamService {
     public Team getTeamByIdWithParticipants(Long teamId) {
         return teamRepository.findByIdWithParticipantsAndUserAndActivatedTrue(teamId).orElse(null);
     }
-
-    // 모임 완료 처리
-//    @Transactional
-//    public void completeTeam(Long teamId) {
-//        Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-//                .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
-//        Status prevStatus = team.getStatus();
-//        team.setStatus(status);
-//        teamRepository.save(team);
-//
-//        if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
-//            increaseTemperatureForCompletedTeam(team);
-//        }
-//    }
 
     // 모임 상태 변경 - 모임 완료
     @Transactional
@@ -281,9 +263,9 @@ public class TeamService {
         }
     }
 
-    public List<Team> findAll() {
-        return teamRepository.findAll();
-    }
+//    public List<Team> findAll() {
+//        return teamRepository.findAll();
+//    }
 
     public Page<Team> findByFilter(String status, String keyword, Pageable pageable) {
         if (!status.isBlank() && StringUtils.hasText(keyword)) {

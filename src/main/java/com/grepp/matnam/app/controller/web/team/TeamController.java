@@ -163,8 +163,6 @@ public class TeamController {
         // 주최자인지 확인
         boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
         model.addAttribute("isLeader", isLeader);
-//        // 모임 완료 상태인지 확인
-//        model.addAttribute("isCompleted", team.getStatus() == Status.COMPLETED);
 
         return "team/teamPage";
     }
