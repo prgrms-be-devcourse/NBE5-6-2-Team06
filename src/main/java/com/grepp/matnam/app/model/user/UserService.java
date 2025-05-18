@@ -2,6 +2,7 @@ package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.notification.entity.Notice;
 import com.grepp.matnam.app.model.notification.entity.Notification;
@@ -47,6 +48,7 @@ public class UserService {
     private final SseService sseService;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
+    private final NotificationSender notificationSender;
     private final ModelMapper mapper;
 
     public User signup(User user) {
@@ -312,10 +314,7 @@ public class UserService {
         notificationService.saveNotice(content, null);
 
         for (User user : usersToSend) {
-            Notification notification = notificationService.createNotification(user.getUserId(), NotificationType.NOTICE, content, null);
-
-            sseService.sendNotificationToUser(user.getUserId(), "newMessage", notification);
-            sseService.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
+            notificationSender.sendNotificationToUser(user.getUserId(), NotificationType.NOTICE, content, null);
         }
     }
 
@@ -324,8 +323,7 @@ public class UserService {
         Notice notice = notificationService.getNotice(noticeId);
 
         for (User user : usersToSend) {
-            sseService.sendNotificationToUser(user.getUserId(), "newMessage", notice);
-            sseService.sendNotificationToUser(user.getUserId(), "unreadCount", notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(user.getUserId()));
+            notificationSender.resendNotificationToUser(user.getUserId(), notice);
         }
     }
 }
