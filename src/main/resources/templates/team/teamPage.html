@@ -375,7 +375,7 @@
 <!--        <button type="button" class="btn complete-button" disabled>모임 완료된 상태</button>-->
 <!--      </div>-->
 
-      <form th:if="${isLeader != null}"
+      <form th:if="${isLeader != null && isLeader && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
             method="post" style="display: inline;">
         <button type="submit" class="complete-button"
@@ -385,6 +385,10 @@
           모임 완료하기
         </button>
       </form>
+
+      <div th:if="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}">
+        <button type="button" class="btn complete-button" disabled>모임 완료된 상태</button>
+      </div>
 
     </div>
     <div class="participant-list">
