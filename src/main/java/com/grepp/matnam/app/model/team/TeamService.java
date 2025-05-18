@@ -127,6 +127,8 @@ public class TeamService {
             team.setStatus(Status.FULL);
         }
 
+        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 승인되었습니다!", "/team/detail/" + team.getTeamId());
+
         teamRepository.save(team);
     }
 
