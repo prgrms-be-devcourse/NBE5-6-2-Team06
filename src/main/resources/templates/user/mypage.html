@@ -841,7 +841,7 @@
         if (!confirm("정말로 이 모임을 취소하시겠습니까?")) return;
 
         fetch(`/api/team/${teamId}/cancel`, {
-          method: 'POST',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
