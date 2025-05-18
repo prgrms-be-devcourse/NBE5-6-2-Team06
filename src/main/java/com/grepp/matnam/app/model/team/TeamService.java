@@ -182,6 +182,13 @@ public class TeamService {
         unActivatedById(teamId);
 
         teamRepository.save(team);
+
+        List<Participant> participants = team.getParticipants();
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 취소되었습니다.", null);
+            }
+        }
     }
 
     //조회 부분
