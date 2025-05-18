@@ -1,5 +1,6 @@
 class NotificationHandler {
     constructor() {
+        this.isServerRestarting = false;
         this.eventSource = null;
         this.unreadCount = 0;
         this.notificationBell = document.getElementById('notification-bell');
@@ -212,7 +213,9 @@ class NotificationHandler {
 
         this.eventSource.onerror = (error) => {
             console.error('SSE 연결 오류:', error);
-            setTimeout(() => this.connectSSE(), 3000);
+            if (!this.isServerRestarting){
+                setTimeout(() => this.connectSSE(), 3000);
+            }
         };
 
         this.eventSource.addEventListener('unreadCount', (event) => {
@@ -227,6 +230,13 @@ class NotificationHandler {
             this.unreadCount++;
             this.updateBadge();
             showToastNow(newNotification.message, 'info');
+        });
+
+        this.eventSource.addEventListener('shutdown', (event) => {
+            console.log("서버가 종료 중입니다:", event.data);
+            this.isServerRestarting = true;
+            this.eventSource.close();  // SSE 연결 종료
+            this.eventSource = null;
         });
     }
 

@@ -29,6 +29,7 @@ public class SseService {
 
         // 연결 종료 처리
         emitter.onCompletion(() -> {
+            emitter.complete(); // 명시적 호출
             sseRepository.delete(userId);
             log.info("SSE 연결 완료 - 사용자 ID: {}", userId);
         });
@@ -66,9 +67,7 @@ public class SseService {
         SseEmitter emitter = sseRepository.get(userId);
         if (emitter != null) {
             try {
-                emitter.send(SseEmitter.event()
-                    .name(eventName)
-                    .data(data));
+                emitter.send(SseEmitter.event().name(eventName).data(data).reconnectTime(0L));
                 log.debug("SSE 이벤트 전송 - 사용자 ID: {}, 이벤트: {}, 데이터: {}", userId, eventName, data);
             } catch (IOException e) {
                 sseRepository.delete(userId);
@@ -79,4 +78,17 @@ public class SseService {
         }
     }
 
+    public void clearAll() {
+        log.info("SseService - 모든 Emitter 정리 및 complete 처리 시작 (SmartLifecycle)");
+        sseRepository.sendShutdownEventToAllEmitters();
+
+        try {
+            Thread.sleep(100); // async dispatch 유도
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        sseRepository.clearAllEmittersImmediately();
+        log.info("SseService - 모든 Emitter 정리 및 complete 처리 완료 (SmartLifecycle)");
+    }
 }
