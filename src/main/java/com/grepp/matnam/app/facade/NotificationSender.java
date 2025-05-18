@@ -34,8 +34,10 @@ public class NotificationSender {
     }
 
     public void resendNotificationToUser(String userId, Notice notice) {
+        Notification notification = notificationService.createNotification(userId, notice.getType(), notice.getMessage(), notice.getLink());
+
         // 알림 SSE 전송
-        sseService.sendNotificationToUser(userId, "newMessage", notice);
+        sseService.sendNotificationToUser(userId, "newMessage", notification);
 
         // 읽지 않은 알림 개수 전송
         long unreadCount = notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(userId);
