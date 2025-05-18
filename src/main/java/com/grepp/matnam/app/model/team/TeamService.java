@@ -251,10 +251,13 @@ public class TeamService {
         log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+
+        log.info("현재 상태: {}", team.getStatus());
         Status prevStatus = team.getStatus();
         team.setStatus(status);
 
         teamRepository.save(team);
+        log.info("상태 변경 후: {}", team.getStatus());
 
         // 모임이 완료 상태가 되면 참여자들의 매너온도 증가
         if (status == Status.COMPLETED && prevStatus != Status.COMPLETED) {
