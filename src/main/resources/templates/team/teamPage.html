@@ -351,7 +351,7 @@
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>방장 정보</h2>
-      <form th:if="${isLeader != null && isLeader && #strings.toString(team.status) != null && #strings.toString(team.status) != 'COMPLETED'}"
+      <form th:if="${isLeader != null && isLeader && #strings.toString(team.status) != null && #strings.toString(team.status) != 'COMPLETED' && #strings.toString(team.status) != 'CANCELED'}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
             method="post" style="display: inline;">
         <button type="submit" class="complete-button"
@@ -365,6 +365,12 @@
         <button type="button" class="btn complete-button" disabled
                 style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
           모임 완료된 상태
+        </button>
+      </div>
+      <div th:if="${team.status != null && #strings.toString(team.status) == 'CANCELED'}">
+        <button type="button" class="btn complete-button" disabled
+                style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
+          취소된 모임입니다
         </button>
       </div>
     </div>
