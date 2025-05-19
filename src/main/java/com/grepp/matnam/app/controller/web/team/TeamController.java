@@ -163,18 +163,22 @@ public class TeamController {
         }
 
         List<Participant> approvedParticipants = team.getParticipants().stream()
-            .filter(participant -> participant.getRole() == Role.MEMBER)
-            .toList();
+                .filter(participant -> participant.getRole() == Role.MEMBER)
+                .toList();
         model.addAttribute("participants", approvedParticipants);
 
         // 주최자인지 확인
         boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
         model.addAttribute("isLeader", isLeader);
 
-        // 로그인된 사용자가 해당 팀의 참가자인지 확인
-        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
-        if (participant == null) {
-            return "redirect:/team/" + teamId + "?error=notParticipant";
+        boolean isAdmin = currentUser.getRole().equals(com.grepp.matnam.app.model.auth.code.Role.ROLE_ADMIN);
+
+        if (!isAdmin) {
+            log.info("Checking if user {} is a participant in team {}", userId, teamId);
+            Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+            if (participant == null) {
+                return "redirect:/team/" + teamId + "?error=notParticipant";
+            }
         }
 
         return "team/teamPage";
