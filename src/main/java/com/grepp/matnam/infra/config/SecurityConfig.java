@@ -86,7 +86,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/chat/**").hasRole("USER")
 
                         // 모임/팀 관련
-                        .requestMatchers("/team/**", "/api/team/**").hasRole("USER")
+                        .requestMatchers("/team/**", "/api/team/**").authenticated()
 
                         // 지도/장소 관련
                         .requestMatchers("/map/**", "/api/mymap/**").hasRole("USER")
