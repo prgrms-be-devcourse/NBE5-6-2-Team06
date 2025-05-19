@@ -851,58 +851,58 @@
     switchTab('all');
   });
 
-      // 모임 취소
-      document.addEventListener('DOMContentLoaded', function () {
-        const cancelForms = document.querySelectorAll('.cancel-form');
+    // 모임 취소
+    document.addEventListener('DOMContentLoaded', function () {
+      const cancelForms = document.querySelectorAll('.cancel-form');
 
-        cancelForms.forEach(form => {
-          form.addEventListener('submit', function (event) {
-            event.preventDefault();
+      cancelForms.forEach(form => {
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
 
-            const teamId = this.getAttribute('data-team-id');
+          const teamId = this.getAttribute('data-team-id');
 
-            if (!confirm("정말로 이 모임을 취소하시겠습니까?")) {
-              return;
+          if (!confirm("정말로 이 모임을 취소하시겠습니까?")) {
+            return;
+          }
+
+          fetch(`/api/team/${teamId}/cancel`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+          .then(res => {
+            if (!res.ok) {
+              return res.json().then(err => {
+                const errorData = err.message || '모임 취소 실패';
+                alert(errorData);
+                throw new Error(errorData);
+              });
+            }
+            return res.json();
+          })
+          .then(data => {
+            alert(data.message || "모임이 취소되었습니다.");
+
+            const cancelButton = form.querySelector('.cancel-button');
+            if (cancelButton) {
+              cancelButton.style.display = 'none';
             }
 
-            fetch(`/api/team/${teamId}/cancel`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            })
-            .then(res => {
-              if (!res.ok) {
-                return res.json().then(err => {
-                  const errorData = err.message || '모임 취소 실패';
-                  alert(errorData);
-                  throw new Error(errorData);
-                });
-              }
-              return res.json();
-            })
-            .then(data => {
-              alert(data.message || "모임이 취소되었습니다.");
-              location.reload();
-              //   const cancelButton = form.querySelector('.cancel-button');
-              //   if (cancelButton) {
-              //     cancelButton.style.display = 'none';
-              //   }
-              //   const completedButton = document.createElement('button');
-              //   completedButton.className = 'btn-secondary';
-              //   completedButton.disabled = true;
-              //   completedButton.textContent = '모임 취소 완료';
-              //   completedButton.style.pointerEvents = 'none';
-              //
-              //   // 폼의 부모 요소에 취소 완료 버튼을 추가
-              //   form.parentNode.appendChild(completedButton);
-            })
-            .catch(err => {
-              console.error("모임 취소 오류:", err);
-            });
+            const completedButton = document.createElement('button');
+            completedButton.className = 'btn-secondary';
+            completedButton.disabled = true;
+            completedButton.textContent = '모임 취소 완료';
+            completedButton.style.pointerEvents = 'none';
+
+            form.parentNode.appendChild(completedButton);
+          })
+          .catch(err => {
+            console.error("모임 취소 오류:", err);
           });
         });
       });
+    });
 
   // 모임 목록 탭 전환
   function switchTab(tabName) {
