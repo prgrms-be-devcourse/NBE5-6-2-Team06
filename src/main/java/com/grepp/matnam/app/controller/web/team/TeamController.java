@@ -88,10 +88,11 @@ public class TeamController {
     // 모임 수정
     @PostMapping("/edit/{teamId}")
     public String updateTeam(@PathVariable Long teamId, @ModelAttribute UpdatedTeamRequest updatedTeamRequest) {
+        String UserId = SecurityContextHolder.getContext().getAuthentication().getName();
         Team team = updatedTeamRequest.toTeam();
         team.setTeamId(teamId);
 
-        teamService.updateTeam(teamId, team);
+        teamService.updateTeam(teamId, team, UserId);
         return "redirect:/team/detail/" + teamId;
     }
 
@@ -144,14 +145,20 @@ public class TeamController {
     @GetMapping("/page/{teamId}")
     public String getTeamPage(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         User currentUser = userService.getUserById(userId);
         model.addAttribute("userId", userId);
         model.addAttribute("userNickname", currentUser.getNickname());
         model.addAttribute("teamId", teamId);
 
         Team team = teamService.getTeamByIdWithParticipants(teamId);
+        if (team == null) {
+            return "redirect:/error/404";
+        }
+
         model.addAttribute("team", team);
-        if (team != null && team.getUser() != null) {
+
+        if (team.getUser() != null) {
             model.addAttribute("leader", team.getUser());
         }
 
@@ -164,8 +171,15 @@ public class TeamController {
         boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
         model.addAttribute("isLeader", isLeader);
 
+        // 로그인된 사용자가 해당 팀의 참가자인지 확인
+        Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+        if (participant == null) {
+            return "redirect:/team/" + teamId + "?error=notParticipant";
+        }
+
         return "team/teamPage";
     }
+
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시

@@ -38,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -50,7 +51,6 @@ public class TeamService {
 
     private final ParticipantRepository participantRepository;
     private final PreferenceRepository preferenceRepository;
-//    private final RestaurantRepository restaurantRepository;
 
     private final MymapRepository mymapRepository;
     private final UserRepository userRepository;
@@ -101,7 +101,7 @@ public class TeamService {
 
     // 모임 참여 수락
     @Transactional
-    public void approveParticipant(Long participantId) {
+    public void approveParticipant(Long participantId, String userId) {
         Participant participant = participantRepository.findById(participantId)
             .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
 
@@ -110,6 +110,10 @@ public class TeamService {
         }
 
         Team team = participant.getTeam();
+        if (!team.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("모임 생성자만 참가 신청을 승인할 수 있습니다.");
+        }
+
         if (team.getMaxPeople() != null && team.getNowPeople() >= team.getMaxPeople()) {
             throw new RuntimeException("모임의 최대 인원 수를 초과했습니다.");
         }
@@ -127,33 +131,44 @@ public class TeamService {
             team.setStatus(Status.FULL);
         }
 
-        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 승인되었습니다!", "/team/detail/" + team.getTeamId());
+        notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+            NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 승인되었습니다!",
+            "/team/detail/" + team.getTeamId());
 
         teamRepository.save(team);
     }
 
     // 모임 참여 거절
     @Transactional
-    public void rejectParticipant(Long participantId) {
+    public void rejectParticipant(Long participantId, String userId) {
         Participant participant = participantRepository.findById(participantId)
             .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
 
         if (participant.getParticipantStatus() == ParticipantStatus.PENDING) {
+            Team team = participant.getTeam();
+            if (!team.getUser().getUserId().equals(userId)) {
+                throw new AccessDeniedException("모임 생성자만 참가 신청을 거절할 수 있습니다.");
+            }
             participant.setParticipantStatus(ParticipantStatus.REJECTED);
             participantRepository.save(participant);
+            notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 거절되었습니다.",
+                "/team/detail/" + team.getTeamId());
         } else {
             throw new IllegalStateException("대기 중인 참여자만 거절 가능합니다.");
         }
-        Team team = participant.getTeam();
-        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 거절되었습니다.", "/team/detail/" + team.getTeamId());
     }
 
 
     // 모임 업데이트
     @Transactional
-    public void updateTeam(Long teamId, Team updatedTeam) {
+    public void updateTeam(Long teamId, Team updatedTeam, String userId) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+
+        if (!team.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("모임 생성자만 수정할 수 있습니다.");
+        }
 
         team.setTeamTitle(updatedTeam.getTeamTitle());
         team.setTeamDetails(updatedTeam.getTeamDetails());
@@ -171,9 +186,13 @@ public class TeamService {
 
     // 모임 상태 변경 - 모임 취소
     @Transactional
-    public void cancelTeam(Long teamId) {
+    public void cancelTeam(Long teamId, String userId) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
+
+        if (!team.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("모임 생성자만 취소할 수 있습니다.");
+        }
 
         if (team.getStatus() == Status.COMPLETED) {
             throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
@@ -186,7 +205,9 @@ public class TeamService {
         List<Participant> participants = team.getParticipants();
         for (Participant participant : participants) {
             if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 취소되었습니다.", null);
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 취소되었습니다.",
+                    null);
             }
         }
     }
@@ -237,13 +258,17 @@ public class TeamService {
 
     // 모임 상태 변경 - 모임 완료
     @Transactional
-    public void completeTeam(Long teamId, Status status) {
+    public void completeTeam(Long teamId, Status status, String userId) {
         log.info("팀 ID: {} 상태 변경 시도, 변경할 상태: {}", teamId, status);
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
 
         log.info("현재 상태: {}", team.getStatus());
         Status prevStatus = team.getStatus();
+
+        if (!team.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("모임 생성자만 완료 처리할 수 있습니다.");
+        }
 
         boolean hasMemberRole = team.getParticipants().stream()
             .anyMatch(participant -> participant.getRole() == Role.MEMBER);
@@ -265,8 +290,13 @@ public class TeamService {
         List<Participant> participants = team.getParticipants();
         for (Participant participant : participants) {
             if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!", null);
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.REVIEW_REQUEST, "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!", "/team/" + team.getTeamId() + "/reviews");
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!",
+                    null);
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.REVIEW_REQUEST,
+                    "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!",
+                    "/team/" + team.getTeamId() + "/reviews");
             }
         }
     }
@@ -314,7 +344,9 @@ public class TeamService {
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
-            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해 [" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "/team/page/" + teamId);
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS,
+                "관리자에 의해 [" + team.getTeamTitle() + "] 모임의 상태가 [" + team.getStatus().getKoreanName()
+                    + "](으)로 변경되었습니다.", "/team/page/" + teamId);
         }
 
     }
@@ -327,7 +359,8 @@ public class TeamService {
         team.unActivated();
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
-            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해  [" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS,
+                "관리자에 의해  [" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
         }
     }
 
@@ -383,9 +416,11 @@ public class TeamService {
             );
         }).collect(Collectors.toList());
     }
+
     // 특정 팀의 사용자 teamId를 통해 userId 리스트 받기[상태가 승인인 사용자]
     public List<Participant> getApprovedUserIdsByTeamId(Long teamId) {
-        return participantRepository.findByTeam_TeamIdAndParticipantStatus(teamId, ParticipantStatus.APPROVED);
+        return participantRepository.findByTeam_TeamIdAndParticipantStatus(teamId,
+            ParticipantStatus.APPROVED);
     }
 
     //팀원들의 취향 키워드 종합
@@ -560,7 +595,7 @@ public class TeamService {
 
     //주최자 모임 삭제
     @Transactional
-    public void unActivatedTeamByLeader(Long teamId) {
+    public void unActivatedTeamByLeader(Long teamId, String userId) {
         Team team = teamRepository.findById(teamId)
             .orElseThrow(() -> new RuntimeException("팀을 찾을 수 없습니다."));
 
@@ -572,7 +607,9 @@ public class TeamService {
         List<Participant> participants = team.getParticipants();
         for (Participant participant : participants) {
             if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 삭제되었습니다.",
+                    null);
             }
         }
     }
