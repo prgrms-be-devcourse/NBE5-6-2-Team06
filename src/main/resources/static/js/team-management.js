@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   viewButtons.forEach(button => {
     button.addEventListener('click', function () {
       const teamId = this.getAttribute('data-id');
+      document.getElementById('view-team-id').value = teamId;
 
       fetch(`/api/admin/team/${teamId}`)
       .then(response => {
@@ -85,6 +86,19 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('teamViewModal').style.display = 'block';
     });
   });
+
+  const detailBtn = document.querySelector('#teamViewModal .detail-btn');
+  if (detailBtn) {
+    detailBtn.addEventListener('click', function () {
+      const teamId = document.getElementById('view-team-id').value;
+
+      if (teamId) {
+        window.open(`/team/detail/${teamId}`, '_blank');
+      } else {
+        alert('팀 ID가 없습니다.');
+      }
+    });
+  }
 
   // 모임 상태 변경 버튼 클릭 이벤트
   const editStatusBtn = document.querySelectorAll('.action-btn.edit');
