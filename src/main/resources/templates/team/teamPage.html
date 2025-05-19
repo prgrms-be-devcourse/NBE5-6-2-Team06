@@ -323,7 +323,6 @@
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<!-- ✅ 헤더는 여기에서 불러옵니다 -->
 <header th:replace="~{fragments/header :: siteHeader}"></header>
 <h1 th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'"
     style="font-size: 2rem; font-weight: 700; text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: #333;">

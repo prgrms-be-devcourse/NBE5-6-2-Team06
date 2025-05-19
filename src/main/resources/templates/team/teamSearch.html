@@ -12,31 +12,7 @@
       background-color: #fff;
       color: #333;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-    nav a {
-      text-decoration: none;
-      color: #333;
-      margin-right: 1rem;
-    }
-    .header-buttons button {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      background-color: #000;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
+
     .container {
       max-width: 1200px;
       margin: 2rem auto;
@@ -142,22 +118,12 @@
       pointer-events: none;
     }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/search}">모임찾기</a>
-      <a th:href="@{restaurant/restaurants}">맛집 탐색</a>
-      <a th:href="@{/user/mypage}">마이페이지</a>
-    </nav>
-  </div>
-  <div class="header-buttons">
-    <button th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div class="container">
   <h1>모임 찾기</h1>
@@ -199,5 +165,8 @@
     <a th:if="${page.hasNext()}" th:href="@{/team/search(page=${page.number + 1}, size=${page.size})}">다음</a>
   </div>
 </div>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>
