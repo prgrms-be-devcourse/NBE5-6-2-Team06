@@ -13,53 +13,21 @@
       color: #333;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
+    /* 기본 카드 스타일 통일 */
+    .card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
       background-color: #fff;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .header-left .logo {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-
-    .header-left nav a {
-      text-decoration: none;
-      color: #333;
-      margin-right: 1rem;
-      font-weight: 500;
-    }
-
-    .header-left nav a:hover {
-      color: #000;
-    }
-
-    .header-left nav a.active {
-      color: #000;
-      border-bottom: 2px solid #000;
-      padding-bottom: 3px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-right span {
-      font-size: 1.2rem;
-      cursor: pointer;
+    .card h2, .card h3, .card h4 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
     }
 
     .btn-primary {
@@ -85,7 +53,8 @@
       padding: 0 1rem;
     }
 
-    .profile-section, .stats-section {
+    /* 프로필 섹션 */
+    .profile-section {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 1.5rem;
@@ -107,6 +76,8 @@
     .profile-section h3 {
       text-align: center;
       margin-bottom: 0.5rem;
+      border: none;
+      padding: 0;
     }
 
     .profile-temperature {
@@ -145,6 +116,24 @@
       background-color: #fff0f0;
     }
 
+    /* 통계, 정보 섹션 */
+    .stats-section, .profile-info-section {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-section h4, .profile-info-section h4 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    /* 메인 섹션 통일 */
     .main-section {
       border: 1px solid #eee;
       border-radius: 8px;
@@ -155,6 +144,7 @@
     }
 
     .main-section h2 {
+      margin-top: 0;
       margin-bottom: 1.5rem;
       border-bottom: 1px solid #eee;
       padding-bottom: 0.5rem;
@@ -197,12 +187,15 @@
       background-color: #333;
     }
 
+    /* 모임 아이템 카드 통일 */
     .meeting-item {
       border: 1px solid #eee;
       border-radius: 8px;
-      padding: 1.2rem;
-      margin: 1rem 0;
-      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .meeting-item:hover {
@@ -211,10 +204,13 @@
     }
 
     .meeting-item h4 {
+      margin-top: 0;
       margin-bottom: 0.7rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: none;
+      padding: 0;
     }
 
     .meeting-item p {
@@ -399,6 +395,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: none;
+      padding: 0;
     }
 
     .preference-section h4 a {
@@ -431,7 +429,6 @@
       transform: scale(1.05);
     }
 
-    /* 버튼 비활성화 상태 */
     .cancel-btn:disabled {
       background-color: #ccc;
       cursor: not-allowed;
@@ -492,27 +489,46 @@
       border-top: 1px solid #eee;
       background-color: #fff;
     }
+
+    /* 맛집 지도 섹션 헤더 스타일 통일 */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .add-restaurant-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .add-restaurant-btn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
   <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/search}">모임 찾기</a>
-      <a th:href="@{/map}">맛집 탐색</a>
-      <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    </nav>
-  </div>
-  <div class="header-right">
-    <span title="알림">🔔</span>
-    <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기
-    </button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div class="container">
   <div>
@@ -909,5 +925,9 @@
     }
   });
 </script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/header.js"></script>
+    <script src="/js/notification-common.js"></script>
 </body>
+
 </html>

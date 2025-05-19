@@ -12,14 +12,6 @@
       background-color: #f9f9f9;
       color: #333;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
     nav a {
       margin-right: 1rem;
       text-decoration: none;
@@ -326,18 +318,16 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="logo">
-    <h1>맛남</h1>
-  </div>
-  <nav>
-    <a th:href="@{/}">홈</a>
-    <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    <a th:href="@{/user/logout}">로그아웃</a>
-  </nav>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
+<h1 th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'"
+    style="font-size: 2rem; font-weight: 700; text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: #333;">
+  "모임 이름" 모임입니다 👥
+</h1>
 <div class="container">
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -599,7 +589,7 @@
     const input = document.getElementById('chat-input');
     const messageContent = input.value.trim();
     const now = new Date();
-    const time = now.toTimeString().slice(0,5);
+    const time = now.toTimeString().slice(0, 5);
     if (messageContent && stompClient) {
       const chatMessage = {
         teamId: teamId,
@@ -635,7 +625,7 @@
         reportButton.textContent = '신고';
         reportButton.title = '이 메시지 신고하기';
 
-        reportButton.onclick = function(e) {
+        reportButton.onclick = function (e) {
           e.stopPropagation();
           openReportModal(messageSenderId, nickname, chatId);
         };
@@ -871,8 +861,11 @@
                 <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
                 <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
                 <p><strong>📝 소개:</strong> ${dbItem.description}</p>
-                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url
-          || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
+                <p style="margin-top: 1rem;">
+  <strong>🔗 URL:</strong>
+  <a href="https://map.kakao.com/?q=${encodeURIComponent(dbItem.restaurantName)}"
+     target="_blank" style="color: blue;">바로가기</a>
+</p>
               </div>
             `;
           wrapper.appendChild(card);
@@ -899,6 +892,10 @@
       loading.style.display = "none";
     });
   }
+
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

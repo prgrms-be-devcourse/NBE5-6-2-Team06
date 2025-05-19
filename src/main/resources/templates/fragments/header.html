@@ -1,11 +1,57 @@
+<header th:fragment="siteHeader">
+    <!-- 비로그인 상태 -->
+    <div id="header-anonymous" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <div class="logo">맛남</div>
+            <nav>
+                <a th:href="@{/}">홈</a>
+                <a th:href="@{/team/search}">모임찾기</a>
+                <a th:href="@{/team/create}">모임만들기</a>
+            </nav>
+        </div>
+        <div class="header-buttons">
+            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/user/signin} + '\''">로그인</button>
+        </div>
+    </div>
 
-<header>
-    <h1>🍽️ 맛집 메이트</h1>
-    <nav>
-        <a href="/">홈</a> |
-        <a href="/meetups">모임</a> |
-        <a href="/restaurants">내 맛집</a> |
-        <a href="/users/profile">내 프로필</a>
-    </nav>
-    <hr/>
+    <!-- 로그인 상태 -->
+    <div id="header-login" style="display: none;">
+        <div style="display: flex; align-items: center; gap: 2rem;">
+            <div class="logo">맛남</div>
+            <nav>
+                <a th:href="@{/}">홈</a>
+                <a th:href="@{/team/search}">모임찾기</a>
+                <a th:href="@{/team/create}">모임만들기</a>
+                <a th:href="@{/user/mypage}">마이페이지</a>
+            </nav>
+        </div>
+        <div class="header-buttons">
+            <div class="notification" id="notification-bell">
+                <i class="fas fa-bell" style="color: gold;"></i>
+                <span class="badge">3</span>
+                <div class="notification-modal" id="notification-modal">
+                    <div class="notification-header">
+                        <h3>알림</h3>
+                        <div class="notification-actions">
+                            <button class="mark-all-read">모두 읽음 표시</button>
+                            <button class="close-notification">&times;</button>
+                        </div>
+                    </div>
+                    <div class="notification-tabs">
+                        <button class="notification-tab active" data-tab="all">전체</button>
+                        <button class="notification-tab" data-tab="unread">읽지 않음</button>
+                        <button class="notification-tab" data-tab="system">시스템</button>
+                    </div>
+                    <div class="notification-list"></div>
+                </div>
+            </div>
+
+            <div class="profile">
+                <img src="https://w7.pngwing.com/pngs/306/70/png-transparent-computer-icons-management-admin-silhouette-black-and-white-neck.png" alt="Profile">
+                <span id="profile-name">사용자</span>
+            </div>
+
+            <button class="btn btn-outline" onclick="auth.logout()">로그아웃</button>
+        </div>
+    </div>
 </header>

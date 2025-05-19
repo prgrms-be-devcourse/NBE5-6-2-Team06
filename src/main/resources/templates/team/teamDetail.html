@@ -6,13 +6,12 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
     body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
-    header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; border-bottom: 1px solid #eee; }
-    nav a { margin-right: 1rem; text-decoration: none; color: #333; font-size: 0.9rem; }
+
     .container { display: flex; max-width: 1200px; margin: 2rem auto; }
     .main { flex: 3; margin-right: 2rem; }
     .sidebar { flex: 1; border-left: 1px solid #eee; padding-left: 1rem; }
     .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-    button { background: black; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    button { background: black; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
     .info-section { margin-bottom: 2rem; }
     .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
     footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
@@ -135,16 +134,12 @@
     .notification-card { background-color: #f9f9f9; border: 1px solid #ccc; padding: 15px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); text-align: center; }
     #notificationButton { margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div><a href="/" style="text-decoration:none; color:black; font-weight:bold;">맛남</a></div>
-  <nav>
-    <a th:href="@{/}">홈</a>
-    <a th:href="@{/team/search}">모임찾기</a>
-    <a th:href="@{/user/mypage}">마이페이지</a>
-  </nav>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 <div class="container">
   <div class="main">
     <div class="card">
@@ -471,5 +466,8 @@
     });
   });
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

@@ -225,66 +225,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<header>
-    <div id="header-anonymous" >
-        <div style="display: flex; align-items: center; gap: 2rem;">
-            <div class="logo">맛남</div>
-            <nav>
-                <a th:href="@{/}">홈</a> <!-- 홈 페이지 -->
-                <a th:href="@{/team/search}">모임찾기</a> <!-- 모임 찾기 페이지 -->
-                <a th:href="@{/team/create}">모임만들기</a> <!-- 모임 만들기 페이지 -->
-                <a th:href="@{/user/signin}">로그인</a>
-            </nav>
-        </div>
-        <div class="header-buttons">
-            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button>
-        </div>
-    </div>
-    <div id="header-login">
-        <div style="display: flex; align-items: center; gap: 2rem;">
-            <div class="logo">맛남</div>
-            <nav>
-                <a th:href="@{/}">홈</a> <!-- 홈 페이지 -->
-                <a th:href="@{/team/search}">모임찾기</a> <!-- 모임 찾기 페이지 -->
-                <a th:href="@{/team/create}">모임만들기</a> <!-- 모임 만들기 페이지 -->
-                <a th:href="@{/user/mypage}">마이페이지</a>
-            </nav>
-        </div>
-        <div class="header-buttons">
-            <div class="notification" id="notification-bell">
-                <i class="fas fa-bell"></i>
-                <span class="badge" th:text="${notificationCount ?: 3}"></span>
-                <!-- 알림 모달 추가 -->
-                <div class="notification-modal" id="notification-modal">
-                    <div class="notification-header">
-                        <h3>알림</h3>
-                        <div class="notification-actions">
-                            <button class="mark-all-read">모두 읽음 표시</button>
-                            <button class="close-notification">&times;</button>
-                        </div>
-                    </div>
-                    <div class="notification-tabs">
-                        <button class="notification-tab active" data-tab="all">전체</button>
-                        <button class="notification-tab" data-tab="unread">읽지 않음</button>
-                        <button class="notification-tab" data-tab="system">시스템</button>
-                    </div>
-                    <div class="notification-list">
-
-                    </div>
-                </div>
-            </div>
-            <div class="profile">
-                <img
-                    src="https://w7.pngwing.com/pngs/306/70/png-transparent-computer-icons-management-admin-silhouette-black-and-white-neck.png"
-                    alt="Profile">
-                <span id="profile-name">관리자</span>
-            </div>
-            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button> <!-- 모임 만들기 버튼 -->
-            <button class="btn btn-outline" onclick="auth.logout()">로그아웃</button>
-        </div>
-    </div>
-    <script th:src="@{/js/notification-common.js}"></script>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <message>
     <div id="messageBox" style="display: none;
@@ -308,9 +249,8 @@
             <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
         </div>
     </div>
-    <div style="width: 45%; height: 250px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-        <span style="color: #999;">이미지 영역</span>
-    </div>
+        <img src="" alt="식사 모임 이미지">
+
 </section>
 
 <!-- 검색 섹션 -->
@@ -437,6 +377,8 @@
         }
     });
 </script>
-
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>
