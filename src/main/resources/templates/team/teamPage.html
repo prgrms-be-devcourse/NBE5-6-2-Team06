@@ -590,7 +590,7 @@
     const input = document.getElementById('chat-input');
     const messageContent = input.value.trim();
     const now = new Date();
-    const time = now.toTimeString().slice(0,5);
+    const time = now.toTimeString().slice(0, 5);
     if (messageContent && stompClient) {
       const chatMessage = {
         teamId: teamId,
@@ -626,7 +626,7 @@
         reportButton.textContent = '신고';
         reportButton.title = '이 메시지 신고하기';
 
-        reportButton.onclick = function(e) {
+        reportButton.onclick = function (e) {
           e.stopPropagation();
           openReportModal(messageSenderId, nickname, chatId);
         };
