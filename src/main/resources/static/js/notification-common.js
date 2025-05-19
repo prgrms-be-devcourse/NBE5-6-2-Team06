@@ -154,26 +154,65 @@ class NotificationHandler {
 
     // 알림 아이템 엘리먼트 생성 함수
     createNotificationItemElement(notification) {
-        const notificationItem = document.createElement('div');
-        notificationItem.classList.add('notification-item', notification.type.toLowerCase());
+        const wrapper = document.createElement(notification.link ? 'a' : 'div');
+
+        wrapper.classList.add('notification-item', notification.type.toLowerCase());
         if (notification.isRead) {
-            notificationItem.classList.add('read');
+            wrapper.classList.add('read');
         } else {
-            notificationItem.classList.add('unread');
+            wrapper.classList.add('unread');
         }
-        notificationItem.innerHTML = `
-            <div class="notification-icon"> 
-              ${this.getNotificationIcon(notification.type)}
-            </div>
-            <div class="notification-content">
-                <p class="notification-text">${notification.message}</p>
-                <span class="notification-time">${this.formatTimeAgo(notification.createdAt)}</span>
-            </div>
-            <div class="notification-actions">
-                ${notification.isRead ? `<button class="delete-notification" data-id="${notification.id}" title="삭제"><i class="fas fa-trash"></i></button>` : `<button class="mark-read" data-id="${notification.id}" title="읽음 표시"><i class="fas fa-check"></i></button>`}
-            </div>
-        `;
-        return notificationItem;
+
+        if (notification.link) {
+            wrapper.href = notification.link;
+        }
+
+        wrapper.innerHTML = `
+        <div class="notification-icon"> 
+            ${this.getNotificationIcon(notification.type)}
+        </div>
+        <div class="notification-content">
+            <p class="notification-text">${notification.message}</p>
+            <span class="notification-time">${this.formatTimeAgo(notification.createdAt)}</span>
+        </div>
+        <div class="notification-actions">
+            ${notification.isRead
+            ? `<button class="delete-notification" data-id="${notification.id}" title="삭제"><i class="fas fa-trash"></i></button>`
+            : `<button class="mark-read" data-id="${notification.id}" title="읽음 표시"><i class="fas fa-check"></i></button>`
+        }
+        </div>
+    `;
+
+        // 액션 버튼에 이벤트 버블링 방지 처리
+        const deleteBtn = wrapper.querySelector('.delete-notification');
+        const markReadBtn = wrapper.querySelector('.mark-read');
+
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        }
+
+        if (markReadBtn) {
+            markReadBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        }
+
+        if (notification.link && !notification.isRead) {
+            wrapper.addEventListener('click', async (e) => {
+                try {
+                    await this.markNotificationAsRead(notification.id);
+                } catch (error) {
+                    console.error('알림 클릭 시 읽음 처리 실패:', error);
+                }
+            });
+        }
+
+
+        return wrapper;
     }
 
     // 알림 아이템 이벤트 리스너 설정 함수
@@ -313,6 +352,27 @@ class NotificationHandler {
                 console.error('알림 삭제 요청 실패:', error);
             }
         });
+    }
+
+    async markNotificationAsRead(notificationId) {
+        const response = await window.auth.fetchWithAuth(`/api/notification/mark-read`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ notificationIds: [parseInt(notificationId)] })
+        });
+
+        if (response && response.ok) {
+            this.notifications = this.notifications.map(n =>
+                n.id === notificationId ? { ...n, isRead: true } : n
+            );
+            this.unreadCount--;
+            this.updateBadge();
+            this.renderNotifications();
+        } else {
+            throw new Error(await response.text());
+        }
     }
 }
 

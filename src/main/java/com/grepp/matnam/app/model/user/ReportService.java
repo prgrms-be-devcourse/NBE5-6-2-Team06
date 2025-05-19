@@ -3,7 +3,9 @@ package com.grepp.matnam.app.model.user;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportChatResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.ReportTeamResponse;
 import com.grepp.matnam.app.controller.api.user.payload.ReportRequest;
+import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.chat.repository.ChatRepository;
+import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.team.TeamRepository;
 import com.grepp.matnam.app.model.user.dto.ReportDto;
 import com.grepp.matnam.app.model.user.entity.Report;
@@ -26,6 +28,7 @@ public class ReportService {
     private final UserService userService;
     private final TeamRepository teamRepository;
     private final ChatRepository chatRepository;
+    private final NotificationSender notificationSender;
 
     public Page<ReportDto> findByFilter(Boolean status, String keyword, Pageable pageable) {
         if (status != null && StringUtils.hasText(keyword)) {
@@ -63,6 +66,7 @@ public class ReportService {
         report.setReportType(reportRequest.getReportType());
         report.setChatId(reportRequest.getChatId());
         report.setTeamId(reportRequest.getTeamId());
+        notificationSender.sendNotificationToUser("admin", NotificationType.REPORT, user.getUserId() + "님의 신고가 접수되었습니다.", "/admin/user/report");
 
         reportRepository.save(report);
     }

@@ -127,6 +127,8 @@ public class TeamService {
             team.setStatus(Status.FULL);
         }
 
+        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 승인되었습니다!", "/team/detail/" + team.getTeamId());
+
         teamRepository.save(team);
     }
 
@@ -142,6 +144,8 @@ public class TeamService {
         } else {
             throw new IllegalStateException("대기 중인 참여자만 거절 가능합니다.");
         }
+        Team team = participant.getTeam();
+        notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.PARTICIPANT_STATUS, "[" + team.getTeamTitle() + "] 모임에 거절되었습니다.", "/team/detail/" + team.getTeamId());
     }
 
 
@@ -178,6 +182,13 @@ public class TeamService {
         unActivatedById(teamId);
 
         teamRepository.save(team);
+
+        List<Participant> participants = team.getParticipants();
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 취소되었습니다.", null);
+            }
+        }
     }
 
     //조회 부분
@@ -251,6 +262,13 @@ public class TeamService {
             increaseTemperatureForCompletedTeam(team);
         }
         log.info("팀 상태 변경 완료: {}", team.getStatus());
+        List<Participant> participants = team.getParticipants();
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!", null);
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.REVIEW_REQUEST, "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!", "/team/" + team.getTeamId() + "/reviews");
+            }
+        }
     }
 
     private void increaseTemperatureForCompletedTeam(Team team) {
@@ -296,7 +314,7 @@ public class TeamService {
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
-            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "");
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해 [" + team.getTeamTitle() + "] 모임의 상태가 ["+ team.getStatus().getKoreanName() + "](으)로 변경되었습니다.", "/team/page/" + teamId);
         }
 
     }
@@ -307,6 +325,10 @@ public class TeamService {
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
         log.info("team {}", team);
         team.unActivated();
+        List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
+        for (ParticipantWithUserIdDto dto : participants) {
+            notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS, "관리자에 의해  [" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
+        }
     }
 
     public NewTeamResponse getNewTeamStats() {
@@ -546,5 +568,12 @@ public class TeamService {
         unActivatedById(teamId);
 
         teamRepository.save(team);
+
+        List<Participant> participants = team.getParticipants();
+        for (Participant participant : participants) {
+            if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(), NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 삭제되었습니다.", null);
+            }
+        }
     }
 }

@@ -63,6 +63,6 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
 
     @Query("SELECT new com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto(p.participantId, u.userId) " +
         "FROM Participant p JOIN p.user u " +
-        "WHERE p.team.teamId = :teamId AND p.team.activated = true")
+        "WHERE p.team.teamId = :teamId AND p.participantStatus = 'APPROVED'")
     List<ParticipantWithUserIdDto> findAllDtoByTeamId(@Param("teamId") Long teamId);
 }

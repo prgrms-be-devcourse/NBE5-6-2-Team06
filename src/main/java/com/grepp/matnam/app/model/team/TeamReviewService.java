@@ -1,5 +1,7 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.facade.NotificationSender;
+import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
@@ -22,6 +24,7 @@ public class TeamReviewService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final ParticipantRepository participantRepository;
+    private final NotificationSender notificationSender;
 
     public TeamReview createReview(Long teamId, String reviewerId, String revieweeId, Double rating) {
         Team team = teamRepository.findById(teamId)
@@ -60,6 +63,8 @@ public class TeamReviewService {
         TeamReview savedReview = teamReviewRepository.save(review);
 
         updateTemperatureByReview(revieweeId, rating);
+
+        notificationSender.sendNotificationToUser(revieweeId, NotificationType.REVIEW_RECEIVED, "[" + team.getTeamTitle() + "] 모임의 리뷰를 받았습니다!", "/team/" + team.getTeamId() + "/reviews");
 
         return savedReview;
     }
