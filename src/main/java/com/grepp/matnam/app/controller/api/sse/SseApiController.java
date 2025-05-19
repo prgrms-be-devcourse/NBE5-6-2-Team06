@@ -1,4 +1,4 @@
-package com.grepp.matnam.app.controller.sse;
+package com.grepp.matnam.app.controller.api.sse;
 
 import com.grepp.matnam.app.model.sse.SseService;
 import com.grepp.matnam.infra.auth.AuthenticationUtils;
@@ -8,14 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
-public class SseController implements SmartLifecycle {
+public class SseApiController implements SmartLifecycle {
 
     private final SseService sseService;
     private volatile boolean isRunning = false;

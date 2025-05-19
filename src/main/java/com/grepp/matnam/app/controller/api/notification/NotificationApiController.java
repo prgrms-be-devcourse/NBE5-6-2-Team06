@@ -55,7 +55,7 @@ public class NotificationApiController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("{notificationId}")
+    @DeleteMapping("/{notificationId}")
     public ResponseEntity<Void> deleteNotification(@PathVariable Long notificationId) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
         notificationService.deactivateNotification(currentUserId, notificationId);
