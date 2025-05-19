@@ -510,7 +510,6 @@
     }
 
     footer {
-      margin-top: 5rem;
       text-align: center;
       font-size: 0.8rem;
       color: #999;
@@ -554,7 +553,6 @@
   <link rel="stylesheet" th:href="@{/css/notification.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
-  <script th:src="@{/js/auth.js}"></script>
 </head>
 <body>
 <header th:replace="~{fragments/header :: siteHeader}"></header>
@@ -583,10 +581,10 @@
         <strong>가입일:</strong> <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2023-01-01</span>
       </div>
       <div class="info-item" style="white-space: nowrap;">
-      <strong style="margin-right: 4px;">저장 맛집 수:</strong>
-      공개  <span th:text="${visiblePlaceCount}">0</span>
-      숨김  <span th:text="${hiddenPlaceCount}">0</span>
-    </div>
+        <strong style="margin-right: 4px;">저장 맛집 수:</strong>
+        공개 <span th:text="${visiblePlaceCount}">0</span>
+        숨김 <span th:text="${hiddenPlaceCount}">0</span>
+      </div>
 
       <div class="preference-section">
         <h4>
@@ -739,7 +737,7 @@
         </div>
       </div>
 
-      <div id="participating-meetings" class="meetings-section" style="display: none;">
+      <div id="participating-meetings" class="meetings-section" style="display: none; padding: 0">
         <h3>참여 중인 모임</h3>
         <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
           <p>아직 참여한 모임이 없습니다.</p>
@@ -758,15 +756,16 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+
         </div>
       </div>
     </div>
-      <!-- 내 맛집 지도 -->
-      <div class="main-section mypage-section">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h2 style="margin-bottom: 0;">내 맛집 지도</h2>
-          <button onclick="location.href='/map/add'"
-                  style="
+    <!-- 내 맛집 지도 -->
+    <div class="main-section mypage-section">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin-bottom: 0;">내 맛집 지도</h2>
+        <button onclick="location.href='/map/add'"
+                style="
           background: #000;
           color: #fff;
           border: none;
@@ -775,27 +774,28 @@
           border-radius: 4px;
           cursor: pointer;
           transition: background 0.2s ease, transform 0.2s ease;"
-                  onmouseover="this.style.background='#333'; this.style.transform='translateY(-1px)'"
-                  onmouseout="this.style.background='#000'; this.style.transform='none'">
-            맛집 검색 및 등록하기
-          </button>
-        </div>
-        <div id="map-container">
-          <div class="map-container">
-            <iframe th:src="@{/map/editMap}"
-                    width="100%"
-                    height="1000px"
-                    style="border: none;
+                onmouseover="this.style.background='#333'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.background='#000'; this.style.transform='none'">
+          맛집 검색 및 등록하기
+        </button>
+      </div>
+      <div id="map-container">
+        <div class="map-container">
+          <iframe th:src="@{/map/editMap}"
+                  width="100%"
+                  height="1000px"
+                  style="border: none;
                     border-radius: 8px;
                     overflow: auto;">
-            </iframe>
-          </div>
+          </iframe>
         </div>
       </div>
+    </div>
 
 
     <!-- 모임 리뷰 -->
-    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview) or currentPage > 0}">
+    <div class="main-section reviews-section"
+         th:if="${not #lists.isEmpty(teamsWithoutReview) or currentPage > 0}">
       <h2>리뷰 작성이 필요한 모임</h2>
 
       <div class="review-alert">
@@ -807,43 +807,55 @@
         <p>리뷰 작성이 필요한 모임이 없습니다.</p>
       </div>
 
-      <div th:each="team : ${teamsWithoutReview}" class="meeting-item" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
+      <div th:each="team : ${teamsWithoutReview}" class="meeting-item"
+           th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
         <h4>
           <span th:text="${team.teamTitle}">모임 제목</span>
           <span class="badge">완료됨</span>
         </h4>
-        <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+        <p>📅 <span
+            th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+        </p>
         <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
         <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-        <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>
+        <button class="btn-primary review-btn"
+                th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">
+          리뷰 작성
+        </button>
       </div>
 
       <div class="pagination-container" th:if="${totalPages > 1}">
         <div class="pagination">
-          <a th:if="${currentPage > 0}" th:href="@{/user/mypage(page=${currentPage - 1})}" class="page-link">&laquo; 이전</a>
+          <a th:if="${currentPage > 0}" th:href="@{/user/mypage(page=${currentPage - 1})}"
+             class="page-link">&laquo; 이전</a>
           <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a th:if="${i != currentPage}" th:href="@{/user/mypage(page=${i})}" class="page-link" th:text="${i + 1}">1</a>
-                <span th:if="${i == currentPage}" class="page-link active" th:text="${i + 1}">1</span>
+                <a th:if="${i != currentPage}" th:href="@{/user/mypage(page=${i})}"
+                   class="page-link" th:text="${i + 1}">1</a>
+                <span th:if="${i == currentPage}" class="page-link active"
+                      th:text="${i + 1}">1</span>
             </span>
-          <a th:if="${currentPage < totalPages - 1}" th:href="@{/user/mypage(page=${currentPage + 1})}" class="page-link">다음 &raquo;</a>
+          <a th:if="${currentPage < totalPages - 1}"
+             th:href="@{/user/mypage(page=${currentPage + 1})}" class="page-link">다음 &raquo;</a>
         </div>
       </div>
     </div>
 
-<div id="deactivateModal" class="modal">
-  <div class="modal-content">
-    <h3 class="modal-title">회원 탈퇴</h3>
-    <form id="deactivateForm" action="/user/deactivate" method="post">
-      <div class="modal-body">
-        <p>정말로 회원 탈퇴를 진행하시겠습니까? 탈퇴 후에는 계정을 복구할 수 없습니다.</p>
-        <p>비밀번호를 입력하여 탈퇴를 확인해주세요.</p>
-        <input type="password" id="deactivatePassword" name="password" placeholder="비밀번호">
+    <div id="deactivateModal" class="modal">
+      <div class="modal-content">
+        <h3 class="modal-title">회원 탈퇴</h3>
+        <form id="deactivateForm" action="/user/deactivate" method="post">
+          <div class="modal-body">
+            <p>정말로 회원 탈퇴를 진행하시겠습니까? 탈퇴 후에는 계정을 복구할 수 없습니다.</p>
+            <p>비밀번호를 입력하여 탈퇴를 확인해주세요.</p>
+            <input type="password" id="deactivatePassword" name="password" placeholder="비밀번호">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="cancel" onclick="hideDeactivateModal()">취소</button>
+            <button type="submit" class="confirm">탈퇴하기</button>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="cancel" onclick="hideDeactivateModal()">취소</button>
-        <button type="submit" class="confirm">탈퇴하기</button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -974,21 +986,21 @@
     switchTab('all'); // 초기 로딩 시 "전체" 탭 활성화
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('page')) {
       const reviewsSection = document.querySelector('.reviews-section');
       if (reviewsSection) {
         setTimeout(() => {
-          reviewsSection.scrollIntoView({ behavior: 'smooth' });
+          reviewsSection.scrollIntoView({behavior: 'smooth'});
         }, 100);
       }
     }
   });
 </script>
-    <script src="/js/auth.js"></script>
-    <script src="/js/header.js"></script>
-    <script src="/js/notification-common.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 
 </html>
