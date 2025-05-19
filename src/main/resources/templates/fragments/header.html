@@ -7,12 +7,12 @@
                 <a th:href="@{/}">홈</a>
                 <a th:href="@{/team/search}">모임찾기</a>
                 <a th:href="@{/team/create}">모임만들기</a>
-                <a th:href="@{/user/signin}">로그인</a>
+<!--                <a th:href="@{/user/signin}">내 맛집 이동하기</a>-->
             </nav>
         </div>
-<!--        <div class="header-buttons">-->
-<!--            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button>-->
-<!--        </div>-->
+        <div class="header-buttons">
+            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/user/signin} + '\''">로그인</button>
+        </div>
     </div>
 
     <!-- 로그인 상태 -->
@@ -52,7 +52,7 @@
                 <span id="profile-name">사용자</span>
             </div>
 
-            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button>
+<!--            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button>-->
             <button class="btn btn-outline" onclick="auth.logout()">로그아웃</button>
         </div>
     </div>
