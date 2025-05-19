@@ -1,5 +1,4 @@
 * {
-  margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Noto Sans KR', sans-serif;
@@ -148,6 +147,7 @@ nav a {
   font-size: 0.9rem;
 }
 footer {
+  text-align: center;
   padding: 1rem 2rem;
   font-size: 0.8rem;
   color: #999;
