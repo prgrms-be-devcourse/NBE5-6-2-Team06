@@ -50,7 +50,6 @@
       padding: 0.5rem 1rem;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
       font-weight: 500;
     }
 
@@ -618,13 +617,16 @@
           <p>아직 참여하거나 주최한 모임이 없습니다.</p>
           <p>모임을 만들거나 다른 사용자의 모임에 참여해보세요!</p>
         </div>
+
         <div th:each="team : ${hostingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge active">주최중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-          </p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
@@ -632,32 +634,38 @@
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <hr>
 
-          <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
             모임 수정
           </button>
 
-          <!-- 모임 취소 버튼-->
-          <div th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}">
-            <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                  method="post" style="display: inline;" class="cancel-form"
-                  th:data-team-id=${team.teamId}>
-              <button type="submit" class="btn-primary cancel-button">모임 취소</button>
-            </form>
-          </div>
-          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">
-            <button class="btn-secondary" disabled>모임 취소 완료</button>
+          <div th:if="${team.user.userId == user.userId}">
+            <div th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+              <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                    method="post" style="display: inline;" class="cancel-form"
+                    th:data-team-id=${team.teamId}>
+                <button type="submit" class="btn-primary cancel-button">모임 취소</button>
+              </form>
+            </div>
+            <div th:if="${#strings.toString(team.status) == 'CANCELED'}" style="display: inline;">
+              <button class="btn-secondary" disabled>모임 취소 완료</button>
+            </div>
+            <div th:if="${#strings.toString(team.status) == 'COMPLETED'}" style="display: inline;">
+              <button class="btn-success" disabled>모임 완료됨</button>
+            </div>
           </div>
         </div>
 
         <div th:each="team : ${participatingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-          </p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -674,37 +682,42 @@
         <div th:each="team : ${hostingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge active">주최중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-          </p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
-
           <hr>
 
-          <!-- 모임 수정 버튼 -->
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
             모임 수정
           </button>
 
-          <!-- 모임 취소 버튼-->
-          <div th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}">
-            <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                  method="post" style="display: inline;" class="cancel-form"
-                  th:data-team-id=${team.teamId}>
-              <button type="submit" class="btn-primary cancel-button">모임 취소</button>
-            </form>
-          </div>
-          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">
-            <button class="btn-secondary" disabled>모임 취소 완료</button>
+          <div th:if="${team.user.userId == user.userId}">
+            <div th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+              <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                    method="post" style="display: inline;" class="cancel-form"
+                    th:data-team-id=${team.teamId}>
+                <button type="submit" class="btn-primary cancel-button">모임 취소</button>
+              </form>
+            </div>
+            <div th:if="${#strings.toString(team.status) == 'CANCELED'}" style="display: inline;">
+              <button class="btn-secondary" disabled>모임 취소 완료</button>
+            </div>
+            <div th:if="${#strings.toString(team.status) == 'COMPLETED'}" style="display: inline;">
+              <button class="btn-success" disabled>모임 완료됨</button>
+            </div>
           </div>
         </div>
       </div>
+
       <div id="participating-meetings" class="meetings-section" style="display: none;">
         <h3>참여 중인 모임</h3>
         <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
@@ -714,10 +727,13 @@
         <div th:each="team : ${participatingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+            <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
             <span class="status-badge">참여중</span>
           </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-          </p>
+          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
           <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
@@ -883,19 +899,20 @@
           })
           .then(data => {
             alert(data.message || "모임이 취소되었습니다.");
+            location.reload();
 
-            const cancelButton = form.querySelector('.cancel-button');
-            if (cancelButton) {
-              cancelButton.style.display = 'none';
-            }
-
-            const completedButton = document.createElement('button');
-            completedButton.className = 'btn-secondary';
-            completedButton.disabled = true;
-            completedButton.textContent = '모임 취소 완료';
-            completedButton.style.pointerEvents = 'none';
-
-            form.parentNode.appendChild(completedButton);
+          //   const cancelButton = form.querySelector('.cancel-button');
+          //   if (cancelButton) {
+          //     cancelButton.style.display = 'none';
+          //   }
+          //
+          //   const completedButton = document.createElement('button');
+          //   completedButton.className = 'btn-secondary';
+          //   completedButton.disabled = true;
+          //   completedButton.textContent = '모임 취소 완료';
+          //   completedButton.style.pointerEvents = 'none';
+          //
+          //   form.parentNode.appendChild(completedButton);
           })
           .catch(err => {
             console.error("모임 취소 오류:", err);

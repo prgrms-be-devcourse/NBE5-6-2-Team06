@@ -19,8 +19,6 @@ import org.springframework.stereotype.Repository;
 public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositoryCustom {
 
     // 사용자 ID로 팀 조회 (주최자)
-    @Query("SELECT t FROM Team t WHERE EXISTS (SELECT p FROM Participant p "
-        + "WHERE p.team = t AND p.user.userId = :userId AND p.participantStatus = :status) AND t.activated = true")
     List<Team> findTeamsByUser_UserIdAndActivatedTrue(String userId);
 
     @Query("SELECT t FROM Team t JOIN t.participants p " +
