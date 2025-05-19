@@ -249,7 +249,7 @@ public class TeamService {
         return teamRepository.findAllWithParticipantsAndActivatedTrue(pageable);
     }
 
-    // 모임 상세 조회
+    // 모임 상세 조회, 팀 페이지 조회
     @Transactional
     public Team getTeamByIdWithParticipants(Long teamId) {
         return teamRepository.findByIdWithParticipantsAndUserAndActivatedTrue(teamId).orElse(null);
@@ -313,6 +313,11 @@ public class TeamService {
                 userRepository.save(user);
             }
         }
+    }
+
+    // 승인된 상태의 참여자 수
+    public long getParticipantCountExcludingHost(Long teamId) {
+        return participantRepository.countApprovedExcludingHost(teamId, ParticipantStatus.APPROVED);
     }
 
 //    public List<Team> findAll() {
