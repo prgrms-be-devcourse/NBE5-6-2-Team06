@@ -854,20 +854,22 @@
           card.className = "recommend-card";
 
           card.innerHTML = `
-              <div>
-                <h3 style="margin-top: 0; font-size: 1.2rem;">🍽️ ${dbItem.restaurantName}</h3>
-                <p><strong>📍 위치:</strong> ${dbItem.address}</p>
-                <p><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
-                <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
-                <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
-                <p><strong>📝 소개:</strong> ${dbItem.description}</p>
-                <p style="margin-top: 1rem;">
-  <strong>🔗 URL:</strong>
-  <a href="https://map.kakao.com/?q=${encodeURIComponent(dbItem.restaurantName)}"
-     target="_blank" style="color: blue;">바로가기</a>
-</p>
-              </div>
-            `;
+  <div>
+    <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem;">🍽️ ${dbItem.restaurantName}</h2>
+
+    <p style="margin-bottom: 0.6rem;"><strong>📍 위치:</strong> ${dbItem.address}</p>
+    <p style="margin-bottom: 0.6rem;"><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
+    <p style="margin-bottom: 0.6rem;"><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
+    <p style="margin-bottom: 0.6rem;"><strong>📂 카테고리:</strong> ${dbItem.category}</p>
+    <p style="margin-bottom: 0.6rem;"><strong>📝 소개:</strong> ${dbItem.description}</p>
+
+    <p style="margin-top: 1rem; margin-bottom: 0;">
+      <strong>🔗 URL:</strong>
+      <a href="https://map.kakao.com/?q=${encodeURIComponent(dbItem.restaurantName)}"
+         target="_blank" style="color: blue;">바로가기</a>
+    </p>
+  </div>
+`;
           wrapper.appendChild(card);
         })
         .catch(err => {
