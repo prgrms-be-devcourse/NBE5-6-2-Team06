@@ -73,11 +73,11 @@ public class TeamApiController {
     // 참여 신청
     @PostMapping("/{teamId}/apply/{userId}")
     @Operation(summary = "모임 참여 신청", description = "사용자가 모임에 참여 신청을 합니다.")
-    public ResponseEntity<ApiResponse> applyToJoinTeam(@PathVariable Long teamId, @PathVariable String userId) {
+    public ResponseEntity<ApiResponse> applyToJoinTeam(@PathVariable Long teamId) {
 
-        String loggedInUserId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String UserId = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
-            User user = userService.getUserById(loggedInUserId);
+            User user = userService.getUserById(UserId);
             teamService.addParticipant(teamId, user);
 
             return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), "참여 신청 성공", null));
