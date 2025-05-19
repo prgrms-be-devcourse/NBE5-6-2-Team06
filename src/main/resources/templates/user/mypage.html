@@ -639,24 +639,18 @@
           </button>
 
           <!-- 모임 취소 버튼-->
-          <form th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}"
-                th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                method="post" style="display: inline;" class="cancel-form"
-                th:data-team-id=${team.teamId}>
-            <button type="submit" class="btn-primary cancel-button">모임 취소</button>
-          </form>
-<!--          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">-->
-<!--            <button class="btn-secondary" disabled>모임 취소 완료</button>-->
-<!--          </div>-->
-
-          <!--          <div id="application-info-${team.teamId}" class="application-info" style="display: none;">-->
-          <!--            <h4>신청자 목록</h4>-->
-          <!--            &lt;!&ndash; 신청자 정보 동적으로 추가될 부분 &ndash;&gt;-->
-          <!--            <ul id="applicant-list-${team.teamId}">-->
-          <!--              &lt;!&ndash; 신청자 정보 리스트 &ndash;&gt;-->
-          <!--            </ul>-->
-          <!--          </div>-->
+          <div th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}">
+            <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                  method="post" style="display: inline;" class="cancel-form"
+                  th:data-team-id=${team.teamId}>
+              <button type="submit" class="btn-primary cancel-button">모임 취소</button>
+            </form>
+          </div>
+          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">
+            <button class="btn-secondary" disabled>모임 취소 완료</button>
+          </div>
         </div>
+
         <div th:each="team : ${participatingTeams}" class="meeting-item">
           <h4>
             <span th:text="${team.teamTitle}">모임 제목</span>
@@ -668,8 +662,6 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
-          </form>
-
         </div>
       </div>
 
@@ -701,26 +693,18 @@
           </button>
 
           <!-- 모임 취소 버튼-->
-          <form th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}"
-                th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                method="post" style="display: inline;" class="cancel-form"
-                th:data-team-id=${team.teamId}>
-            <button type="submit" class="btn-primary cancel-button">모임 취소</button>
-          </form>
-<!--          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">-->
-<!--            <button class="btn-secondary" disabled>모임 취소 완료</button>-->
-<!--          </div>-->
-
-          <!--          <div id="application-info-${teamId}" class="application-info" style="display: none;">-->
-          <!--            <h4>신청자 목록</h4>-->
-          <!--            &lt;!&ndash; 신청자 정보 동적으로 추가될 부분 &ndash;&gt;-->
-          <!--            <ul id="applicant-list-${teamId}">-->
-          <!--              &lt;!&ndash; 신청자 정보 리스트 &ndash;&gt;-->
-          <!--            </ul>-->
-          <!--          </div>-->
+          <div th:if="${team.status != 'CANCELED' and team.status != 'COMPLETED'}">
+            <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                  method="post" style="display: inline;" class="cancel-form"
+                  th:data-team-id=${team.teamId}>
+              <button type="submit" class="btn-primary cancel-button">모임 취소</button>
+            </form>
+          </div>
+          <div th:if="${team.status == 'CANCELED'}" style="display: inline;">
+            <button class="btn-secondary" disabled>모임 취소 완료</button>
+          </div>
         </div>
       </div>
-
       <div id="participating-meetings" class="meetings-section" style="display: none;">
         <h3>참여 중인 모임</h3>
         <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
@@ -738,7 +722,6 @@
           <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
           <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
-
         </div>
       </div>
     </div>
@@ -783,7 +766,8 @@
         <p>완료된 모임에 대해 다른 참여자들의 매너 온도를 매겨주세요!</p>
       </div>
 
-      <div th:if="${#lists.isEmpty(teamsWithoutReview) and currentPage == 0}" class="empty-state">
+      <div th:if="${#lists.isEmpty(teamsWithoutReview) and currentPage == 0}"
+           class="empty-state">
         <p>리뷰 작성이 필요한 모임이 없습니다.</p>
       </div>
 
@@ -899,19 +883,19 @@
             })
             .then(data => {
               alert(data.message || "모임이 취소되었습니다.");
-
-              const cancelButton = form.querySelector('.cancel-button');
-              if (cancelButton) {
-                cancelButton.style.display = 'none';
-              }
-              const completedButton = document.createElement('button');
-              completedButton.className = 'btn-secondary';
-              completedButton.disabled = true;
-              completedButton.textContent = '모임 취소 완료';
-              completedButton.style.pointerEvents = 'none';
-
-              // 폼의 부모 요소에 취소 완료 버튼을 추가
-              form.parentNode.appendChild(completedButton);
+              location.reload();
+              //   const cancelButton = form.querySelector('.cancel-button');
+              //   if (cancelButton) {
+              //     cancelButton.style.display = 'none';
+              //   }
+              //   const completedButton = document.createElement('button');
+              //   completedButton.className = 'btn-secondary';
+              //   completedButton.disabled = true;
+              //   completedButton.textContent = '모임 취소 완료';
+              //   completedButton.style.pointerEvents = 'none';
+              //
+              //   // 폼의 부모 요소에 취소 완료 버튼을 추가
+              //   form.parentNode.appendChild(completedButton);
             })
             .catch(err => {
               console.error("모임 취소 오류:", err);

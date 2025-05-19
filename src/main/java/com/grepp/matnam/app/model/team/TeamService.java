@@ -198,7 +198,6 @@ public class TeamService {
             throw new IllegalStateException("모임완료 상태에서는 취소할 수 없습니다.");
         }
         team.setStatus(Status.CANCELED);
-//        unActivatedById(teamId);
 
         teamRepository.save(team);
 
