@@ -343,19 +343,19 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>방장 정보</h2>
 <!--    <div style="text-align: right;">-->
-      <form th:if="${isLeader != null && isLeader && team.status != T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
+      <form th:if="${isLeader != null && isLeader && team.status != null && #strings.toString(team.status) != 'COMPLETED'}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
             method="post" style="display: inline;">
         <button type="submit" class="complete-button"
                 th:data-team-id="${team.teamId}"
-                th:disabled="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}"
-                th:text="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED ? '모임 완료된 상태' : '모임 완료하기'}"
+                th:disabled="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}"
+                th:text="${team.status != null && #strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}"
                 style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem;">
           모임 완료하기
         </button>
       </form>
 
-      <div th:if="${team.status == T(com.grepp.matnam.app.model.team.code.Status).COMPLETED}">
+      <div th:if="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}">
         <button type="button" class="btn complete-button" disabled
                 style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
           모임 완료된 상태
@@ -427,7 +427,7 @@
     </div>
     <div class="participant-list">
       <div class="participant" th:each="participant : ${participants}"
-           th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED}">
+           th:if="${participant.participantStatus != null && #strings.toString(participant.participantStatus) == 'APPROVED'}">
         <div class="participant-info">
           <!-- 사용자 닉네임 -->
           <div class="info-item">
