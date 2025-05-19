@@ -2,8 +2,8 @@ package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.ParticipantResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamResponse;
+import com.grepp.matnam.app.controller.api.admin.payload.TeamStatusUpdateRequest;
 import com.grepp.matnam.app.model.team.TeamService;
-import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.infra.response.ApiResponse;
@@ -50,8 +50,8 @@ public class AdminTeamApiController {
 
     @PatchMapping("/{teamId}")
     @Operation(summary = "모임 상세 변경", description = "특정 모임 상태를 변경합니다.")
-    public ResponseEntity<?> updateTeamStatus(@PathVariable Long teamId, @RequestBody Status status) {
-        teamService.updateTeamStatus(teamId, status);
+    public ResponseEntity<?> updateTeamStatus(@PathVariable Long teamId, @RequestBody TeamStatusUpdateRequest teamStatusUpdateRequest) {
+        teamService.updateTeamStatus(teamId, teamStatusUpdateRequest);
         return ResponseEntity.ok("모임 상태가 변경되었습니다.");
     }
 
