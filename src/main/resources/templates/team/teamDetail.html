@@ -196,7 +196,7 @@
       <div class="participant-list">
         <h5>참여 요청</h5>
         <div class="participant" th:each="participant : ${team.participants}"
-             th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING}">
+             th:if="${participant.participantStatus != null and #strings.toString(participant.participantStatus) == 'PENDING'}">
           <div class="participant-info" th:if="${participant.user != null}">
             <div class="info-item">
               <strong>👤:</strong>
@@ -224,9 +224,10 @@
             <span>탈퇴한 사용자</span>
           </div>
         </div>
-    <hr/>
+        <hr/>
         <h5>현재 참여자</h5>
-        <div class="participant" th:each="participant : ${team.participants}" th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and participant.role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER}">
+        <div class="participant" th:each="participant : ${team.participants}"
+             th:if="${participant.participantStatus != null and #strings.toString(participant.participantStatus) == 'APPROVED' and participant.role != null and #strings.toString(participant.role) == 'MEMBER'}">
           <div class="participant-info" th:if="${participant.user != null}">
             <div class="info-item">
               <strong>👤:</strong>
@@ -238,7 +239,7 @@
             <span>탈퇴한 사용자</span>
           </div>
         </div>
-        <div class="participant" th:if="${#lists.isEmpty(team.participants.?[participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED and role == T(com.grepp.matnam.app.model.team.code.Role).MEMBER]) and #lists.isEmpty(team.participants.?[participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).PENDING])}">
+        <div class="participant" th:if="${#lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'APPROVED' and role != null and #strings.toString(role) == 'MEMBER']) and #lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'PENDING'])}">
           <span>현재 참여자가 없습니다.</span>
         </div>
       </div>
