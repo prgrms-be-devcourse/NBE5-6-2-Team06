@@ -516,7 +516,7 @@ public class TeamService {
 
     public Map<String, Long> getDailyNewTeamCountsLast7Days() {
         LocalDate today = LocalDate.now();
-        Map<LocalDate, Long> dailyCounts = IntStream.rangeClosed(0, 6)
+        Map<LocalDate, Long> dailyCounts = IntStream.iterate(6, i -> i - 1).limit(7)
             .mapToObj(today::minusDays)
             .collect(Collectors.toMap(
                 date -> date,
