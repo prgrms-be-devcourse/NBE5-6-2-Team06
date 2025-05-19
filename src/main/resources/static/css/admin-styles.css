@@ -1332,6 +1332,18 @@ h1 {
     gap: 0.75rem;
 }
 
+.meta-item-address {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    grid-column: 1 / -1;
+    word-break: break-word;
+}
+.meta-item-address i {
+    width: 20px;
+    color: var(--primary-color);
+}
+
 .meta-item {
     display: flex;
     align-items: center;

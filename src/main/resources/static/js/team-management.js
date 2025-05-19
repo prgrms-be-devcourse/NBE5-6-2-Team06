@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(
             'team-description-text').textContent = result.teamDetails;
         document.getElementById('team-image').src = result.imageUrl;
+        document.getElementById('team-address').textContent = result.address;
+        document.getElementById('team-category').textContent = result.category;
 
       });
 
