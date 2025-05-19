@@ -12,14 +12,6 @@
       background-color: #f9f9f9;
       color: #333;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
     nav a {
       margin-right: 1rem;
       text-decoration: none;
@@ -326,18 +318,13 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="logo">
-    <h1>맛남</h1>
-  </div>
-  <nav>
-    <a th:href="@{/}">홈</a>
-    <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    <a th:href="@{/user/logout}">로그아웃</a>
-  </nav>
-</header>
+<!-- ✅ 헤더는 여기에서 불러옵니다 -->
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 <h1 th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'"
     style="font-size: 2rem; font-weight: 700; text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: #333;">
   "모임 이름" 모임입니다 👥
@@ -593,7 +580,8 @@
       stompClient.subscribe('/room/' + teamId, function (chat) {
         const message = JSON.parse(chat.body);
 
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`,
+            message.senderId, message.chatId);
       });
     });
   }
@@ -603,7 +591,7 @@
     const input = document.getElementById('chat-input');
     const messageContent = input.value.trim();
     const now = new Date();
-    const time = now.toTimeString().slice(0,5);
+    const time = now.toTimeString().slice(0, 5);
     if (messageContent && stompClient) {
       const chatMessage = {
         teamId: teamId,
@@ -639,7 +627,7 @@
         reportButton.textContent = '신고';
         reportButton.title = '이 메시지 신고하기';
 
-        reportButton.onclick = function(e) {
+        reportButton.onclick = function (e) {
           e.stopPropagation();
           openReportModal(messageSenderId, nickname, chatId);
         };
@@ -672,7 +660,8 @@
 
       // 채팅 메시지 표시
       data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
+        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`,
+            message.senderId, message.chatId);
       });
     })
     .catch(error => {
@@ -682,7 +671,7 @@
 
   // 모임 완료 - 완료 버튼을 비활성화
   document.addEventListener('DOMContentLoaded', function () {
-    $('.complete-button').on('click', function(event) {
+    $('.complete-button').on('click', function (event) {
       event.preventDefault();
 
       var teamId = $(this).data('team-id');
@@ -694,16 +683,16 @@
       $.ajax({
         type: 'PUT',
         url: url,
-        data: { status: status },
-        success: function(response) {
-          $('#notificationMessage').text(response.message  || '모임이 성공적으로 완료 처리되었습니다.');
+        data: {status: status},
+        success: function (response) {
+          $('#notificationMessage').text(response.message || '모임이 성공적으로 완료 처리되었습니다.');
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
           });
           location.reload();
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           var errorMessage = "모임 완료에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage = xhr.responseJSON.message; // 서버에서 보낸 오류 메시지 사용
@@ -712,7 +701,7 @@
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
           });
 
@@ -758,9 +747,9 @@
     }, 3000);
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const chatInput = document.getElementById('chat-input');
-    chatInput.addEventListener('keypress', function(e) {
+    chatInput.addEventListener('keypress', function (e) {
       if (e.key === 'Enter') {
         sendMessage();
       }
@@ -769,18 +758,18 @@
     const reasonTextarea = document.getElementById('reason');
     const submitBtn = document.getElementById('submitReport');
 
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
       const reportModal = document.getElementById('reportModal');
       if (event.target === reportModal) {
         closeReportModal();
       }
     });
 
-    reasonTextarea.addEventListener('input', function() {
+    reasonTextarea.addEventListener('input', function () {
       submitBtn.disabled = this.value.trim().length < 5;
     });
 
-    document.getElementById('submitReport').addEventListener('click', function() {
+    document.getElementById('submitReport').addEventListener('click', function () {
       if (reasonTextarea.value.trim().length < 5) {
         reasonTextarea.focus();
         return;
@@ -906,6 +895,10 @@
       loading.style.display = "none";
     });
   }
+
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

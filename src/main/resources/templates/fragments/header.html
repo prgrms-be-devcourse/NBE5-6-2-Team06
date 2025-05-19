@@ -7,7 +7,6 @@
                 <a th:href="@{/}">홈</a>
                 <a th:href="@{/team/search}">모임찾기</a>
                 <a th:href="@{/team/create}">모임만들기</a>
-<!--                <a th:href="@{/user/signin}">내 맛집 이동하기</a>-->
             </nav>
         </div>
         <div class="header-buttons">
@@ -52,31 +51,7 @@
                 <span id="profile-name">사용자</span>
             </div>
 
-<!--            <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button>-->
             <button class="btn btn-outline" onclick="auth.logout()">로그아웃</button>
         </div>
     </div>
-
-    <script th:src="@{/js/notification-common.js}"></script>
-
-    <script>
-        function getCookie(name) {
-            const value = document.cookie
-            .split('; ')
-            .find(row => row.startsWith(name + '='));
-            return value ? decodeURIComponent(value.split('=')[1]) : null;
-        }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const jwt = getCookie('jwtToken');
-            const userId = getCookie('userId');
-
-            if (jwt && userId) {
-                document.getElementById('header-login').style.display = 'flex';
-                document.getElementById('profile-name').innerText = userId;
-            } else {
-                document.getElementById('header-anonymous').style.display = 'flex';
-            }
-        });
-    </script>
 </header>
