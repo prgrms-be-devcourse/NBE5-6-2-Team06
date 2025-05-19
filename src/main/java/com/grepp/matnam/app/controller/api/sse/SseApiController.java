@@ -2,6 +2,8 @@ package com.grepp.matnam.app.controller.api.sse;
 
 import com.grepp.matnam.app.model.sse.SseService;
 import com.grepp.matnam.infra.auth.AuthenticationUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "SSE API", description = "실시간 알림 구독 API")
 public class SseApiController implements SmartLifecycle {
 
     private final SseService sseService;
     private volatile boolean isRunning = false;
 
     @GetMapping(value = "/api/sse/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @Operation(summary = "SSE 구독", description = "실시간 알림을 받기 위한 SSE 구독을 진행합니다.")
     public SseEmitter subscribe(HttpServletResponse response) {
         String userId = AuthenticationUtils.getCurrentUserId();
 
