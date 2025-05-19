@@ -1,14 +1,23 @@
+<!DOCTYPE html>
 <html lang='ko' xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Title</title>
+    <title>리다이렉트</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
 <script th:inline="javascript">
-  if([[${message}]]){
-    alert([[${message}]]);
-  }
-  location.href = '/';
-</script>
+    const message = [[${message}]];
+    if (message) {
+        try {
+            sessionStorage.setItem('toast_message', message);
+            sessionStorage.setItem('toast_type', 'warning');
+        } catch (e) {
+            console.error('세션 스토리지 저장 실패:', e);
+        }
+    }
 
+    window.location.href = '/';
+</script>
 </body>
 </html>
