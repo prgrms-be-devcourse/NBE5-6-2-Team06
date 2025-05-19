@@ -496,7 +496,6 @@ public class TeamService {
                 map(Map.Entry::getKey).
                 toList();
 
-            System.out.println(topKeywords);
             return topKeywords;
 
         }
