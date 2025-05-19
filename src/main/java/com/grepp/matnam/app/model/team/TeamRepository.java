@@ -28,7 +28,7 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
             @Param("participantStatus") ParticipantStatus participantStatus
     );
 
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.activated = true AND t.status != 'COMPLETED' ORDER BY t.createdAt DESC")
+    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.activated = true AND t.status != 'COMPLETED' AND t.status != 'CANCELED' ORDER BY t.createdAt DESC")
     Page<Team> findAllWithParticipantsAndActivatedTrue(Pageable pageable);
 
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user " +

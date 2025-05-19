@@ -246,6 +246,25 @@
       background-color: #f44336;
     }
 
+    .complete-button{
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .complete-button:hover{
+      background-color: #3da354;
+    }
+
+    .complete-button:disabled {
+      background-color: #9e3c3c;
+      color: #686767;
+      cursor: not-allowed;
+    }
+
     .card-wrapper {
       display: flex;
       flex-wrap: nowrap;
@@ -332,26 +351,30 @@
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
     <h2>방장 정보</h2>
-<!--    <div style="text-align: right;">-->
-      <form th:if="${isLeader != null && isLeader && team.status != null && #strings.toString(team.status) != 'COMPLETED'}"
+      <form th:if="${isLeader != null && isLeader && #strings.toString(team.status) != null && #strings.toString(team.status) != 'COMPLETED' && #strings.toString(team.status) != 'CANCELED'}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
             method="post" style="display: inline;">
         <button type="submit" class="complete-button"
                 th:data-team-id="${team.teamId}"
-                th:disabled="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}"
-                th:text="${team.status != null && #strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}"
-                style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+                th:disabled="${#strings.toString(team.status) != null && #strings.toString(team.status) == 'COMPLETED'}"
+                th:text="${#strings.toString(team.status) != null && #strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}">
           모임 완료하기
         </button>
       </form>
-
       <div th:if="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}">
         <button type="button" class="btn complete-button" disabled
                 style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
           모임 완료된 상태
         </button>
       </div>
+      <div th:if="${team.status != null && #strings.toString(team.status) == 'CANCELED'}">
+        <button type="button" class="btn complete-button" disabled
+                style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
+          취소된 모임입니다
+        </button>
+      </div>
     </div>
+
     <div class="participant-list">
       <div class="participant" th:if="${leader}">
         <div class="participant-info">
@@ -692,9 +715,9 @@
         error: function(xhr, status, error) {
           var errorMessage = "모임 완료에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
-            errorMessage = xhr.responseJSON.message; // 서버에서 보낸 오류 메시지 사용
+            errorMessage = xhr.responseJSON.message;
           } else if (xhr.responseText) {
-            errorMessage = xhr.responseText; // 서버에서 단순 텍스트 오류 응답을 받은 경우
+            errorMessage = xhr.responseText;
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();

@@ -34,4 +34,16 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     // 특정 팀에 속하고 상태가 승인 상태인 사용자 조회
     List<Participant> findByTeam_TeamIdAndParticipantStatus(Long teamId, ParticipantStatus participantStatus);
 
+    @Query("""
+       SELECT COUNT(p)
+         FROM Participant p
+        WHERE p.team.teamId      = :teamId
+          AND p.participantStatus = :status
+          AND p.user.userId       <> p.team.user.userId
+    """)
+    long countApprovedExcludingHost(
+        @Param("teamId") Long teamId,
+        @Param("status") ParticipantStatus status
+    );
+
 }
