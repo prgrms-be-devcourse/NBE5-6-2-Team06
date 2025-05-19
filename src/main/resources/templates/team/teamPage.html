@@ -338,6 +338,10 @@
     <a th:href="@{/user/logout}">로그아웃</a>
   </nav>
 </header>
+<h1 th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'"
+    style="font-size: 2rem; font-weight: 700; text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: #333;">
+  "모임 이름" 모임입니다 👥
+</h1>
 <div class="container">
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -871,8 +875,11 @@
                 <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
                 <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
                 <p><strong>📝 소개:</strong> ${dbItem.description}</p>
-                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url
-          || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
+                <p style="margin-top: 1rem;">
+  <strong>🔗 URL:</strong>
+  <a href="https://map.kakao.com/?q=${encodeURIComponent(dbItem.restaurantName)}"
+     target="_blank" style="color: blue;">바로가기</a>
+</p>
               </div>
             `;
           wrapper.appendChild(card);
