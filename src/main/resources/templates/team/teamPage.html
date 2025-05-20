@@ -784,13 +784,24 @@
       }
       return response.json();
     })
-    .then(data => {
+    .then(result => {
       const chatBox = document.getElementById('chat-box');
       chatBox.innerHTML = ''; // 기존 내용 초기화
 
+      const messages = result.data;
+
+      if (!Array.isArray(messages)) {
+        console.error("채팅 이력이 배열이 아닙니다:", messages);
+        return;
+      }
+
       // 채팅 메시지 표시
-      data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
+      messages.forEach(message => {
+        showMessage(
+            `[${message.time}] ${message.senderNickname}: ${message.message}`,
+            message.senderId,
+            message.chatId
+        );
       });
     })
     .catch(error => {
