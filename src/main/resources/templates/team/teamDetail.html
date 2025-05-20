@@ -27,6 +27,7 @@
       display: inline-flex;
       align-items: center;
       margin-left: 10px;
+      height: 40px;
     }
     .report-btn i {
       margin-right: 5px;
@@ -143,6 +144,7 @@
 <div class="container">
   <div class="main">
     <div class="card">
+      <div style="display: flex; justify-content: space-between;">
       <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
@@ -150,6 +152,7 @@
       <button id="reportBtn" class="report-btn">
         <i class="bi bi-flag"></i> 신고하기
       </button>
+      </div>
       <p>
         📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.teamDate, 'a h시 m분')}">오후 7시</span> |
@@ -162,7 +165,8 @@
       </div>
       <div class="info-section">
         <h3>장소 정보</h3>
-        <p th:text="${team.restaurantName} + '<br>' + ${team.restaurantName}">맛남 강남점 식당<br>서울 강남구 테헤란로 123</p>
+        <p><strong>🍽 식당:</strong> <span th:text="${team.restaurantName}">스위트 하우스</span></p>
+        <p><strong>📍 주소:</strong> <span th:text="${team.restaurantAddress}">서울 특별시 맛길로 331</span></p>
         <div class="map-placeholder">지도가 표시될 영역</div>
       </div>
     </div>
