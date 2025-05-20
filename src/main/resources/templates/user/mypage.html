@@ -642,7 +642,8 @@
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <hr>
 
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+          <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                   th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
             모임 수정
@@ -703,7 +704,8 @@
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <hr>
 
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+          <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                   th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
             모임 수정
