@@ -269,7 +269,11 @@
         console.log('응답 데이터:', result);
 
         if (response.ok) {
-          redirectWithSessionToast('/', '로그인에 성공했습니다!', 'success');
+          if (auth.getUserInfo().role === 'ROLE_ADMIN') {
+            redirectWithSessionToast('/admin', '로그인에 성공했습니다!', 'success');
+          } else {
+            redirectWithSessionToast('/', '로그인에 성공했습니다!', 'success');
+          }
         } else {
           if (result.data) {
             if (typeof result.data === 'string') {
