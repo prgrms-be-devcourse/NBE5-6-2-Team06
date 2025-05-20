@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>맛남 | 팀 페이지</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -873,7 +876,7 @@
     reportModal.style.display = 'none';
   }
 
-  function showToast(message, type = '') {
+  function showToastTeamPage(message, type = '') {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = 'toast ' + type;
@@ -944,14 +947,14 @@
       .then(data => {
         if (data.code === 'SUCCESS' || data.code === '0000') {
           closeReportModal();
-          showToast('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
+          showToastTeamPage('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
         } else {
-          showToast('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
+          showToastTeamPage('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        showToast('신고 처리 중 오류가 발생했습니다.', 'error');
+        showToastTeamPage('신고 처리 중 오류가 발생했습니다.', 'error');
       });
     });
   });
@@ -990,7 +993,7 @@
 
       if (!data || !Array.isArray(data.restaurants)) {
         console.error("❌ 잘못된 응답 형식 (data.restaurants 없음):", data);
-        showToast("추천 결과를 불러올 수 없습니다.", "error");
+        showToastTeamPage("추천 결과를 불러올 수 없습니다.", "error");
         loading.style.display = "none";
         return;
       }

@@ -20,20 +20,21 @@
          data-tab="restaurant-stats">식당 통계</a>
     </div>
 
-    <div class="tab-content" id="user-stats" th:classappend="${activeTab == 'user-stats'} ? 'active'"
+    <div class="tab-content" id="user-stats"
+         th:classappend="${activeTab == 'user-stats'} ? 'active'"
          th:if="${activeTab == 'user-stats'}">
-<!--      <div class="filter-container">-->
-<!--        <div class="date-filter">-->
-<!--          <label>기간:</label>-->
-<!--          <select id="period-filter">-->
-<!--            <option value="7days">최근 7일</option>-->
-<!--            <option value="30days">최근 30일</option>-->
-<!--            <option value="90days">최근 90일</option>-->
-<!--            <option value="1year">최근 1년</option>-->
-<!--            <option value="custom">직접 설정</option>-->
-<!--          </select>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="filter-container">-->
+      <!--        <div class="date-filter">-->
+      <!--          <label>기간:</label>-->
+      <!--          <select id="period-filter">-->
+      <!--            <option value="7days">최근 7일</option>-->
+      <!--            <option value="30days">최근 30일</option>-->
+      <!--            <option value="90days">최근 90일</option>-->
+      <!--            <option value="1year">최근 1년</option>-->
+      <!--            <option value="custom">직접 설정</option>-->
+      <!--          </select>-->
+      <!--        </div>-->
+      <!--      </div>-->
 
       <div class="stats-grid">
         <div class="chart-container">
@@ -97,19 +98,20 @@
       </div>
     </div>
 
-    <div class="tab-content" id="team-stats" th:classappend="${activeTab == 'team-stats'} ? 'active'"
+    <div class="tab-content" id="team-stats"
+         th:classappend="${activeTab == 'team-stats'} ? 'active'"
          th:if="${activeTab == 'team-stats'}">
-<!--      <div class="filter-container">-->
-<!--        <div class="date-filter">-->
-<!--          <label>기간:</label>-->
-<!--          <select id="success-period-filter">-->
-<!--            <option value="30days">최근 30일</option>-->
-<!--            <option value="90days">최근 90일</option>-->
-<!--            <option value="1year">최근 1년</option>-->
-<!--            <option value="custom">직접 설정</option>-->
-<!--          </select>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="filter-container">-->
+      <!--        <div class="date-filter">-->
+      <!--          <label>기간:</label>-->
+      <!--          <select id="success-period-filter">-->
+      <!--            <option value="30days">최근 30일</option>-->
+      <!--            <option value="90days">최근 90일</option>-->
+      <!--            <option value="1year">최근 1년</option>-->
+      <!--            <option value="custom">직접 설정</option>-->
+      <!--          </select>-->
+      <!--        </div>-->
+      <!--      </div>-->
 
       <div class="stats-grid">
         <div class="chart-container">
@@ -152,7 +154,8 @@
         </table>
       </div>
     </div>
-    <div class="tab-content" id="restaurant-stats" th:classappend="${activeTab == 'restaurant-stats'} ? 'active'"
+    <div class="tab-content" id="restaurant-stats"
+         th:classappend="${activeTab == 'restaurant-stats'} ? 'active'"
          th:if="${activeTab == 'restaurant-stats'}">
       <div class="stats-grid">
         <div class="chart-container">

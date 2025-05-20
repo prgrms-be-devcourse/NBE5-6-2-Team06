@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>맛남 | 마이페이지</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -642,7 +645,8 @@
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <hr>
 
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+          <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                   th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
             모임 수정
@@ -703,7 +707,8 @@
           <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
           <hr>
 
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
+          <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                   th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
             모임 수정

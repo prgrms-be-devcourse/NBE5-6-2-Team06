@@ -291,12 +291,12 @@ public class TeamService {
         for (Participant participant : participants) {
             if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
                 notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
-                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!",
-                    null);
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
                     NotificationType.REVIEW_REQUEST,
                     "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!",
                     "/team/" + team.getTeamId() + "/reviews");
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!",
+                    null);
             }
         }
     }
@@ -376,18 +376,18 @@ public class TeamService {
     public NewTeamResponse getNewTeamStats() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        long newTeams = teamRepository.countByCreatedAtBetween(today.atStartOfDay(),
+        long newTeams = teamRepository.countByCreatedAtBetweenAndActivatedTrue(today.atStartOfDay(),
             today.plusDays(1).atStartOfDay());
-        long totalTeamCount = teamRepository.count();
+        long totalTeamCount = teamRepository.countByActivatedTrue();
         long yesterdayTotalTeamCount = totalTeamCount - newTeams;
-        String userGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
-        return new NewTeamResponse(newTeams, userGrowth);
+        String teamGrowth = calculateGrowthRate(totalTeamCount, yesterdayTotalTeamCount);
+        return new NewTeamResponse(newTeams, teamGrowth);
     }
 
     public ActiveTeamResponse getActiveTeamStats() {
 
         List<Status> activeStatuses = List.of(Status.RECRUITING, Status.FULL);
-        long todayActiveTeams = teamRepository.countByStatusIn(activeStatuses);
+        long todayActiveTeams = teamRepository.countByStatusInAndActivatedTrue(activeStatuses);
         long totalTeamCount = teamRepository.countAllByActivated(true);
 
         return new ActiveTeamResponse(todayActiveTeams, totalTeamCount);
@@ -507,20 +507,20 @@ public class TeamService {
 
     public Map<String, Long> getTeamParticipantDistribution() {
         Map<String, Long> distribution = new HashMap<>();
-        distribution.put("2-3명", teamRepository.countByNowPeopleBetween(2, 3));
-        distribution.put("4-5명", teamRepository.countByNowPeopleBetween(4, 5));
-        distribution.put("6-7명", teamRepository.countByNowPeopleBetween(6, 7));
-        distribution.put("8-10명", teamRepository.countByNowPeopleBetween(8, 10));
+        distribution.put("2-3명", teamRepository.countByNowPeopleBetweenAndActivatedTrue(2, 3));
+        distribution.put("4-5명", teamRepository.countByNowPeopleBetweenAndActivatedTrue(4, 5));
+        distribution.put("6-7명", teamRepository.countByNowPeopleBetweenAndActivatedTrue(6, 7));
+        distribution.put("8-10명", teamRepository.countByNowPeopleBetweenAndActivatedTrue(8, 10));
         return distribution;
     }
 
     public Map<String, Long> getDailyNewTeamCountsLast7Days() {
         LocalDate today = LocalDate.now();
-        Map<LocalDate, Long> dailyCounts = IntStream.rangeClosed(0, 6)
+        Map<LocalDate, Long> dailyCounts = IntStream.iterate(6, i -> i - 1).limit(7)
             .mapToObj(today::minusDays)
             .collect(Collectors.toMap(
                 date -> date,
-                date -> teamRepository.countByCreatedAtBetween(
+                date -> teamRepository.countByCreatedAtBetweenAndActivatedTrue(
                     LocalDateTime.of(date, LocalTime.MIN),
                     LocalDateTime.of(date, LocalTime.MAX)
                 ),
@@ -539,13 +539,12 @@ public class TeamService {
 
     public TeamStatsResponse getTeamStatistics() {
         TeamStatsResponse statsDto = new TeamStatsResponse();
-        statsDto.setTotalTeams(teamRepository.count());
+        statsDto.setTotalTeams(teamRepository.countByActivatedTrue());
         statsDto.setActiveTeams(
-            teamRepository.countByStatus(Status.RECRUITING) + teamRepository.countByStatus(
-                Status.FULL));
-        statsDto.setCompletedTeams(teamRepository.countByStatus(Status.COMPLETED));
+            teamRepository.countByStatusInAndActivatedTrue(List.of(Status.FULL, Status.RECRUITING)));
+        statsDto.setCompletedTeams(teamRepository.countByStatusInAndActivatedTrue(List.of(Status.COMPLETED)));
         statsDto.setNewTeamsLast30Days(
-            teamRepository.countByCreatedAtAfter(LocalDateTime.now().minusDays(30)));
+            teamRepository.countByCreatedAtAfterAndActivatedTrue(LocalDateTime.now().minusDays(30)));
         Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
         statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
         return statsDto;

@@ -5,10 +5,7 @@ import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
 import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.notification.entity.Notice;
-import com.grepp.matnam.app.model.notification.entity.Notification;
-import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import com.grepp.matnam.app.model.notification.service.NotificationService;
-import com.grepp.matnam.app.model.sse.SseService;
 import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
@@ -220,7 +217,7 @@ public class UserService {
     public TotalUserResponse getTotalUserStats() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
-        long totalUsers = userRepository.count(); // 현재 전체 회원 수
+        long totalUsers = userRepository.count(); // 현재 전체 회원 수, 탈퇴 회원 포함
         long yesterdayUserCount = userRepository.countByCreatedAtBefore(LocalDateTime.of(today, LocalTime.MIDNIGHT));
         String userGrowth = calculateGrowthRate(totalUsers, yesterdayUserCount);
         return new TotalUserResponse(totalUsers, userGrowth);

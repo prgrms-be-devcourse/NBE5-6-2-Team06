@@ -227,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
@@ -336,6 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
@@ -386,6 +388,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
@@ -453,6 +456,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
@@ -527,6 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           scales: {
             y: {
               beginAtZero: true,
@@ -577,6 +582,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }]
         },
         options: {
+          responsive: true,
           indexAxis: 'y',
           scales: {
             x: {
