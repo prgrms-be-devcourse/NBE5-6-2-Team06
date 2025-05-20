@@ -49,7 +49,7 @@ public class AdminTeamApiController {
     }
 
     @PatchMapping("/{teamId}")
-    @Operation(summary = "모임 상세 변경", description = "특정 모임 상태를 변경합니다.")
+    @Operation(summary = "모임 상태 변경", description = "특정 모임 상태를 변경합니다.")
     public ResponseEntity<?> updateTeamStatus(@PathVariable Long teamId, @RequestBody TeamStatusUpdateRequest teamStatusUpdateRequest) {
         teamService.updateTeamStatus(teamId, teamStatusUpdateRequest);
         return ResponseEntity.ok("모임 상태가 변경되었습니다.");
