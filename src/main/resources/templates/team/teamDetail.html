@@ -5,23 +5,78 @@
   <title th:text="${team.teamTitle} + ' | 맛남'">강남 맛집 탐방 모임 | 맛남</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
-    body { font-family: 'Noto Sans KR', sans-serif; margin: 0; padding: 0; background: #fff; color: #333; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: #333;
+    }
 
-    .container { display: flex; max-width: 1200px; margin: 2rem auto; }
-    .main { flex: 3; margin-right: 2rem; }
-    .sidebar { flex: 1; border-left: 1px solid #eee; padding-left: 1rem; }
-    .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-    button { background: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
-    .info-section { margin-bottom: 2rem; }
+    .container {
+      display: flex;
+      max-width: 1200px;
+      margin: 2rem auto;
+    }
+
+    .main {
+      flex: 3;
+      margin-right: 2rem;
+    }
+
+    .sidebar {
+      flex: 1;
+      border-left: 1px solid #eee;
+      padding-left: 1rem;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+    }
+
+    button {
+      background: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .info-section {
+      margin-bottom: 2rem;
+    }
+
     .info-item {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
-    .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
-    footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
-    button:disabled {color: black !important;cursor: not-allowed; }
+
+    .map-placeholder {
+      background: #f4f4f4;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      border-top: 1px solid #eee;
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    button:disabled {
+      color: black !important;
+      cursor: not-allowed;
+    }
+
     .report-btn {
       background-color: #ff5c5c;
       color: white;
@@ -30,14 +85,28 @@
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
+      /*display: inline-flex;*/
+      /*align-items: center;*/
       margin-left: 10px;
       height: 40px;
     }
+
     .report-btn i {
       margin-right: 5px;
     }
+
+    .team-page-btn {
+      background-color: #4a6cf7;;
+      color: white;
+      padding: 0.5rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-left: 10px;
+      height: 40px;
+    }
+
     .modal {
       display: none;
       position: fixed;
@@ -46,8 +115,9 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
+
     .modal-content {
       background-color: #fff;
       margin: 15% auto;
@@ -55,48 +125,58 @@
       border-radius: 8px;
       width: 400px;
       max-width: 90%;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
+
     .modal-title {
       margin-bottom: 1rem;
       font-weight: 500;
     }
+
     .modal-body {
       margin-bottom: 1.5rem;
     }
+
     .modal-footer {
       display: flex;
       justify-content: flex-end;
       gap: 0.5rem;
     }
+
     .modal-footer button {
       padding: 0.7rem 1rem;
       border-radius: 4px;
       cursor: pointer;
       font-weight: 500;
     }
+
     .modal-footer .cancel {
       background-color: #f5f5f5;
       border: 1px solid #ddd;
       color: #333;
     }
+
     .modal-footer .submit {
       background-color: #ff5c5c;
       color: #fff;
       border: none;
     }
+
     .modal-footer .submit:disabled {
       background-color: #ffadad;
       cursor: not-allowed;
     }
+
     .form-group {
       margin-bottom: 1.5rem;
     }
+
     .form-group label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
     }
+
     .form-group textarea {
       width: 100%;
       padding: 0.7rem;
@@ -106,11 +186,13 @@
       min-height: 120px;
       font-family: inherit;
     }
+
     .form-group textarea:focus {
       outline: none;
       border-color: #ff5c5c;
       box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.1);
     }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -126,23 +208,65 @@
       opacity: 0;
       transition: all 0.3s ease;
     }
+
     .toast.show {
       transform: translateY(0);
       opacity: 1;
     }
+
     .toast.success {
       background-color: #4CAF50;
     }
+
     .toast.error {
       background-color: #f44336;
     }
+
     /* 알림 스타일 */
-    #notificationArea { position: fixed; top: 20px; right: 20px; z-index: 1000; display: none; }
-    .notification-card { background-color: #f9f9f9; border: 1px solid #ccc; padding: 15px; border-radius: 5px; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); text-align: center; }
-    #notificationButton { margin-top: 10px; padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+    #notificationArea {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .notification-card {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    #notificationButton {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .status-badge {
+      display: inline-block;
+      background-color: #eee;
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .status-badge.active {
+      background-color: #000;
+      color: #fff;
+    }
   </style>
   <link rel="stylesheet" th:href="@{/css/notification.css}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
@@ -151,16 +275,20 @@
   <div class="main">
     <div class="card">
       <div style="display: flex; justify-content: space-between;">
-      <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
-      <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'COMPLETED'}">종료된 모임</span>
-      <button id="reportBtn" class="report-btn" th:unless="${isAnonymous}">
-        <i class="bi bi-flag"></i> 신고하기
-      </button>
+        <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
+        <div style="min-width: 180px; display: flex; justify-content: flex-end;">
+          <button class="team-page-btn" th:unless="${isAnonymous or !isParticipant}"
+                  th:onclick="|window.location.href='/team/page/${team.teamId}'|">
+            팀 페이지
+          </button>
+          <button id="reportBtn" class="report-btn" th:unless="${isAnonymous}">
+            <i class="bi bi-flag"></i> 신고하기
+          </button>
+        </div>
       </div>
       <p>
-        📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
+        📅 <span
+          th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.teamDate, 'a h시 m분')}">오후 7시</span> |
         📍 <span th:text="${team.restaurantName}">서울 강남구 테헤란로 123</span> |
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
@@ -172,19 +300,29 @@
       <div class="info-section">
         <h3>장소 정보</h3>
         <p><strong>🍽 식당:</strong> <span th:text="${team.restaurantName}">스위트 하우스</span></p>
-        <p><strong>📍 주소:</strong> <span th:text="${team.restaurantAddress}">서울 특별시 맛길로 331</span></p>
+        <p><strong>📍 주소:</strong> <span th:text="${team.restaurantAddress}">서울 특별시 맛길로 331</span>
+        </p>
         <div class="map-placeholder">지도가 표시될 영역</div>
       </div>
     </div>
   </div>
   <div class="sidebar">
     <div class="card">
-      <h4>모임 참여하기</h4>
+      <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between">
+        <h4>모임 참여하기</h4>
+        <span class="status-badge"
+              th:if="${team.status.name() == 'RECRUITING'}">모집 중</span>
+        <span class="status-badge" th:if="${team.status.name() == 'FULL'}">모집 마감</span>
+        <span class="status-badge"
+              th:if="${team.status.name() == 'COMPLETED'}">종료된 모임</span>
+        <span class="status-badge"
+              th:if="${team.status.name() == 'CANCELED'}">취소된 모임</span>
+      </div>
       <p>
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
       <button type="button" id="applyButton"
-              th:unless="${isAnonymous}"
+              th:unless="${isAnonymous or team.status.name() != 'RECRUITING'}"
               th:data-team-id="${team.teamId}"
               th:data-user-id="${#authentication.name}"
               th:disabled="${isParticipant or alreadyApplied}"
@@ -211,16 +349,22 @@
 
               <!-- 버튼 영역 전체를 한 번에 조건처리 -->
               <div th:if="${isLeader}">
-                <form th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display:inline-block;">
+                <form
+                    th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}"
+                    method="post" style="display:inline-block;">
                   <button type="submit" class="approve-button"
                           th:data-team-id="${team.teamId}"
-                          th:data-participant-id="${participant.participantId}">수락</button>
+                          th:data-participant-id="${participant.participantId}">수락
+                  </button>
                 </form>
 
-                <form th:action="@{/api/team/{teamId}/reject/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display:inline-block;">
+                <form
+                    th:action="@{/api/team/{teamId}/reject/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}"
+                    method="post" style="display:inline-block;">
                   <button type="submit" class="reject-button"
                           th:data-team-id="${team.teamId}"
-                          th:data-participant-id="${participant.participantId}">거절</button>
+                          th:data-participant-id="${participant.participantId}">거절
+                  </button>
                 </form>
               </div>
             </div>
@@ -245,7 +389,8 @@
             <span>탈퇴한 사용자</span>
           </div>
         </div>
-        <div class="participant" th:if="${#lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'APPROVED' and role != null and #strings.toString(role) == 'MEMBER']) and #lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'PENDING'])}">
+        <div class="participant"
+             th:if="${#lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'APPROVED' and role != null and #strings.toString(role) == 'MEMBER']) and #lists.isEmpty(team.participants.?[participantStatus != null and #strings.toString(participantStatus) == 'PENDING'])}">
           <span>현재 참여자가 없습니다.</span>
         </div>
       </div>
@@ -292,9 +437,9 @@
 </footer>
 
 <script th:inline="javascript">
-  $(document).ready(function() {
+  $(document).ready(function () {
     // 모임 참여 신청
-    $('#applyButton').click(function() {
+    $('#applyButton').click(function () {
       var teamId = $(this).data('team-id');
       var userId = $(this).data('user-id');
 
@@ -302,22 +447,22 @@
         type: 'POST',
         url: '/api/team/' + teamId + '/apply/' + userId,
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
           $('#notificationMessage').text(response.message);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
             location.reload();
           });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           var errorMessage = "참여 신청에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage += " (" + xhr.responseJSON.message + ")";
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
           });
         }
@@ -325,7 +470,7 @@
     });
 
     // 참여자 승인 처리
-    $('.approve-button').click(function(event) {
+    $('.approve-button').click(function (event) {
       event.preventDefault(); // 기본 폼 제출 막기
       var teamId = $(this).data('team-id');
       var participantId = $(this).data('participant-id');
@@ -336,22 +481,22 @@
         type: 'POST',
         url: url,
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
           $('#notificationMessage').text(response.message);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
             location.reload();
           });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           var errorMessage = "승인 처리에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage += " (" + xhr.responseJSON.message + ")";
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
           });
         }
@@ -359,7 +504,7 @@
     });
 
     // 참여자 거절 처리
-    $('.reject-button').click(function(event) {
+    $('.reject-button').click(function (event) {
       event.preventDefault();
       var teamId = $(this).data('team-id');
       var participantId = $(this).data('participant-id');
@@ -372,22 +517,22 @@
         data: JSON.stringify({teamId: teamId, participantId: participantId}),
         contentType: 'application/json',
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
           $('#notificationMessage').text(response.message);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
             location.reload();
           });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           var errorMessage = "거절 처리에 실패했습니다.";
           if (xhr.responseJSON && xhr.responseJSON.message) {
             errorMessage += " (" + xhr.responseJSON.message + ")";
           }
           $('#notificationMessage').text(errorMessage);
           $('#notificationArea').fadeIn();
-          $('#notificationButton').click(function() {
+          $('#notificationButton').click(function () {
             $('#notificationArea').fadeOut();
           });
         }
@@ -395,30 +540,30 @@
     });
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('reportModal');
     const reportBtn = document.getElementById('reportBtn');
     const reasonTextarea = document.getElementById('reason');
     const submitBtn = document.getElementById('submitReport');
     const toast = document.getElementById('toast');
 
-    reportBtn.addEventListener('click', function() {
+    reportBtn.addEventListener('click', function () {
       modal.style.display = 'block';
     });
 
-    window.closeReportModal = function() {
+    window.closeReportModal = function () {
       modal.style.display = 'none';
       reasonTextarea.value = '';
       submitBtn.disabled = true;
     };
 
-    window.addEventListener('click', function(event) {
+    window.addEventListener('click', function (event) {
       if (event.target === modal) {
         closeReportModal();
       }
     });
 
-    reasonTextarea.addEventListener('input', function() {
+    reasonTextarea.addEventListener('input', function () {
       submitBtn.disabled = this.value.trim().length < 5;
     });
 
@@ -435,7 +580,7 @@
       }, 3000);
     }
 
-    submitBtn.addEventListener('click', function() {
+    submitBtn.addEventListener('click', function () {
       if (reasonTextarea.value.trim().length < 5) {
         reasonTextarea.focus();
         return;
@@ -461,19 +606,19 @@
         },
         body: JSON.stringify(reportData)
       })
-              .then(response => response.json())
-              .then(data => {
-                if (data.code === 'SUCCESS' || data.code === '0000') {
-                  closeReportModal();
-                  showToast('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
-                } else {
-                  showToast('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-                showToast('신고 처리 중 오류가 발생했습니다.', 'error');
-              });
+      .then(response => response.json())
+      .then(data => {
+        if (data.code === 'SUCCESS' || data.code === '0000') {
+          closeReportModal();
+          showToast('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
+        } else {
+          showToast('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('신고 처리 중 오류가 발생했습니다.', 'error');
+      });
     });
   });
 </script>
