@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             fetch(`/api/admin/user/report/${reportId}`, {
-                method: 'DELETE',
+                method: 'PATCH',
             })
             .then(response => {
                 if (response.ok) {

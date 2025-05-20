@@ -112,10 +112,28 @@ public class TeamController {
     @Operation(summary = "특정 모임 정보 조회 (REST API)", description = "주어진 ID의 모임 정보를 REST API로 조회")
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserById(userId);
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
+
+        // approved 상태인 참가자들만 가져와서 리스트로 변환 - 뷰로 사용
+        List<Participant> approvedParticipants = team.getParticipants().stream()
+            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
+            .toList();
+        model.addAttribute("participants", approvedParticipants);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAnonymous = authentication.getPrincipal().equals("anonymousUser");
+
+        if (isAnonymous) {
+            model.addAttribute("isLeader", false);
+            model.addAttribute("isParticipant", false);
+            model.addAttribute("alreadyApplied", false);
+            model.addAttribute("isAnonymous", true);
+            return "team/teamDetail";
+        }
+
+        String userId = authentication.getName();
+        User user = userService.getUserById(userId);
 
         boolean isLeader = team.getUser().getUserId().equals(userId);
         model.addAttribute("isLeader", isLeader);
@@ -127,15 +145,11 @@ public class TeamController {
         boolean alreadyApplied = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
             userId, teamId, ParticipantStatus.PENDING);
 
-        // approved 상태인 참가자들만 가져와서 리스트로 변환 - 뷰로 사용
-        List<Participant> approvedParticipants = team.getParticipants().stream()
-            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
-            .toList();
-        model.addAttribute("participants", approvedParticipants);
 
         model.addAttribute("isParticipant", isParticipant);
         model.addAttribute("alreadyApplied", alreadyApplied);
         model.addAttribute("user", user);
+        model.addAttribute("isAnonymous", false);
 
         return "team/teamDetail";
     }

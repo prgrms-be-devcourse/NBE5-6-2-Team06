@@ -1,5 +1,4 @@
 * {
-  margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: 'Noto Sans KR', sans-serif;
@@ -37,7 +36,6 @@ nav a {
   border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
-  border: none;
 }
 .btn-primary {
   background-color: #000;
@@ -82,9 +80,9 @@ nav a {
   max-width: 400px;
   margin: 0 auto;
 }
-.meetings-section {
-  padding: 2rem;
-}
+/*.meetings-section {*/
+/*  padding: 2rem;*/
+/*}*/
 .meetings-section h2 {
   font-size: 1.4rem;
   margin-bottom: 0.5rem;
@@ -149,10 +147,12 @@ nav a {
   font-size: 0.9rem;
 }
 footer {
+  text-align: center;
   padding: 1rem 2rem;
   font-size: 0.8rem;
   color: #999;
   border-top: 1px solid #eee;
+  background-color: #fff;
 }
 .ranking-section {
   padding: 2rem;

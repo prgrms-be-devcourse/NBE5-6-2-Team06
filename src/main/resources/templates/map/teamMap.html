@@ -12,55 +12,6 @@
       color: #333;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
-      background-color: #fff;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .header-left .logo {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-
-    .header-left nav a {
-      text-decoration: none;
-      color: #333;
-      margin-right: 1rem;
-      font-weight: 500;
-    }
-
-    .header-left nav a:hover,
-    .header-left nav a.active {
-      color: #000;
-    }
-
-    .header-left nav a.active {
-      border-bottom: 2px solid #000;
-      padding-bottom: 3px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-right span {
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
     h1 {
       padding: 2rem 2rem 0.2rem 2rem;
       margin: 0;
@@ -149,24 +100,12 @@
       background-color: #fff;
     }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/search}">모임 찾기</a>
-      <a th:href="@{/map}">맛집 탐색</a>
-      <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    </nav>
-  </div>
-  <div class="header-right">
-    <span title="알림">🔔</span>
-    <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <h1>🌐 모임 참여자 맛집 지도</h1>
 <h4>서로의 맛집을 공유하고 추천해보세요!</h4>
@@ -351,5 +290,8 @@
           })
           .catch(err => console.error("지도 데이터 로드 실패:", err));
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

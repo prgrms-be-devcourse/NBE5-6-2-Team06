@@ -172,7 +172,7 @@ class NotificationHandler {
             ${this.getNotificationIcon(notification.type)}
         </div>
         <div class="notification-content">
-            <p class="notification-text">${notification.message}</p>
+            <p class="notification-text" title="${notification.message}">${notification.message}</p>
             <span class="notification-time">${this.formatTimeAgo(notification.createdAt)}</span>
         </div>
         <div class="notification-actions">

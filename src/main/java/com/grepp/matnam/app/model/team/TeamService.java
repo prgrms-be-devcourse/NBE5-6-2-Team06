@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.controller.api.admin.payload.TeamStatusUpdateRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
@@ -341,13 +342,17 @@ public class TeamService {
     }
 
     @Transactional
-    public void updateTeamStatus(Long teamId, Status status) {
+    public void updateTeamStatus(Long teamId, TeamStatusUpdateRequest teamStatusUpdateRequest) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
             .orElseThrow(() -> new EntityNotFoundException("팀을 찾을 수 없습니다."));
-        team.setStatus(status);
+        team.setStatus(teamStatusUpdateRequest.getStatus());
 
         List<ParticipantWithUserIdDto> participants = teamRepository.findAllDtoByTeamId(teamId);
         for (ParticipantWithUserIdDto dto : participants) {
+            if (!teamStatusUpdateRequest.getReason().isBlank()) {
+                notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS,
+                    "["+ team.getTeamTitle() + "] 상태 변경 사유 : " + teamStatusUpdateRequest.getReason(), null);
+            }
             notificationSender.sendNotificationToUser(dto.getUserId(), NotificationType.TEAM_STATUS,
                 "관리자에 의해 [" + team.getTeamTitle() + "] 모임의 상태가 [" + team.getStatus().getKoreanName()
                     + "](으)로 변경되었습니다.", "/team/page/" + teamId);
@@ -495,7 +500,6 @@ public class TeamService {
                 map(Map.Entry::getKey).
                 toList();
 
-            System.out.println(topKeywords);
             return topKeywords;
 
         }

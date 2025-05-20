@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   viewButtons.forEach(button => {
     button.addEventListener('click', function () {
       const teamId = this.getAttribute('data-id');
+      document.getElementById('view-team-id').value = teamId;
 
       fetch(`/api/admin/team/${teamId}`)
       .then(response => {
@@ -31,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(
             'team-description-text').textContent = result.teamDetails;
         document.getElementById('team-image').src = result.imageUrl;
+        document.getElementById('team-address').textContent = result.address;
+        document.getElementById('team-category').textContent = result.category;
 
       });
 
@@ -86,6 +89,19 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  const detailBtn = document.querySelector('#teamViewModal .detail-btn');
+  if (detailBtn) {
+    detailBtn.addEventListener('click', function () {
+      const teamId = document.getElementById('view-team-id').value;
+
+      if (teamId) {
+        window.open(`/team/detail/${teamId}`, '_blank');
+      } else {
+        alert('팀 ID가 없습니다.');
+      }
+    });
+  }
+
   // 모임 상태 변경 버튼 클릭 이벤트
   const editStatusBtn = document.querySelectorAll('.action-btn.edit');
   editStatusBtn.forEach(button => {
@@ -134,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
       // 선택한 상태 가져오기
       const statusSelect = document.getElementById('team-status-select');
       const selectedStatus = statusSelect.value;
+      const changeReason = document.getElementById('status-change-reason').value;
       const statusText = statusSelect.options[statusSelect.selectedIndex].text;
 
       if (prevTeamStatus === selectedStatus) {
@@ -146,7 +163,10 @@ document.addEventListener('DOMContentLoaded', function () {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(selectedStatus)
+        body: JSON.stringify({
+          status: selectedStatus,
+          reason: changeReason
+        })
       }).then(response => {
         if (response.ok) {
           response.text().then(text => { alert(text)});

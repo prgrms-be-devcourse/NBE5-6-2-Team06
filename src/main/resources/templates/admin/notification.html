@@ -38,7 +38,7 @@
                     <tr th:each="notice, iterStat : ${page.content()}">
                         <td th:text="${iterStat.count + (5 * (page.currentNumber()-1))}"></td>
                         <td th:text="${notice.message}"></td>
-                        <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}">2023-06-25 10:30</td>
+                        <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                         <td>
                             <button class="action-btn send" th:data-id="${notice.id}"><i class="fas fa-paper-plane"></i></button>
                             <button class="action-btn delete" th:data-id="${notice.id}"><i class="fas fa-trash"></i></button>

@@ -11,11 +11,11 @@
     .main { flex: 3; margin-right: 2rem; }
     .sidebar { flex: 1; border-left: 1px solid #eee; padding-left: 1rem; }
     .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
-    button { background: black; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    button { background: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
     .info-section { margin-bottom: 2rem; }
     .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
     footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
-    button:disabled { background: #6c757d; cursor: not-allowed; }
+    button:disabled {color: black !important;cursor: not-allowed; }
     .report-btn {
       background-color: #ff5c5c;
       color: white;
@@ -27,6 +27,7 @@
       display: inline-flex;
       align-items: center;
       margin-left: 10px;
+      height: 40px;
     }
     .report-btn i {
       margin-right: 5px;
@@ -143,13 +144,15 @@
 <div class="container">
   <div class="main">
     <div class="card">
+      <div style="display: flex; justify-content: space-between;">
       <h2 th:text="${team.teamTitle} + ' '">강남 맛집 탐방 모임 </h2>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'COMPLETED'}">종료된 모임</span>
-      <button id="reportBtn" class="report-btn">
+      <button id="reportBtn" class="report-btn" th:unless="${isAnonymous}">
         <i class="bi bi-flag"></i> 신고하기
       </button>
+      </div>
       <p>
         📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 M월 d일 (E)')}">2023년 6월 10일 (토)</span> |
         🕖 <span th:text="${#temporals.format(team.teamDate, 'a h시 m분')}">오후 7시</span> |
@@ -162,7 +165,8 @@
       </div>
       <div class="info-section">
         <h3>장소 정보</h3>
-        <p th:text="${team.restaurantName} + '<br>' + ${team.restaurantName}">맛남 강남점 식당<br>서울 강남구 테헤란로 123</p>
+        <p><strong>🍽 식당:</strong> <span th:text="${team.restaurantName}">스위트 하우스</span></p>
+        <p><strong>📍 주소:</strong> <span th:text="${team.restaurantAddress}">서울 특별시 맛길로 331</span></p>
         <div class="map-placeholder">지도가 표시될 영역</div>
       </div>
     </div>
@@ -174,6 +178,7 @@
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
       <button type="button" id="applyButton"
+              th:unless="${isAnonymous}"
               th:data-team-id="${team.teamId}"
               th:data-user-id="${#authentication.name}"
               th:disabled="${isParticipant or alreadyApplied}"
@@ -254,7 +259,7 @@
   </div>
 </div>
 
-<div id="reportModal" class="modal">
+<div id="reportModal" class="modal" th:unless="${isAnonymous}">
   <div class="modal-content">
     <h3 class="modal-title">모임 신고하기</h3>
     <div class="modal-body">
