@@ -291,12 +291,12 @@ public class TeamService {
         for (Participant participant : participants) {
             if (participant.getParticipantStatus() == ParticipantStatus.APPROVED) {
                 notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
-                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!",
-                    null);
-                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
                     NotificationType.REVIEW_REQUEST,
                     "[" + team.getTeamTitle() + "] 모임의 리뷰를 작성해주세요!",
                     "/team/" + team.getTeamId() + "/reviews");
+                notificationSender.sendNotificationToUser(participant.getUser().getUserId(),
+                    NotificationType.TEAM_STATUS, "[" + team.getTeamTitle() + "] 모임이 완료되었습니다!",
+                    null);
             }
         }
     }
