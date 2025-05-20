@@ -83,7 +83,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasRole("USER")
 
                         // 채팅 관련
-                        .requestMatchers("/api/chat/**").hasRole("USER")
+                        .requestMatchers("/api/chat/**").hasAnyRole("USER","ADMIN")
 
                         // 모임/팀 관련
                         .requestMatchers("/team/**", "/api/team/**").authenticated()
