@@ -7,8 +7,7 @@ const auth = {
         if (!this.isLoggedIn()) return null;
 
         return {
-            userId: this.getCookie('userId'),
-            role: this.getCookie('userRole'),
+            nickname: this.getCookie('userNickname'),
             token: this.getCookie('jwtToken')
         };
     },
