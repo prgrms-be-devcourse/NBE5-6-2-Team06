@@ -1,8 +1,10 @@
 package com.grepp.matnam.app.restaurants;
 
-import com.grepp.matnam.app.controller.api.restaurant.RestaurantApiController;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendRequest;
 import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendResponse;
-import com.grepp.matnam.infra.response.ApiResponse;
+import com.grepp.matnam.app.model.restaurant.RestaurantAiService;
+import com.grepp.matnam.app.model.team.TeamService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -14,25 +16,23 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class RecommendationTest {
 
     @Autowired
-    private RestaurantApiController restaurantApiController;
+    private RestaurantAiService restaurantAiService;
+
+    @Autowired
+    private TeamService teamService;
 
     @Test
     public void testRecommend() {
         Long teamId = 1L;
 
-        ApiResponse<RestaurantRecommendResponse> response = restaurantApiController.recommend(teamId);
+        List<String> keywords = teamService.countPreferenceKeyword(teamId);
 
-        RestaurantRecommendResponse data = response.data();
+        RestaurantRecommendRequest request = new RestaurantRecommendRequest(keywords);
+        RestaurantRecommendResponse response = restaurantAiService.RecommendRestaurant(request);
 
-        if (data != null) {
-            List<String> restaurants = data.restaurants();
-            String reason = data.reason();
-
-            log.info("식당 리스트: {}", restaurants);
-            log.info("이유: {}", reason);
-
-        } else {
-            log.warn("응답 데이터 null");
-        }
+        // null 검사
+        assertNotNull(response);
+        log.info("식당 리스트: {}", response.restaurants());
+        log.info("이유: {}", response.reason());
     }
 }
