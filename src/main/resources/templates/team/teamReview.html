@@ -12,47 +12,6 @@
             background-color: #f9f9f9;
             color: #333;
         }
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #eee;
-            background-color: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-        .header-left .logo {
-            font-size: 1.3rem;
-            font-weight: bold;
-        }
-        .header-left nav a {
-            text-decoration: none;
-            color: #333;
-            margin-right: 1rem;
-            font-weight: 500;
-        }
-        .header-left nav a:hover {
-            color: #000;
-        }
-        .header-left nav a.active {
-            color: #000;
-            border-bottom: 2px solid #000;
-            padding-bottom: 3px;
-        }
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .header-right span {
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
         .btn-primary {
             background-color: #000;
             color: white;
@@ -315,24 +274,12 @@
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
     <script th:src="@{/js/auth.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/notification.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-    <div class="header-left">
-        <div class="logo">맛남</div>
-        <nav>
-            <a th:href="@{/}">홈</a>
-            <a th:href="@{/team/list}">모임 찾기</a>
-            <a th:href="@{/map}">맛집 탐색</a>
-            <a th:href="@{/user/mypage}">마이페이지</a>
-        </nav>
-    </div>
-    <div class="header-right">
-        <span title="알림">🔔</span>
-        <span title="프로필">👤</span>
-        <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div class="container">
     <div class="main-section">
@@ -667,5 +614,7 @@
         }
     }
 </script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

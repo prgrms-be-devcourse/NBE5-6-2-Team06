@@ -149,7 +149,7 @@
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'RECRUITING'}">모집중</span>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'FULL'}">모집 완료</span>
       <span style="font-size: 0.8rem; color: gray;" th:if="${team.status == 'COMPLETED'}">종료된 모임</span>
-      <button id="reportBtn" class="report-btn">
+      <button id="reportBtn" class="report-btn" th:unless="${isAnonymous}">
         <i class="bi bi-flag"></i> 신고하기
       </button>
       </div>
@@ -178,6 +178,7 @@
         👥 <span th:text="${team.nowPeople}">4</span>/<span th:text="${team.maxPeople}">10</span>명
       </p>
       <button type="button" id="applyButton"
+              th:unless="${isAnonymous}"
               th:data-team-id="${team.teamId}"
               th:data-user-id="${#authentication.name}"
               th:disabled="${isParticipant or alreadyApplied}"
@@ -258,7 +259,7 @@
   </div>
 </div>
 
-<div id="reportModal" class="modal">
+<div id="reportModal" class="modal" th:unless="${isAnonymous}">
   <div class="modal-content">
     <h3 class="modal-title">모임 신고하기</h3>
     <div class="modal-body">

@@ -283,7 +283,7 @@
       color: #555;
     }
 
-    .badge {
+    .team_badge {
       display: inline-block;
       background-color: #f0f0f0;
       color: #333;
@@ -811,7 +811,7 @@
            th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
         <h4>
           <span th:text="${team.teamTitle}">모임 제목</span>
-          <span class="badge">완료됨</span>
+          <span class="team_badge">완료됨</span>
         </h4>
         <p>📅 <span
             th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
