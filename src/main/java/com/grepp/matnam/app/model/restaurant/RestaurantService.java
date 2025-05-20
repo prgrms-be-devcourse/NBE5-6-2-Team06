@@ -112,7 +112,7 @@ public class RestaurantService {
     public Map<String, Long> getRestaurantCategoryDistribution() {
         Map<String, Long> distribution = new HashMap<>();
         for (Category category : Category.values()) {
-            long count = restaurantRepository.countByCategory(category.getKoreanName());
+            long count = restaurantRepository.countByCategoryAndActivatedTrue(category.getKoreanName());
             distribution.put(category.getKoreanName(), count);
         }
         return distribution;
@@ -120,22 +120,22 @@ public class RestaurantService {
 
     public Map<String, Long> getRestaurantMoodPreference() {
         Map<String, Long> moodCounts = new HashMap<>();
-        moodCounts.put("대화", restaurantRepository.countByGoodTalk(true));
-        moodCounts.put("다양한 술", restaurantRepository.countByManyDrink(true));
-        moodCounts.put("좋은 음악", restaurantRepository.countByGoodMusic(true));
-        moodCounts.put("깨끗함", restaurantRepository.countByClean(true));
-        moodCounts.put("좋은 뷰", restaurantRepository.countByGoodView(true));
-        moodCounts.put("테라스", restaurantRepository.countByIsTerrace(true));
-        moodCounts.put("사진", restaurantRepository.countByGoodPicture(true));
-        moodCounts.put("다양한 메뉴", restaurantRepository.countByGoodMenu(true));
-        moodCounts.put("오래 머물기", restaurantRepository.countByLongStay(true));
-        moodCounts.put("넓은 매장", restaurantRepository.countByBigStore(true));
+        moodCounts.put("대화", restaurantRepository.countByGoodTalkAndActivatedTrue(true));
+        moodCounts.put("다양한 술", restaurantRepository.countByManyDrinkAndActivatedTrue(true));
+        moodCounts.put("좋은 음악", restaurantRepository.countByGoodMusicAndActivatedTrue(true));
+        moodCounts.put("깨끗함", restaurantRepository.countByCleanAndActivatedTrue(true));
+        moodCounts.put("좋은 뷰", restaurantRepository.countByGoodViewAndActivatedTrue(true));
+        moodCounts.put("테라스", restaurantRepository.countByIsTerraceAndActivatedTrue(true));
+        moodCounts.put("사진", restaurantRepository.countByGoodPictureAndActivatedTrue(true));
+        moodCounts.put("다양한 메뉴", restaurantRepository.countByGoodMenuAndActivatedTrue(true));
+        moodCounts.put("오래 머물기", restaurantRepository.countByLongStayAndActivatedTrue(true));
+        moodCounts.put("넓은 매장", restaurantRepository.countByBigStoreAndActivatedTrue(true));
         return moodCounts;
     }
 
     public List<RestaurantRankingResponse> getTop5RecommendedRestaurants() {
         Pageable top10 = PageRequest.of(0, 5, Sort.by(Sort.Direction.DESC, "recommendedCount"));
-        List<Restaurant> topRestaurants = restaurantRepository.findAll(top10).getContent();
+        List<Restaurant> topRestaurants = restaurantRepository.findAllByActivatedTrue(top10).getContent();
         return topRestaurants.stream()
             .map(restaurant -> new RestaurantRankingResponse(restaurant.getName(), restaurant.getRecommendedCount()))
             .collect(Collectors.toList());
@@ -145,7 +145,7 @@ public class RestaurantService {
         RestaurantStatsResponse statsResponse = new RestaurantStatsResponse();
 
         // 전체 통계
-        statsResponse.setTotalRestaurants(restaurantRepository.count());
+        statsResponse.setTotalRestaurants(restaurantRepository.countByActivatedTrue());
         statsResponse.setAverageGoogleRating(restaurantRepository.averageGoogleRating());
         statsResponse.setTotalRecommendedCount(restaurantRepository.sumRecommendedCount());
 
@@ -155,7 +155,7 @@ public class RestaurantService {
         Map<String, Long> categoryTotalRecommendedCounts = new HashMap<>();
 
         for (Category category : Category.values()) {
-            long count = restaurantRepository.countByCategory(category.getKoreanName());
+            long count = restaurantRepository.countByCategoryAndActivatedTrue(category.getKoreanName());
             Double avgRating = restaurantRepository.averageGoogleRatingByCategory(category.getKoreanName());
             Long totalRecommended = restaurantRepository.sumRecommendedCountByCategory(category.getKoreanName());
 
