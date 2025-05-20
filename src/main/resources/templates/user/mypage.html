@@ -652,7 +652,7 @@
             <div th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
               <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
                     method="post" style="display: inline;" class="cancel-form"
-                    th:data-team-id=${team.teamId}>
+                    th:data-team-id="${team.teamId}">
                 <button type="submit" class="cancel-btn">모임 취소</button>
               </form>
             </div>
@@ -705,7 +705,7 @@
 
           <button th:if="${team.user.userId == user.userId}" class="btn-primary"
                   th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
-                  th:disabled="${#strings.toString(team.status) == 'CANCELED'}">
+                  th:disabled="${#strings.toString(team.status) == 'COMPLETED'}">
             모임 수정
           </button>
 
@@ -713,7 +713,7 @@
             <div th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
               <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
                     method="post" style="display: inline;" class="cancel-form"
-                    th:data-team-id=${team.teamId}>
+                    th:data-team-id="${team.teamId}">
                 <button type="submit" class="cancel-btn">모임 취소</button>
               </form>
             </div>
