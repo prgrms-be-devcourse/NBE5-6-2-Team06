@@ -20,15 +20,26 @@
     }
     .search-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      background-color: var(--light-color);
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
     }
+
     .search-bar input {
-      width: 80%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      border: none;
+      background: none;
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+
+    .search-bar input:focus {
+      box-shadow: none;
+    }
+
+    .search-bar i {
+      color: var(--gray-color);
+      cursor: pointer;
     }
     .filters {
       margin: 1rem 0;
@@ -131,7 +142,7 @@
 
   <div class="search-bar">
     <input type="text" placeholder="모임 검색...">
-    <button>🔍</button>
+    <i class="fas fa-search"></i>
   </div>
 
   <div class="filters">
