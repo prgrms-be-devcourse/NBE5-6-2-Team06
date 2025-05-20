@@ -254,7 +254,8 @@
             새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
         <div class="banner-buttons" style="display: flex; gap: 0.5rem;">
             <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button><!-- 모임 찾기 버튼 -->
-            <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
+            <button class="btn btn-outline" id="signup-button" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
+
         </div>
     </div>
         <img src="/img/index.png" alt="메인 배너 이미지" style="max-width: 60%;">
@@ -379,6 +380,13 @@
                 url.searchParams.delete('message');
                 window.history.replaceState({}, document.title, url);
             }, 5000);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupButton = document.getElementById("signup-button");
+        if (auth.isLoggedIn() && signupButton) {
+            signupButton.style.display = "none";
         }
     });
 </script>

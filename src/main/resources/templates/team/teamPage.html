@@ -784,13 +784,24 @@
       }
       return response.json();
     })
-    .then(data => {
+    .then(result => {
       const chatBox = document.getElementById('chat-box');
       chatBox.innerHTML = ''; // 기존 내용 초기화
 
+      const messages = result.data;
+
+      if (!Array.isArray(messages)) {
+        console.error("채팅 이력이 배열이 아닙니다:", messages);
+        return;
+      }
+
       // 채팅 메시지 표시
-      data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
+      messages.forEach(message => {
+        showMessage(
+            `[${message.time}] ${message.senderNickname}: ${message.message}`,
+            message.senderId,
+            message.chatId
+        );
       });
     })
     .catch(error => {
@@ -972,8 +983,18 @@
       }
       return response.json();
     })
-    .then(data => {
-      console.log("📦 받아온 추천 데이터:", data);
+    .then(result => {
+      console.log("📦 받아온 추천 응답:", result);
+
+      const data = result.data;
+
+      if (!data || !Array.isArray(data.restaurants)) {
+        console.error("❌ 잘못된 응답 형식 (data.restaurants 없음):", data);
+        showToast("추천 결과를 불러올 수 없습니다.", "error");
+        loading.style.display = "none";
+        return;
+      }
+
       const restaurants = data.restaurants;
       const reason = data.reason;
       let completed = 0;
@@ -982,26 +1003,26 @@
         fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
         .then(res => res.json())
         .then(dbItem => {
+          const data = dbItem.data;
           const card = document.createElement("div");
           card.className = "recommend-card";
 
           card.innerHTML = `
-  <div>
-    <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem;">🍽️ ${dbItem.restaurantName}</h2>
+              <div>
+                <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem;">🍽️ ${data.restaurantName}</h2>
+                <p style="margin-bottom: 0.6rem;"><strong>📍 위치:</strong> ${data.address}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>🕒 영업시간:</strong> ${data.openTime}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>🍱 메인메뉴:</strong> ${data.mainFood}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>📂 카테고리:</strong> ${data.category}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>📝 소개:</strong> ${data.description}</p>
+                <p style="margin-top: 1rem; margin-bottom: 0;">
+                  <strong>🔗 URL:</strong>
+                  <a href="https://map.kakao.com/?q=${encodeURIComponent(data.restaurantName)}"
+                     target="_blank" style="color: blue;">바로가기</a>
+                </p>
+              </div>
+            `;
 
-    <p style="margin-bottom: 0.6rem;"><strong>📍 위치:</strong> ${dbItem.address}</p>
-    <p style="margin-bottom: 0.6rem;"><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
-    <p style="margin-bottom: 0.6rem;"><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
-    <p style="margin-bottom: 0.6rem;"><strong>📂 카테고리:</strong> ${dbItem.category}</p>
-    <p style="margin-bottom: 0.6rem;"><strong>📝 소개:</strong> ${dbItem.description}</p>
-
-    <p style="margin-top: 1rem; margin-bottom: 0;">
-      <strong>🔗 URL:</strong>
-      <a href="https://map.kakao.com/?q=${encodeURIComponent(dbItem.restaurantName)}"
-         target="_blank" style="color: blue;">바로가기</a>
-    </p>
-  </div>
-`;
           wrapper.appendChild(card);
         })
         .catch(err => {
@@ -1011,7 +1032,6 @@
           completed++;
           if (completed === restaurants.length) {
             loading.style.display = "none";
-
             reasonBox.innerHTML = `
                 <h2 style="margin-top: 0; margin-bottom: 0.8rem;">💬 추천 이유</h2>
                 <div>${reason}</div>
