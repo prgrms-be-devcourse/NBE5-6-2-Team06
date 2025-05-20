@@ -53,21 +53,30 @@
     .input-group {
       display: flex;
       margin-top: 1rem;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .input-group input {
       flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-right: none;
+      border-radius: 24px 0 0 24px;
+      font-size: 0.95rem;
     }
     .input-group button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
+      padding: 12px 20px;
       border: none;
-      background-color: #000;
+      background-color: #4CAF50;
       color: #fff;
-      border-radius: 4px;
+      border-radius: 0 24px 24px 0;
       cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .input-group button:hover {
+      background-color: #43a047;
     }
 
     .participant-list {
@@ -125,10 +134,94 @@
     .chat-message:hover {
       background-color: #f0f0f0;
     }
+    .other-message:hover .report-btn {
+      opacity: 1;
+    }
+
+    .chat-box {
+      height: 400px; /* 높이 증가 */
+      overflow-y: auto;
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f7f7f7;
+      margin-bottom: 1rem;
+    }
+
+    /* 채팅 메시지 컨테이너 */
+    .chat-message {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+      width: 100%;
+      clear: both;
+      font-size: 0.95rem; /* 폰트 크기 조정 */
+    }
+
+    /* 내 메시지 (왼쪽 정렬) */
+    .my-message .message-content {
+      align-self: flex-start;
+      background-color: #dcf8c6; /* 밝은 초록색 배경 */
+      border-radius: 12px 12px 12px 0;
+      padding: 10px 14px;
+      max-width: 70%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      margin-right: auto;
+      color: #333;
+    }
+
+    /* 다른 사람 메시지 (오른쪽 정렬) */
+    .other-message .message-content {
+      align-self: flex-end;
+      background-color: white;
+      border-radius: 12px 12px 0 12px;
+      padding: 10px 14px;
+      max-width: 70%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      margin-left: auto;
+      color: #333;
+    }
+
+    /* 닉네임 스타일 */
+    .nickname {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    /* 내 메시지 닉네임 */
+    .my-message .nickname {
+      align-self: flex-start;
+      color: #2e7d32; /* 어두운 초록색 */
+    }
+
+    /* 다른 사람 메시지 닉네임 */
+    .other-message .nickname {
+      align-self: flex-end;
+      color: #0277bd; /* 파란색 */
+      text-align: right;
+    }
+    /* 시간 표시 */
+    .timestamp {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+    /* 내 메시지 시간 */
+    .my-message .timestamp {
+      align-self: flex-start;
+    }
+    /* 다른 사람 메시지 시간 */
+    .other-message .timestamp {
+      align-self: flex-end;
+    }
+    /* 신고 버튼 */
     .report-btn {
       position: absolute;
-      right: 5px;
-      top: 5px;
+      top: 2px;
+      left: 5px;
       background-color: #ff5c5c;
       color: white;
       border: none;
@@ -622,33 +715,55 @@
 
   function showMessage(messageText, messageSenderId, chatId) {
     const chatBox = document.getElementById('chat-box');
+
+    // 정규식으로 시간, 닉네임, 내용 분리
+    const messagePattern = /\[(.*?)\] (.*?): (.*)/;
+    const match = messageText.match(messagePattern);
+
+    if (!match) return; // 패턴 매치 실패 시 처리 중단
+
+    const time = match[1];
+    const nickname = match[2];
+    const content = match[3];
+
+    // 새 메시지 요소 생성
     const messageElement = document.createElement('div');
 
-    messageElement.className = 'chat-message';
+    // 내 메시지인지 다른 사람 메시지인지 결정
+    const isMyMessage = messageSenderId === senderId;
+    messageElement.className = `chat-message ${isMyMessage ? 'my-message' : 'other-message'}`;
 
-    messageElement.textContent = messageText;
+    // 닉네임 추가
+    const nicknameElement = document.createElement('div');
+    nicknameElement.className = 'nickname';
+    nicknameElement.textContent = nickname;
+    messageElement.appendChild(nicknameElement);
 
+    // 메시지 내용 추가
+    const contentElement = document.createElement('div');
+    contentElement.className = 'message-content';
+    contentElement.textContent = content;
+    messageElement.appendChild(contentElement);
+
+    // 시간 표시 추가
+    const timeElement = document.createElement('div');
+    timeElement.className = 'timestamp';
+    timeElement.textContent = time;
+    messageElement.appendChild(timeElement);
+
+    // 다른 사람 메시지에만 신고 버튼 추가 (신고 기능 유지)
     if (messageSenderId && messageSenderId !== senderId) {
-      const messagePattern = /\[(.*?)\] (.*?): (.*)/;
-      const match = messageText.match(messagePattern);
+      const reportButton = document.createElement('button');
+      reportButton.className = 'report-btn';
+      reportButton.textContent = '신고';
+      reportButton.title = '이 메시지 신고하기';
 
-      if (match) {
-        const time = match[1];
-        const nickname = match[2];
-        const content = match[3];
+      reportButton.onclick = function (e) {
+        e.stopPropagation();
+        openReportModal(messageSenderId, nickname, chatId);
+      };
 
-        const reportButton = document.createElement('button');
-        reportButton.className = 'report-btn';
-        reportButton.textContent = '신고';
-        reportButton.title = '이 메시지 신고하기';
-
-        reportButton.onclick = function (e) {
-          e.stopPropagation();
-          openReportModal(messageSenderId, nickname, chatId);
-        };
-
-        messageElement.appendChild(reportButton);
-      }
+      messageElement.appendChild(reportButton);
     }
 
     chatBox.appendChild(messageElement);
