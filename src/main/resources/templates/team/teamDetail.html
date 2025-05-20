@@ -13,6 +13,12 @@
     .card { border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px; }
     button { background: white; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
     .info-section { margin-bottom: 2rem; }
+    .info-item {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
     .map-placeholder { background: #f4f4f4; height: 200px; display: flex; align-items: center; justify-content: center; color: #aaa; }
     footer { text-align: center; padding: 1rem; border-top: 1px solid #eee; font-size: 0.8rem; color: #777; }
     button:disabled {color: black !important;cursor: not-allowed; }
@@ -203,20 +209,20 @@
               <span th:text="${participant.user.nickname}">참여자 닉네임</span> :
               <span th:text="${participant.user.temperature}">매너온도</span> °C
 
-              <!-- 수락 버튼 -->
-              <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display: inline;">
-                <button type="submit" class="approve-button"
-                        th:data-team-id="${team.teamId}"
-                        th:data-participant-id="${participant.participantId}">수락</button>
-              </form>
+              <!-- 버튼 영역 전체를 한 번에 조건처리 -->
+              <div th:if="${isLeader}">
+                <form th:action="@{/api/team/{teamId}/approve/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display:inline-block;">
+                  <button type="submit" class="approve-button"
+                          th:data-team-id="${team.teamId}"
+                          th:data-participant-id="${participant.participantId}">수락</button>
+                </form>
 
-              <!-- 거절 버튼 -->
-              <form th:if="${isLeader}" th:action="@{/api/team/{teamId}/reject/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display: inline;">
-                <button type="submit" class="reject-button"
-                        th:data-team-id="${team.teamId}"
-                        th:data-participant-id="${participant.participantId}">거절</button>
-              </form>
-
+                <form th:action="@{/api/team/{teamId}/reject/{participantId}(teamId=${team.teamId}, participantId=${participant.participantId})}" method="post" style="display:inline-block;">
+                  <button type="submit" class="reject-button"
+                          th:data-team-id="${team.teamId}"
+                          th:data-participant-id="${participant.participantId}">거절</button>
+                </form>
+              </div>
             </div>
           </div>
 
