@@ -1,7 +1,6 @@
 package com.grepp.matnam.app.controller.api.user;
 
 import com.grepp.matnam.app.controller.api.user.payload.*;
-import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.model.log.UserActivityLogService;
 import com.grepp.matnam.app.model.user.PreferenceService;
 import com.grepp.matnam.app.model.user.UserService;
@@ -10,6 +9,7 @@ import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import com.grepp.matnam.infra.auth.CookieUtils;
 import com.grepp.matnam.infra.jwt.JwtTokenProvider;
 import com.grepp.matnam.infra.response.ApiResponse;
+import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,8 +44,7 @@ public class UserApiController {
 
         int maxAge = 86400;
         CookieUtils.addJwtCookie(response, token, maxAge);
-        CookieUtils.addUserIdCookie(response, user.getUserId(), maxAge);
-        CookieUtils.addUserRoleCookie(response, user.getRole().name(), maxAge);
+        CookieUtils.addUserNicknameCookie(response, user.getNickname(), maxAge);
 
         JwtResponse jwtResponse = JwtResponse.builder()
                 .token(token)
@@ -70,8 +69,7 @@ public class UserApiController {
 
         int maxAge = 86400;
         CookieUtils.addJwtCookie(response, token, maxAge);
-        CookieUtils.addUserIdCookie(response, user.getUserId(), maxAge);
-        CookieUtils.addUserRoleCookie(response, user.getRole().name(), maxAge);
+        CookieUtils.addUserNicknameCookie(response, user.getNickname(), maxAge);
 
         JwtResponse jwtResponse = JwtResponse.builder()
                 .token(token)

@@ -36,6 +36,10 @@ public class CookieUtils {
         addCookie(response, "userRole", role, maxAge, "/");
     }
 
+    public static void addUserNicknameCookie(HttpServletResponse response, String nickname, int maxAge) {
+        addCookie(response, "userNickname", nickname, maxAge, "/");
+    }
+
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

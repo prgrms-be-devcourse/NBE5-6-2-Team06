@@ -5,7 +5,9 @@ import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.User;
+import com.grepp.matnam.infra.auth.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/user/oauth2")
@@ -51,17 +51,21 @@ public class OAuth2UserController {
             @RequestParam String address,
             @RequestParam int age,
             @RequestParam String gender,
-            HttpServletRequest request) {
+            HttpServletRequest request,
+            HttpServletResponse response) {
 
         String email = (String) request.getSession().getAttribute("oauthEmail");
+        String userId = (String) request.getSession().getAttribute("oauthUserId");
 
         if (email == null) {
             log.warn("OAuth 세션 정보 없음");
             return "redirect:/user/signin";
         }
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
+        if (userId == null) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            userId = authentication.getName();
+        }
 
         log.info("OAuth2 회원가입: userId={}, email={}, nickname={}", userId, email, nickname);
 
@@ -79,8 +83,12 @@ public class OAuth2UserController {
 
         userService.updateOAuth2User(user);
 
+        int maxAge = 86400;
+        CookieUtils.addUserNicknameCookie(response, nickname, maxAge);
+
         request.getSession().removeAttribute("oauthEmail");
         request.getSession().removeAttribute("oauthName");
+        request.getSession().removeAttribute("oauthUserId");
 
         return "redirect:/user/preference";
     }
