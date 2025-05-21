@@ -58,6 +58,7 @@ public class TeamController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
+
         Team team = teamRequest.toDto(user);
 
         if (teamRequest.getDate() != null && teamRequest.getTime() != null) {

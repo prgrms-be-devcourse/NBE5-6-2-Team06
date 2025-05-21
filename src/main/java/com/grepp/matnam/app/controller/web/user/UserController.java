@@ -163,7 +163,7 @@ public class UserController {
             model.addAttribute("participatingTeams", paginatedParticipatingTeams);
 //            model.addAttribute("allTeamsForUser", allTeamsForUser);
             model.addAttribute("teamCurrentPage", teamPage);
-            model.addAttribute("teamTotalPage", totalTeamPages);
+            model.addAttribute("teamTotalPages", totalTeamPages);
             model.addAttribute("teamSize", teamSize);
             model.addAttribute("userMaps", new ArrayList<>());
 

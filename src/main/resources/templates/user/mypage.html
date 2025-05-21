@@ -276,7 +276,7 @@
       color: #555;
     }
 
-    .team-section{
+    .team-section {
       margin-top: 2rem;
     }
 
@@ -466,6 +466,12 @@
       margin-top: 2rem;
     }
 
+    .teamPaging-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
     .pagination {
       display: flex;
       list-style: none;
@@ -619,10 +625,22 @@
     <div class="main-section team-section">
       <h2>내 모임 목록</h2>
       <div class="tabs">
-        <button class="active" id="all-tab" onclick="switchTab('all')">전체</button>
-        <button id="hosting-tab" onclick="switchTab('hosting')">주최 중</button>
-        <button id="participating-tab" onclick="switchTab('participating')">참여 중</button>
-        <button class="create-meeting" onclick="location.href='/team/create'">모임 만들기</button>
+        <button class="active"
+                id="all-tab"
+                data-tab="all"
+                onclick="switchTab('all')">전체</button>
+
+        <button id="hosting-tab"
+                data-tab="hosting"
+                onclick="switchTab('hosting')">주최 중</button>
+
+        <button id="participating-tab"
+                data-tab="participating"
+                onclick="switchTab('participating')">참여 중</button>
+
+        <button class="create-meeting"
+                onclick="location.href='/team/create'">모임 만들기</button>
+
       </div>
 
       <div id="meetings-container">
@@ -634,23 +652,25 @@
             <p>모임을 만들거나 다른 사용자의 모임에 참여해보세요!</p>
           </div>
 
-          <div th:each="team : ${hostingTeams}" class="meeting-item">
-            <h4>
-              <span th:text="${team.teamTitle}">모임 제목</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
-              <span class="status-badge"
-                    th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
-            </h4>
-            <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-            </p>
-            <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-            <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+          <div th:each="team : ${paginatedAllTeams}" class="meeting-item">
+            <div th:if="${team.user.userId == user.userId}">
+              <h4>
+                <span th:text="${team.teamTitle}">모임 제목</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+              </h4>
+              <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+              </p>
+              <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+              <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
 
-            <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-            <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
-            <hr>
+              <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+              <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+              <hr>
 
           <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
                or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
@@ -659,42 +679,47 @@
             모임 수정
           </button>
 
-            <div th:if="${team.user.userId == user.userId}">
-              <div
-                  th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
-                <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
-                      method="post" style="display: inline;" class="cancel-form"
-                      th:data-team-id="${team.teamId}">
-                  <button type="submit" class="cancel-btn">모임 취소</button>
-                </form>
-              </div>
-              <div th:if="${#strings.toString(team.status) == 'CANCELED'}" style="display: inline;">
-                <button class="btn-secondary" disabled>모임 취소 완료</button>
-              </div>
-              <div th:if="${#strings.toString(team.status) == 'COMPLETED'}"
-                   style="display: inline;">
-                <button class="btn-success" disabled>모임 완료</button>
+              <div th:if="${team.user.userId == user.userId}">
+                <div
+                    th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                  <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                        method="post" style="display: inline;" class="cancel-form"
+                        th:data-team-id="${team.teamId}">
+                    <button type="submit" class="cancel-btn">모임 취소</button>
+                  </form>
+                </div>
+                <div th:if="${#strings.toString(team.status) == 'CANCELED'}"
+                     style="display: inline;">
+                  <button class="btn-secondary" disabled>모임 취소 완료</button>
+                </div>
+                <div th:if="${#strings.toString(team.status) == 'COMPLETED'}"
+                     style="display: inline;">
+                  <button class="btn-success" disabled>모임 완료</button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div th:each="team : ${participatingTeams}" class="meeting-item">
-            <h4>
-              <span th:text="${team.teamTitle}">모임 제목</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
-              <span class="status-badge"
-                    th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
-              <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
-            </h4>
-            <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
-            </p>
-            <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-            <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-            <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-            <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+          <div th:each="team : ${paginatedAllTeams}" class="meeting-item">
+            <div th:unless="${team.user.userId == user.userId}">
+              <h4>
+                <span th:text="${team.teamTitle}">모임 제목</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+              </h4>
+              <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+              </p>
+              <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+              <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+              <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+              <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+            </div>
           </div>
-          <div class="pagination-container" th:if="${teamTotalPages > 1}">
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
             <div class="pagination">
               <a th:if="${teamCurrentPage > 0}"
                  th:href="@{/user/mypage(tab='all', teamPage=${teamCurrentPage - 1}, page=${currentPage})}"
@@ -762,7 +787,7 @@
               </div>
             </div>
           </div>
-          <div class="pagination-container" th:if="${teamTotalPages > 1}">
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
             <div class="pagination">
               <a th:if="${teamCurrentPage > 0}"
                  th:href="@{/user/mypage(tab='hosting', teamPage=${teamCurrentPage - 1}, page=${currentPage})}"
@@ -802,24 +827,23 @@
             <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
             <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
             <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
-
           </div>
-        </div>
-        <div class="pagination-container" th:if="${teamTotalPages > 1}">
-          <div class="pagination">
-            <a th:if="${teamCurrentPage > 0}"
-               th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage - 1}, page=${currentPage})}"
-               class="page-link">&laquo; 이전</a>
-            <span th:each="i : ${#numbers.sequence(0, teamTotalPages - 1)}">
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
+            <div class="pagination">
+              <a th:if="${teamCurrentPage > 0}"
+                 th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage - 1}, page=${currentPage})}"
+                 class="page-link">&laquo; 이전</a>
+              <span th:each="i : ${#numbers.sequence(0, teamTotalPages - 1)}">
                 <a th:if="${i != teamCurrentPage}"
                    th:href="@{/user/mypage(tab='participating', teamPage=${i}, page=${currentPage})}"
                    class="page-link" th:text="${i + 1}">1</a>
                 <span th:if="${i == teamCurrentPage}" class="page-link active"
                       th:text="${i + 1}">1</span>
             </span>
-            <a th:if="${teamCurrentPage < teamTotalPages - 1}"
-               th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage + 1}, page=${currentPage})}"
-               class="page-link">다음 &raquo;</a>
+              <a th:if="${teamCurrentPage < teamTotalPages - 1}"
+                 th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage + 1}, page=${currentPage})}"
+                 class="page-link">다음 &raquo;</a>
+            </div>
           </div>
         </div>
       </div>
@@ -1011,29 +1035,22 @@
     tabButtons.forEach(btn => btn.classList.remove('active'));
     document.getElementById(tabName + '-tab').classList.add('active');
 
-    document.getElementById('all-meetings').style.display = 'none';
-    document.getElementById('hosting-meetings').style.display = 'none';
-    document.getElementById('participating-meetings').style.display = 'none';
+    ['all', 'hosting', 'participating'].forEach(name => {
+      document.getElementById(name + '-meetings').style.display = 'none';
+    });
 
-    if (tabName === 'all') {
-      document.getElementById('all-meetings').style.display = 'block';
-    } else if (tabName === 'hosting') {
-      document.getElementById('hosting-meetings').style.display = 'block';
-    } else if (tabName === 'participating') {
-      document.getElementById('participating-meetings').style.display = 'block';
-    }
+    document.getElementById(tabName + '-meetings').style.display = 'block';
   }
 
   function scrollToTeamSectionIfNeeded() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('teamPage')) {
+    if (new URLSearchParams(window.location.search).has('teamPage')) {
       document.querySelector('.team-section')?.scrollIntoView({behavior: 'smooth'});
     }
   }
 
   function scrollToReviewsIfNeeded() {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('page')) {
+    const pageParam = new URLSearchParams(window.location.search).get('page');
+    if (pageParam !== null && pageParam !== '0') {
       document.querySelector('.reviews-section')?.scrollIntoView({behavior: 'smooth'});
     }
   }
@@ -1044,15 +1061,20 @@
       return;
     }
 
-    document.querySelectorAll('.tabs button:not(.create-meeting)')
-    .forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    // 탭 클릭 이벤트 바인딩
+    document.querySelectorAll('.tabs button:not(.create-meeting)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('tab', btn.dataset.tab);
+        params.set('teamPage', '0');
+        window.location.search = params.toString();
+      });
     });
 
-    // 초기 탭 활성화
-    switchTab('all');
+    const params = new URLSearchParams(window.location.search);
+    const initialTab = params.get('tab') || 'all';
+    switchTab(initialTab);
 
-    // URL 파라미터에 따라 스크롤 처리
     scrollToTeamSectionIfNeeded();
     scrollToReviewsIfNeeded();
   });
