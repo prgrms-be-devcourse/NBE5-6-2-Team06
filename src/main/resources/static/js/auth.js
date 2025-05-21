@@ -7,7 +7,7 @@ const auth = {
         if (!this.isLoggedIn()) return null;
 
         return {
-            nickname: this.getCookie('userNickname'),
+            nickname: this.getNickname('userNickname'),
             token: this.getCookie('jwtToken')
         };
     },
@@ -32,6 +32,11 @@ const auth = {
             if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
+    },
+
+    getNickname(name) {
+        const encodedNickname = this.getCookie('userNickname');
+        return encodedNickname ? decodeURIComponent(encodedNickname) : null;
     },
 
     eraseCookie(name) {
