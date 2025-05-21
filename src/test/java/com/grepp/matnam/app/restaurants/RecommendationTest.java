@@ -28,7 +28,7 @@ public class RecommendationTest {
         List<String> keywords = teamService.countPreferenceKeyword(teamId);
 
         RestaurantRecommendRequest request = new RestaurantRecommendRequest(keywords);
-        RestaurantRecommendResponse response = restaurantAiService.RecommendRestaurant(request);
+        RestaurantRecommendResponse response = restaurantAiService.recommendRestaurant(request);
 
         // null 검사
         assertNotNull(response);
