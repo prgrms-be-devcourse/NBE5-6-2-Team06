@@ -1,6 +1,5 @@
 package com.grepp.matnam.app.controller.api.restaurant;
 
-import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendRequest;
 import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendResponse;
 
 import com.grepp.matnam.app.model.restaurant.RestaurantAiService;
@@ -41,21 +40,19 @@ public class RestaurantApiController {
         }
     }
 
-    // 팀 맞춤 추천
     @GetMapping("recommend/restaurant/{teamId}")
-    @Operation(summary = "추천", description = "팀에 속한 사용자의 취향 키워드를 종합하여 이를 기반으로 추천을 받습니다.")
+    @Operation(summary = "추천", description = "팀에 속한 사용자의 취향 키워드를 종합하여 이를 기반으로 추천을 제공합니다.")
     public ApiResponse<RestaurantRecommendResponse> recommend(@PathVariable Long teamId) {
         try {
             List<String> keywords = teamService.countPreferenceKeyword(teamId);
             log.info("teamId {}에 대한 추출된 키워드: {}", teamId, keywords);
 
-            RestaurantRecommendRequest request = new RestaurantRecommendRequest(keywords);
-            RestaurantRecommendResponse response = restaurantAiService.recommendRestaurant(request);
+            String keywordPrompt = "우리 팀은 다음 키워드를 선호해요: " +
+                String.join(", ", keywords) + ". 이 키워드를 기반으로 최적의 식당 3곳을 추천해줘.";
+            log.info("keywordPrompt {}", keywordPrompt);
 
+            RestaurantRecommendResponse response = restaurantAiService.recommendRestaurant(keywordPrompt);
             return ApiResponse.success(response);
-        } catch (IllegalArgumentException e) {
-            log.warn("추천 요청 실패: {}", e.getMessage());
-            return ApiResponse.error(ResponseCode.BAD_REQUEST);
         } catch (Exception e) {
             log.error("추천 처리 중 오류 발생", e);
             return ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR);

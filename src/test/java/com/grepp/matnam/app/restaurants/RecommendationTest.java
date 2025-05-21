@@ -18,17 +18,10 @@ public class RecommendationTest {
     @Autowired
     private RestaurantAiService restaurantAiService;
 
-    @Autowired
-    private TeamService teamService;
-
     @Test
     public void testRecommend() {
-        Long teamId = 1L;
 
-        List<String> keywords = teamService.countPreferenceKeyword(teamId);
-
-        RestaurantRecommendRequest request = new RestaurantRecommendRequest(keywords);
-        RestaurantRecommendResponse response = restaurantAiService.recommendRestaurant(request);
+        RestaurantRecommendResponse response = restaurantAiService.reRecommendRestaurant();
 
         // null 검사
         assertNotNull(response);
