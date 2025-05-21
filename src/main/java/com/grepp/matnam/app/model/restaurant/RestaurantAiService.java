@@ -45,7 +45,10 @@ public interface RestaurantAiService {
         }
         ※ JSON 객체와 배열의 괄호 {} 및 []는 정확히 닫혀 있어야 하며, 문법 오류가 발생하지 않도록 작성하세요.
     """)
-    @UserMessage("데이터를 통해 3개 식당을 추천해주세요. 이유에는 반드시 숫자랑 영어를 넣지말아줘.")
+    @UserMessage("""
+    전달한 키워드를 기반으로 최적의 식당 3곳을 추천해주세요
+    키워드는 꼭 반영해주세요.
+    """)
     RestaurantRecommendResponse recommendRestaurant(RestaurantRecommendRequest request);
 
     @SystemMessage("""
