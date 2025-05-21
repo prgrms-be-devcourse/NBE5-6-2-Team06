@@ -11,8 +11,14 @@ import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import com.grepp.matnam.infra.auth.CookieUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -59,8 +65,10 @@ public class UserController {
     @Transactional
     @GetMapping("/mypage")
     public String mypage(Model model,
-                         @RequestParam(defaultValue = "0") int page,
-                         @RequestParam(defaultValue = "5") int size) {
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size,
+        @RequestParam(defaultValue = "0") int teamPage,
+        @RequestParam(defaultValue = "5") int teamSize) {
         log.info("마이페이지 접근 시도");
 
         if (!AuthenticationUtils.isAuthenticated()) {
@@ -85,8 +93,8 @@ public class UserController {
 
             // 리뷰 정보
             List<Team> completedTeams = teamService.getTeamsByParticipant(userId).stream()
-                    .filter(team -> team.getStatus() == Status.COMPLETED)
-                    .toList();
+                .filter(team -> team.getStatus() == Status.COMPLETED)
+                .toList();
 
             List<Team> teamsWithoutReview = new ArrayList<>();
             for (Team team : completedTeams) {
@@ -103,7 +111,7 @@ public class UserController {
             int end = Math.min(start + size, totalTeamsWithoutReview);
 
             List<Team> paginatedTeamsWithoutReview =
-                    start < totalTeamsWithoutReview ? teamsWithoutReview.subList(start, end) : new ArrayList<>();
+                start < totalTeamsWithoutReview ? teamsWithoutReview.subList(start, end) : new ArrayList<>();
 
             // 모델에 데이터 추가
             model.addAttribute("user", user);
@@ -119,11 +127,44 @@ public class UserController {
             participatingTeams.removeAll(hostingTeams);
 
             // 참여한 모든 모임 조회 (승인된 참여자 및 상태 무관)
-            List<Team> allTeamsForUser = teamService.getAllTeamsForUser(userId);
+//            List<Team> allTeamsForUser = teamService.getAllTeamsForUser(userId);
+            List<Team> allTeams = new ArrayList<>();
+            allTeams.addAll(hostingTeams);
+            allTeams.addAll(participatingTeams);
+            allTeams.sort(getTeamComparator());
 
-            model.addAttribute("hostingTeams", hostingTeams);
-            model.addAttribute("participatingTeams", participatingTeams);
-            model.addAttribute("allTeamsForUser", allTeamsForUser);
+            // 팀 페이지네이션
+            int totalTeams = allTeams.size();
+            int totalTeamPages = (int) Math.ceil((double) totalTeams / teamSize);
+
+            int teamStart = teamPage * teamSize;
+            int teamEnd = Math.min(teamStart + teamSize, totalTeams);
+
+            List<Team> paginatedHostingTeams = new ArrayList<>();
+            List<Team> paginatedParticipatingTeams = new ArrayList<>();
+
+            List<Team> paginatedAllTeams = new ArrayList<>();
+
+            if (teamStart < totalTeams) {
+                paginatedAllTeams = allTeams.subList(teamStart, teamEnd);
+
+                // 호스트/참여 분류
+                for (Team team : paginatedAllTeams) {
+                    if (team.getUser().getUserId().equals(userId)) {
+                        paginatedHostingTeams.add(team);
+                    } else {
+                        paginatedParticipatingTeams.add(team);
+                    }
+                }
+            }
+
+            model.addAttribute("all", paginatedAllTeams);
+            model.addAttribute("hostingTeams", paginatedHostingTeams);
+            model.addAttribute("participatingTeams", paginatedParticipatingTeams);
+//            model.addAttribute("allTeamsForUser", allTeamsForUser);
+            model.addAttribute("teamCurrentPage", teamPage);
+            model.addAttribute("teamTotalPages", totalTeamPages);
+            model.addAttribute("teamSize", teamSize);
             model.addAttribute("userMaps", new ArrayList<>());
 
             return "user/mypage";
@@ -131,6 +172,23 @@ public class UserController {
             log.error("마이페이지 로딩 중 오류 발생: {}", e.getMessage(), e);
             return "redirect:/user/signin?error=profile_load_failed";
         }
+    }
+
+    public static Comparator<Team> getTeamComparator() {
+        return Comparator
+            .comparing((Team team) -> {
+                if (team.getStatus() == Status.RECRUITING) {
+                    return 1;
+                } else if (team.getStatus() == Status.FULL) {
+                    return 2;
+                } else if (team.getStatus() == Status.COMPLETED) {
+                    return 3;
+                } else if (team.getStatus() == Status.CANCELED) {
+                    return 4;
+                }
+                return 5;
+            })
+            .thenComparing(Team::getTeamDate);
     }
 
     @PostMapping("/deactivate")

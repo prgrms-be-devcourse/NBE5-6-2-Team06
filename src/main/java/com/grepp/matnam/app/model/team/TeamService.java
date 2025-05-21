@@ -225,6 +225,26 @@ public class TeamService {
         );
     }
 
+//    // 새로 추가—페이징 전용
+//    public Page<Team> getTeamsByLeader(String userId, Pageable pageable) {
+//        return teamRepository.findTeamsByUser_UserIdAndActivatedTrue(userId, pageable);
+//    }
+//
+//    // 새로 추가—페이징 전용
+//    public Page<Team> getTeamsByParticipant(String userId, Pageable pageable) {
+//        return teamRepository.findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
+//            userId, ParticipantStatus.APPROVED, pageable
+//        );
+//    }
+//    // 새로 추가—페이징 전용
+//    public Page<Team> getAllTeamsForUser(String userId, Pageable pageable) {
+//        return teamRepository.findTeamsForUser(
+//            userId,
+//            ParticipantStatus.APPROVED,
+//            pageable
+//        );
+//    }
+
     // 사용자의 모든 참여 정보 조회 (PENDING, APPROVED, REJECTED)
     public List<Participant> getAllParticipantsForUser(String userId) {
         return participantRepository.findByUser_UserId(userId);
