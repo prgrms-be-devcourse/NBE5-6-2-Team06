@@ -2,7 +2,10 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.entity.Participant;
+import com.grepp.matnam.app.model.team.entity.Team;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,8 +29,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     @Query("SELECT p FROM Participant p JOIN FETCH p.user WHERE p.team.teamId = :teamId")
     List<Participant> findParticipantsWithUserByTeamId(@Param("teamId") Long teamId);
-
-    void deleteByTeam_TeamId(Long teamId);
 
     boolean existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(String userId, Long teamId, ParticipantStatus participantStatus);
 

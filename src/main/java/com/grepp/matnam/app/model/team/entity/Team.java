@@ -42,16 +42,14 @@ public class Team extends BaseEntity {
     @JoinColumn(name = "teamId")
     private List<Participant> participants;
     
-    private String restaurantAddress; // 추가
-    private String category; // 추가
+    private String restaurantAddress;
+    private String category;
 
     private String teamTitle;
 
     private String teamDetails;
 
     private LocalDateTime teamDate;
-
-//    private LocalDateTime meetDate;
 
     private Integer maxPeople;
 
