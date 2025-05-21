@@ -47,7 +47,7 @@
 ![SSE-notification-example.png](docs/sequence-diagram/SSE-notification-example.png)
 
 ## 5. API 명세서
-[맛남 API 명세서](docs/api/swagger.html)
+[맛남 API 명세서](docs/api/api.html)
 
 ## 6. 기술 스택
 <div align=center> 
