@@ -15,6 +15,7 @@ import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/team")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Team API", description = "모임 관련 REST API")
 public class TeamController {
 
     private final TeamService teamService;
@@ -54,7 +54,7 @@ public class TeamController {
 
     // 모임 생성
     @PostMapping("/create")
-    public String createTeam(@ModelAttribute TeamRequest teamRequest) {
+    public String createTeam(@Valid @ModelAttribute TeamRequest teamRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
@@ -110,7 +110,6 @@ public class TeamController {
 
 
     // 모임 상세 조회
-    @Operation(summary = "특정 모임 정보 조회 (REST API)", description = "주어진 ID의 모임 정보를 REST API로 조회")
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
         Team team = teamService.getTeamByIdWithParticipants(teamId);
