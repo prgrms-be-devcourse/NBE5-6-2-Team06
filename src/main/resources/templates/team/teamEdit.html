@@ -117,9 +117,9 @@
 <div class="container">
   <div class="title-row">
     <h1>모임 수정</h1>
-    <div class="delete-button">
-      <button id="deleteButton" type="button" th:attr="data-team-id=${team.teamId}">모임 삭제</button>
-    </div>
+<!--    <div class="delete-button">-->
+<!--      <button id="deleteButton" type="button" th:attr="data-team-id=${team.teamId}">모임 삭제</button>-->
+<!--    </div>-->
   </div>
   <form th:action="@{/team/edit/{teamId}(teamId=${team.teamId})}" method="post">
     <div class="section">
@@ -186,35 +186,35 @@
   © 2025 맛남. 모든 권리 보유.
 </footer>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const deleteBtn = document.getElementById('deleteButton');
-    if (deleteBtn) {
-      const teamId = deleteBtn.getAttribute('data-team-id');
-      deleteBtn.addEventListener('click', function () {
-        if (!confirm("정말로 이 모임을 삭제하시겠습니까?")) return;
-
-        fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
-                .then(res => {
-                  if (!res.ok) {
-                    return res.json().then(err => { throw new Error(err.message || '삭제 실패'); });
-                  }
-                  return res.json();
-                })
-                .then(data => {
-                  alert(data.message || "삭제되었습니다.");
-                  window.location.href = "/user/mypage";
-                })
-                .catch(err => {
-                  alert(err.message || "삭제 중 오류가 발생했습니다.");
-                });
-      });
-    }
-  });
+  // document.addEventListener('DOMContentLoaded', function () {
+  //   const deleteBtn = document.getElementById('deleteButton');
+  //   if (deleteBtn) {
+  //     const teamId = deleteBtn.getAttribute('data-team-id');
+  //     deleteBtn.addEventListener('click', function () {
+  //       if (!confirm("정말로 이 모임을 삭제하시겠습니까?")) return;
+  //
+  //       fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
+  //         method: 'DELETE',
+  //         headers: {
+  //           'Content-Type': 'application/json'
+  //         }
+  //       })
+  //               .then(res => {
+  //                 if (!res.ok) {
+  //                   return res.json().then(err => { throw new Error(err.message || '삭제 실패'); });
+  //                 }
+  //                 return res.json();
+  //               })
+  //               .then(data => {
+  //                 alert(data.message || "삭제되었습니다.");
+  //                 window.location.href = "/user/mypage";
+  //               })
+  //               .catch(err => {
+  //                 alert(err.message || "삭제 중 오류가 발생했습니다.");
+  //               });
+  //     });
+  //   }
+  // });
 </script>
 <script src="/js/auth.js"></script>
 <script src="/js/header.js"></script>
