@@ -35,7 +35,7 @@ function updateHeader() {
         const userInfo = auth.getUserInfo();
         headerAnonymous.style.display = 'none';
         headerLogin.style.display = 'flex';
-        document.getElementById('profile-name').textContent = userInfo.userId + '님';
+        document.getElementById('profile-name').textContent = userInfo.nickname + '님';
     } else if (headerAnonymous && headerLogin && !auth.isLoggedIn()){
         headerAnonymous.style.display = 'flex';
         headerLogin.style.display = 'none';
