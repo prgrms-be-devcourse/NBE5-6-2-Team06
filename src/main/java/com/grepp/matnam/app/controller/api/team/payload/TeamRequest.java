@@ -3,6 +3,8 @@ package com.grepp.matnam.app.controller.api.team.payload;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.entity.User;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +19,7 @@ public class TeamRequest {
     private String time;
 
     private String category;
+
     private int maxPeople;
     private int nowPeople;
 

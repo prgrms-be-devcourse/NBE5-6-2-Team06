@@ -9,6 +9,7 @@ import com.grepp.matnam.app.model.user.entity.User;
 import com.grepp.matnam.infra.response.ApiResponse;
 import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/team")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Team API", description = "모임 관련 REST API")
 public class TeamApiController {
 
     private final TeamService teamService;
@@ -34,6 +36,7 @@ public class TeamApiController {
 
     // 모임 상태 변경 - 모임 완료
     @PutMapping("/{teamId}/complete")
+    @Operation(summary = "모임 완료", description = "주최자가 모임 완료 처리 합니다")
     public ResponseEntity<String> completeTeam(@PathVariable Long teamId,
         @RequestParam Status status) {
 
@@ -56,6 +59,7 @@ public class TeamApiController {
 
     // 모임 상태 변경 - 모임 취소
     @PostMapping("/{teamId}/cancel")
+    @Operation(summary = "모임 취소", description = "주최자가 모임 취소 처리 합니다")
     public ResponseEntity<ApiResponse> cancelTeam(@PathVariable Long teamId) {
 
         String UserId = SecurityContextHolder.getContext().getAuthentication().getName();
