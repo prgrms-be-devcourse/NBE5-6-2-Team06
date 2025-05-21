@@ -83,7 +83,7 @@ public class SseService {
         sseRepository.sendShutdownEventToAllEmitters();
 
         try {
-            Thread.sleep(100); // async dispatch 유도
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

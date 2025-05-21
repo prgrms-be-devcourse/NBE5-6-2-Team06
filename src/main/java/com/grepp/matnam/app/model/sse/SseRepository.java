@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @Slf4j
@@ -50,9 +49,6 @@ public class SseRepository {
                 log.warn("Emitter 종료 중 예외 발생 - 사용자 ID: {}, 오류: {}", userId, e.getMessage());
             }
         });
-
-        // 🚨 강제 컨테이너 반영: 비동기 컨텍스트 종료 요청
-        RequestContextHolder.resetRequestAttributes();
 
         emitters.clear();
         log.info("강제 종료 - 모든 emitter complete 및 정리 완료");
