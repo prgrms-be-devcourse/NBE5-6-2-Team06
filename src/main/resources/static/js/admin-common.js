@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   if (auth.isLoggedIn()){
     document.getElementById(
-        'profile-name').textContent = auth.getUserInfo().userId + "님";
+        'profile-name').textContent = auth.getUserInfo().nickname + "님";
   }
 
   // 탭 처리
