@@ -308,7 +308,10 @@
         <p><strong>🍽 식당:</strong> <span th:text="${team.restaurantName}">스위트 하우스</span></p>
         <p><strong>📍 주소:</strong> <span th:text="${team.restaurantAddress}">서울 특별시 맛길로 331</span>
         </p>
-        <div class="map-placeholder">지도가 표시될 영역</div>
+        <br>
+        <h3>위치 선택</h3>
+        <div id="map-placeholder" style="width:100%; height:300px; border:1px solid #ccc;"></div>
+
       </div>
     </div>
   </div>
@@ -441,7 +444,7 @@
 <footer>
   © 2025 맛남. 모든 권리 보유.
 </footer>
-
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=9e9f7116c9bee853591bfa6e12c7fa5f&libraries=services"></script>
 <script th:inline="javascript">
   $(document).ready(function () {
     // 모임 참여 신청
@@ -627,6 +630,15 @@
       });
     });
   });
+  kakao.maps.load(function() {
+    const container = document.getElementById('map-placeholder');
+    const options = {
+    center: new kakao.maps.LatLng(37.5665, 126.9780),
+    level: 4
+  };
+    new kakao.maps.Map(container, options);
+  });
+
 </script>
 <script src="/js/auth.js"></script>
 <script src="/js/header.js"></script>

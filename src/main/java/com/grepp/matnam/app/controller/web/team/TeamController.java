@@ -171,6 +171,7 @@ public class TeamController {
         }
 
         model.addAttribute("team", team);
+        model.addAttribute("teamImageUrl", team.getImageUrl());
 
         if (team.getUser() != null) {
             model.addAttribute("leader", team.getUser());

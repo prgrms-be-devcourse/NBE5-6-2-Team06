@@ -395,6 +395,29 @@
       }
     }
 
+    .team-banner {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+    .team-banner__bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-position: center;
+      background-size: cover;
+      filter: brightness(0.6);
+    }
+    .team-banner__title {
+      position: relative;
+      z-index: 1;
+      color: #050505;
+      font-size: 2rem;
+      text-align: center;
+      line-height: 220px;
+      margin: 0;
+    }
+
+
     #notificationArea {
       position: fixed;
       top: 20px;
@@ -415,7 +438,7 @@
     #notificationButton {
       margin-top: 10px;
       padding: 8px 15px;
-      background-color: #007bff;
+      background-color: #6565a5;
       color: white;
       border: none;
       border-radius: 3px;
@@ -448,10 +471,16 @@
 </head>
 <body>
 <header th:replace="~{fragments/header :: siteHeader}"></header>
-<h1 th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'"
-    style="font-size: 2rem; font-weight: 700; text-align: center; margin-top: 2rem; margin-bottom: 1rem; color: #333;">
-  "모임 이름" 모임입니다 👥
-</h1>
+<div class="team-banner">
+  <div class="team-banner__bg"
+       th:style="|background-image: url('@{/img/food.jpg}');|">
+  </div>
+  <h1 class="team-banner__title"
+      th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'">
+    "모임 이름" 모임입니다 👥
+  </h1>
+</div>
+
 <div class="container">
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
