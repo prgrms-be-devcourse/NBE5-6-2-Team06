@@ -4,8 +4,6 @@ import com.grepp.matnam.app.model.sse.SseService;
 import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
@@ -25,22 +23,9 @@ public class SseApiController implements SmartLifecycle {
 
     @GetMapping(value = "/api/sse/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     @Operation(summary = "SSE 구독", description = "실시간 알림을 받기 위한 SSE 구독을 진행합니다.")
-    public SseEmitter subscribe(HttpServletResponse response) {
+    public SseEmitter subscribe() {
         String userId = AuthenticationUtils.getCurrentUserId();
-
-        // SSE 헤더 수동 설정
-        response.setHeader("Content-Type", "text/event-stream;charset=UTF-8");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setHeader("Connection", "keep-alive");
-        response.setHeader("X-Accel-Buffering", "no");
-
         SseEmitter emitter = sseService.subscribe(userId);
-
-        try {
-            response.flushBuffer();
-        } catch (IOException e) {
-            log.warn("Flush 실패 - userId: {}", userId, e);
-        }
 
         return emitter;
     }
