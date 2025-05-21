@@ -66,8 +66,8 @@ public class RecommendationConfig {
         return EmbeddingStoreContentRetriever.builder()
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
-            .maxResults(100) // 최대 100개
-            .minScore(0.6) // 유사도 0.6 이상
+            .maxResults(50)
+            .minScore(0.65)
             .build();
     }
 
