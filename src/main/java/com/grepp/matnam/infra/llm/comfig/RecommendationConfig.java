@@ -67,7 +67,7 @@ public class RecommendationConfig {
             .embeddingStore(embeddingStore)
             .embeddingModel(embeddingModel)
             .maxResults(50)
-            .minScore(0.65)
+            .minScore(0.7)
             .build();
     }
 
