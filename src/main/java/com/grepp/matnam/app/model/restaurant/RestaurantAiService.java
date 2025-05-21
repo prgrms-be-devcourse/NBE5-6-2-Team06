@@ -61,8 +61,7 @@ public interface RestaurantAiService {
         JSON은 반드시 `{}` 와 `[]` 등의 괄호가 정확히 닫혀 있어야 하며, 잘리지 않도록 짧게 작성하세요.
         """)
     @UserMessage("""
-        데이터를 통해 팀에게 3개 식당을 추천해주고 왜 추천되었는지 길게 이유를 작성해줘.
-        이유에는 반드시 숫자랑 영어를 넣지말아줘.
+        데이터를 통해 팀에게 3개 식당을 추천해줘 특히 소개,구글 평점을 활용해줘
     """)
     RestaurantRecommendResponse reRecommendRestaurant();
 
