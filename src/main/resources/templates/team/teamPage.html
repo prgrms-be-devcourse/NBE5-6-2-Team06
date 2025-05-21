@@ -422,6 +422,21 @@
       cursor: pointer;
     }
 
+    .delete-button button{
+      text-align : right;
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .delete-button button :hover {
+      background-color: #c82333;
+      transition: background-color 0.2s ease;
+    }
 
   </style>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -440,17 +455,28 @@
 <div class="container">
   <div class="section">
     <div style="display: flex; justify-content: space-between; align-items: center;">
-    <h2>방장 정보</h2>
-      <form th:if="${isLeader != null && isLeader && #strings.toString(team.status) != null && #strings.toString(team.status) != 'COMPLETED' && #strings.toString(team.status) != 'CANCELED'}"
+      <h2>방장 정보</h2>
+      <form th:if="${isLeader != null && isLeader
+              && #strings.toString(team.status) != null
+              && #strings.toString(team.status) != 'COMPLETED'
+              && #strings.toString(team.status) != 'CANCELED'}"
             th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
-            method="post" style="display: inline;">
+            method="post"
+            style="display: flex; gap: 10px; align-items: center;">
+
         <button type="submit" class="complete-button"
                 th:data-team-id="${team.teamId}"
-                th:disabled="${#strings.toString(team.status) != null && #strings.toString(team.status) == 'COMPLETED'}"
-                th:text="${#strings.toString(team.status) != null && #strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}">
+                th:disabled="${#strings.toString(team.status) == 'COMPLETED'}"
+                th:text="${#strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}">
           모임 완료하기
         </button>
+
+        <div class="delete-button" style="text-align: right"
+             th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+          <button id="deleteButton" type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+        </div>
       </form>
+
       <div th:if="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}">
         <button type="button" class="btn complete-button" disabled
                 style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
@@ -618,7 +644,7 @@
 
     <!-- 안내 메시지 + 추천 버튼 -->
     <div
-        style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+            style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
       <p style="margin-bottom: 1rem; font-size: 1.05rem; line-height: 1.6;">
         🍽️ <strong>오늘의 2차 장소</strong>, 고민하지 마세요!<br>
         <span style="color: #555;">우리 팀을 위해 AI가 분위기 좋은 맛집을 추천해드려요.</span><br>
@@ -781,35 +807,35 @@
   function loadChatHistory() {
     console.log("채팅 이력 불러오기 시도...");
     fetch(`/api/chat/history/${teamId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('채팅 이력을 불러오는데 실패했습니다.');
-      }
-      return response.json();
-    })
-    .then(result => {
-      const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = ''; // 기존 내용 초기화
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('채팅 이력을 불러오는데 실패했습니다.');
+              }
+              return response.json();
+            })
+            .then(result => {
+              const chatBox = document.getElementById('chat-box');
+              chatBox.innerHTML = ''; // 기존 내용 초기화
 
-      const messages = result.data;
+              const messages = result.data;
 
-      if (!Array.isArray(messages)) {
-        console.error("채팅 이력이 배열이 아닙니다:", messages);
-        return;
-      }
+              if (!Array.isArray(messages)) {
+                console.error("채팅 이력이 배열이 아닙니다:", messages);
+                return;
+              }
 
-      // 채팅 메시지 표시
-      messages.forEach(message => {
-        showMessage(
-            `[${message.time}] ${message.senderNickname}: ${message.message}`,
-            message.senderId,
-            message.chatId
-        );
-      });
-    })
-    .catch(error => {
-      console.error("채팅 이력 로딩 오류:", error);
-    });
+              // 채팅 메시지 표시
+              messages.forEach(message => {
+                showMessage(
+                        `[${message.time}] ${message.senderNickname}: ${message.message}`,
+                        message.senderId,
+                        message.chatId
+                );
+              });
+            })
+            .catch(error => {
+              console.error("채팅 이력 로딩 오류:", error);
+            });
   }
 
   // 모임 완료 - 완료 버튼을 비활성화
@@ -943,19 +969,19 @@
         },
         body: JSON.stringify(reportData)
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.code === 'SUCCESS' || data.code === '0000') {
-          closeReportModal();
-          showToastTeamPage('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
-        } else {
-          showToastTeamPage('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        showToastTeamPage('신고 처리 중 오류가 발생했습니다.', 'error');
-      });
+              .then(response => response.json())
+              .then(data => {
+                if (data.code === 'SUCCESS' || data.code === '0000') {
+                  closeReportModal();
+                  showToastTeamPage('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
+                } else {
+                  showToastTeamPage('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                showToastTeamPage('신고 처리 중 오류가 발생했습니다.', 'error');
+              });
     });
   });
   // ====================================== 추천 ========================================
@@ -980,37 +1006,37 @@
     loading.style.display = "block";
 
     fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('추천 실패');
-      }
-      return response.json();
-    })
-    .then(result => {
-      console.log("📦 받아온 추천 응답:", result);
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('추천 실패');
+              }
+              return response.json();
+            })
+            .then(result => {
+              console.log("📦 받아온 추천 응답:", result);
 
-      const data = result.data;
+              const data = result.data;
 
-      if (!data || !Array.isArray(data.restaurants)) {
-        console.error("❌ 잘못된 응답 형식 (data.restaurants 없음):", data);
-        showToastTeamPage("추천 결과를 불러올 수 없습니다.", "error");
-        loading.style.display = "none";
-        return;
-      }
+              if (!data || !Array.isArray(data.restaurants)) {
+                console.error("❌ 잘못된 응답 형식 (data.restaurants 없음):", data);
+                showToastTeamPage("추천 결과를 불러올 수 없습니다.", "error");
+                loading.style.display = "none";
+                return;
+              }
 
-      const restaurants = data.restaurants;
-      const reason = data.reason;
-      let completed = 0;
+              const restaurants = data.restaurants;
+              const reason = data.reason;
+              let completed = 0;
 
-      restaurants.forEach(name => {
-        fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
-        .then(res => res.json())
-        .then(dbItem => {
-          const data = dbItem.data;
-          const card = document.createElement("div");
-          card.className = "recommend-card";
+              restaurants.forEach(name => {
+                fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
+                        .then(res => res.json())
+                        .then(dbItem => {
+                          const data = dbItem.data;
+                          const card = document.createElement("div");
+                          card.className = "recommend-card";
 
-          card.innerHTML = `
+                          card.innerHTML = `
               <div>
                 <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem;">🍽️ ${data.restaurantName}</h2>
                 <p style="margin-bottom: 0.6rem;"><strong>📍 위치:</strong> ${data.address}</p>
@@ -1026,29 +1052,59 @@
               </div>
             `;
 
-          wrapper.appendChild(card);
-        })
-        .catch(err => {
-          console.error("식당 정보 조회 실패", err);
-        })
-        .finally(() => {
-          completed++;
-          if (completed === restaurants.length) {
-            loading.style.display = "none";
-            reasonBox.innerHTML = `
+                          wrapper.appendChild(card);
+                        })
+                        .catch(err => {
+                          console.error("식당 정보 조회 실패", err);
+                        })
+                        .finally(() => {
+                          completed++;
+                          if (completed === restaurants.length) {
+                            loading.style.display = "none";
+                            reasonBox.innerHTML = `
                 <h2 style="margin-top: 0; margin-bottom: 0.8rem;">💬 추천 이유</h2>
                 <div>${reason}</div>
               `;
-            reasonBox.style.display = "block";
-          }
-        });
-      });
-    })
-    .catch(err => {
-      console.error("추천 요청 실패", err);
-      loading.style.display = "none";
-    });
+                            reasonBox.style.display = "block";
+                          }
+                        });
+              });
+            })
+            .catch(err => {
+              console.error("추천 요청 실패", err);
+              loading.style.display = "none";
+            });
   }
+  //모임 삭제 버튼
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteBtn = document.getElementById('deleteButton');
+    if (deleteBtn) {
+      const teamId = deleteBtn.getAttribute('data-team-id');
+      deleteBtn.addEventListener('click', function () {
+        if (!confirm("정말로 이 모임을 삭제하시겠습니까? 삭제 이후 되돌릴 수 없습니다.")) return;
+
+        fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+                .then(res => {
+                  if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.message || '삭제 실패'); });
+                  }
+                  return res.json();
+                })
+                .then(data => {
+                  alert(data.message || "삭제되었습니다.");
+                  window.location.href = "/user/mypage";
+                })
+                .catch(err => {
+                  alert(err.message || "삭제 중 오류가 발생했습니다.");
+                });
+      });
+    }
+  });
 
 </script>
 <script src="/js/auth.js"></script>

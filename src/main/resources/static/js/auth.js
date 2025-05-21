@@ -1,7 +1,8 @@
-const auth = {
-    isLoggedIn() {
-        return this.getCookie('jwtToken') !== null;
-    },
+(function(global) {
+    const auth = {
+        isLoggedIn() {
+            return this.getCookie('jwtToken') !== null;
+        },
 
     getUserInfo() {
         if (!this.isLoggedIn()) return null;
@@ -76,4 +77,7 @@ const auth = {
     }
 };
 
-window.auth = auth;
+    if (!global.auth) {
+        global.auth = auth;
+    }
+})(window);

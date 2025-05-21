@@ -425,6 +425,7 @@
     }
     .btn-primary,
     .cancel-btn {
+      margin-top: 0.3rem;
       font-size: 13px;
       background-color: #ff4d4d;
       padding: 0.5rem 1rem;
@@ -535,6 +536,22 @@
       margin: 0;
       border: none;
       padding: 0;
+    }
+
+    .delete-button button{
+      text-align : right;
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .delete-button button :hover {
+      background-color: #c82333;
+      transition: background-color 0.2s ease;
     }
 
     .add-restaurant-btn {
@@ -674,13 +691,18 @@
               <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
               <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
               <hr>
-
+              <div style="display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;">
               <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
                or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                       th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                       th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
                 모임 수정
               </button>
+                <div class="delete-button" style="text-align: right"
+                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                  <button type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+               </div>
+              </div>
               <div
                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
                 <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
@@ -768,13 +790,18 @@
               <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
               <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
               <hr>
-
+              <div style="display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;">
               <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
                or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
                       th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
                       th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
                 모임 수정
               </button>
+                <div class="delete-button" style="text-align: right"
+                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                  <button type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+                </div>
+              </div>
               <div
                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
                 <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
@@ -1086,6 +1113,40 @@
 
     scrollToTeamSectionIfNeeded();
     scrollToReviewsIfNeeded();
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-button button');
+
+    deleteButtons.forEach(button => {
+      const teamId = button.getAttribute('data-team-id');
+
+      button.addEventListener('click', function () {
+        if (!confirm("정말로 이 모임을 삭제하시겠습니까? 삭제 이후 되돌릴 수 없습니다.")) return;
+
+        fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+                .then(res => {
+                  if (!res.ok) {
+                    return res.json().then(err => {
+                      throw new Error(err.message || '삭제 실패');
+                    });
+                  }
+                  return res.json();
+                })
+                .then(data => {
+                  alert(data.message || "삭제되었습니다.");
+                  window.location.href = "/user/mypage";
+                })
+                .catch(err => {
+                  alert(err.message || "삭제 중 오류가 발생했습니다.");
+                });
+      });
+    });
   });
 
 </script>
