@@ -82,12 +82,6 @@ public class SseService {
         log.info("SseService - 모든 Emitter 정리 및 complete 처리 시작 (SmartLifecycle)");
         sseRepository.sendShutdownEventToAllEmitters();
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
         sseRepository.clearAllEmittersImmediately();
         log.info("SseService - 모든 Emitter 정리 및 complete 처리 완료 (SmartLifecycle)");
     }
