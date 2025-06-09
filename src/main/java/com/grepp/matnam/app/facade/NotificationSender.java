@@ -3,7 +3,6 @@ package com.grepp.matnam.app.facade;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.notification.entity.Notice;
 import com.grepp.matnam.app.model.notification.entity.Notification;
-import com.grepp.matnam.app.model.notification.repository.NotificationRepository;
 import com.grepp.matnam.app.model.notification.service.NotificationService;
 import com.grepp.matnam.app.model.sse.SseService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationSender {
     private final NotificationService notificationService;
-    private final NotificationRepository notificationRepository;
     private final SseService sseService;
 
     /**
@@ -29,7 +27,7 @@ public class NotificationSender {
         sseService.sendNotificationToUser(userId, "newMessage", notification);
 
         // 읽지 않은 알림 개수 전송
-        long unreadCount = notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(userId);
+        long unreadCount = notificationService.getUnreadNotificationCount(userId);
         sseService.sendNotificationToUser(userId, "unreadCount", unreadCount);
     }
 
@@ -40,7 +38,7 @@ public class NotificationSender {
         sseService.sendNotificationToUser(userId, "newMessage", notification);
 
         // 읽지 않은 알림 개수 전송
-        long unreadCount = notificationRepository.countByUserIdAndIsReadFalseAndActivatedTrue(userId);
+        long unreadCount = notificationService.getUnreadNotificationCount(userId);
         sseService.sendNotificationToUser(userId, "unreadCount", unreadCount);
     }
 }
