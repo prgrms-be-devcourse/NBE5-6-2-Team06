@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelector('#error-hours').textContent = result.openTime;
                 document.querySelector('#error-main-menu').textContent = result.mainFood;
                 document.querySelector('#error-description').textContent = result.summary;
-                document.querySelector('#error-mood').textContent = result.mood;
+                document.querySelector('#error-mood').textContent = result.moodSelectionCountValid;
                 document.querySelector('#error-google-rating').textContent = result.googleRating;
                 alert('필수 항목을 확인해주세요.');
             }

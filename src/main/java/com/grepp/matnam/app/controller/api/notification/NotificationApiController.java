@@ -7,6 +7,7 @@ import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import com.grepp.matnam.infra.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +59,7 @@ public class NotificationApiController {
 
     @PostMapping("/mark-read")
     @Operation(summary = "알림 읽음 처리", description = "알림을 읽음 처리합니다.")
-    public ResponseEntity<ApiResponse<Void>> markAsRead(@RequestBody NotificationIdsRequest request) {
+    public ResponseEntity<ApiResponse<Void>> markAsRead(@RequestBody @Valid NotificationIdsRequest request) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
         notificationService.markAsRead(currentUserId, request.getNotificationIds());
         return ResponseEntity.ok(ApiResponse.noContent());

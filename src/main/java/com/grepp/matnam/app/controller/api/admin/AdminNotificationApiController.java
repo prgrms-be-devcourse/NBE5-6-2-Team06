@@ -6,6 +6,7 @@ import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.infra.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class AdminNotificationApiController {
     @PostMapping("/broadcast")
     @Operation(summary = "공지사항 발송", description = "모든 활성 사용자들에게 공지사항을 발송합니다.")
     public ResponseEntity<ApiResponse<Void>> broadcastNotice(
-        @RequestBody BroadcastNotificationRequest request) {
+        @RequestBody @Valid BroadcastNotificationRequest request) {
         userService.sendBroadcastNotification(request.getContent());
         return ResponseEntity.ok(ApiResponse.noContent());
     }
