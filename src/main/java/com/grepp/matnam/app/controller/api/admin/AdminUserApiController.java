@@ -36,25 +36,24 @@ public class AdminUserApiController {
 
     @PatchMapping("/list/{userId}")
     @Operation(summary = "사용자 상태 수정", description = "특정 사용자의 상태(정상, 정지, 영구정지)를 수정합니다.")
-    public ResponseEntity<?> updateUserStatus(@PathVariable String userId,
+    public ResponseEntity<ApiResponse<Void>> updateUserStatus(@PathVariable String userId,
         @RequestBody UserStatusRequest request) {
-
         userService.updateUserStatus(userId, request);
-        return ResponseEntity.ok("사용자 상태가 수정되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @DeleteMapping("/list/{userId}")
     @Operation(summary = "사용자 비활성화", description = "특정 사용자를 비활성화합니다.")
-    public ResponseEntity<?> unActivatedUser(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<Void>> unActivatedUser(@PathVariable String userId) {
         userService.unActivatedById(userId);
-        return ResponseEntity.ok("사용자가 비활성화되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @PatchMapping("/report/{reportId}")
     @Operation(summary = "신고 처리", description = "특정 신고를 처리합니다.")
-    public ResponseEntity<?> unActivatedReport(@PathVariable Long reportId) {
+    public ResponseEntity<ApiResponse<Void>> unActivatedReport(@PathVariable Long reportId) {
         reportService.unActivatedById(reportId);
-        return ResponseEntity.ok("신고 처리가 완료되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @GetMapping("/report/team/{teamId}")

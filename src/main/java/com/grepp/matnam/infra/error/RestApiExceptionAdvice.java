@@ -15,7 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(basePackages = "com.grepp.spring.app.controller.api")
+@RestControllerAdvice(basePackages = "com.grepp.matnam.app.controller.api")
 @Slf4j
 public class RestApiExceptionAdvice {
     

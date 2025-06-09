@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                alert('사용자 정보가 저장되었습니다.');
+                alert("사용자 상태가 수정되었습니다.");
                 document.getElementById('userEditModal').style.display = 'none';
                 window.location.reload(); // 새로고침으로 반영
 
@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("사용자가 비활성화되었습니다.")
                     window.location.reload(); // 페이지 새로고침
                 } else {
                     return response.text().then(text => { throw new Error(text) });
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("신고 처리가 완료되었습니다.")
                     window.location.reload(); // 페이지 새로고침
                 } else {
                     return response.text().then(text => { throw new Error(text) });
@@ -394,7 +394,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("신고 처리가 완료되었습니다.")
                     document.getElementById('reportViewModal').style.display = 'none';
                     window.location.reload(); // 페이지 새로고침
                 } else {
