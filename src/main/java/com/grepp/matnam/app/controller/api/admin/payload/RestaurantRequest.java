@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.admin.payload;
 
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -48,6 +49,24 @@ public class RestaurantRequest {
     private boolean goodMenu;
     private boolean longStay;
     private boolean bigStore;
+
+    @AssertTrue(message = "최소 1개에서 최대 3개의 분위기를 선택해주세요. ")
+    public boolean isMoodSelectionCountValid() {
+        int count = 0;
+
+        if (goodTalk) count++;
+        if (manyDrink) count++;
+        if (goodMusic) count++;
+        if (clean) count++;
+        if (goodView) count++;
+        if (isTerrace) count++;
+        if (goodPicture) count++;
+        if (goodMenu) count++;
+        if (longStay) count++;
+        if (bigStore) count++;
+
+        return count >= 1 && count <= 3;
+    }
 
     public Restaurant toEntity() {
         Restaurant restaurant = new Restaurant();

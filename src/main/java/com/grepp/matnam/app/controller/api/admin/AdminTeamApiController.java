@@ -9,6 +9,7 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.infra.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class AdminTeamApiController {
 
     @PatchMapping("/{teamId}")
     @Operation(summary = "모임 상태 변경", description = "특정 모임 상태를 변경합니다.")
-    public ResponseEntity<ApiResponse<Void>> updateTeamStatus(@PathVariable Long teamId, @RequestBody TeamStatusUpdateRequest teamStatusUpdateRequest) {
+    public ResponseEntity<ApiResponse<Void>> updateTeamStatus(@PathVariable Long teamId, @RequestBody @Valid TeamStatusUpdateRequest teamStatusUpdateRequest) {
         teamService.updateTeamStatus(teamId, teamStatusUpdateRequest);
         return ResponseEntity.ok(ApiResponse.noContent());
     }
