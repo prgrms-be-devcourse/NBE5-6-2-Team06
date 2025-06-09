@@ -2,7 +2,6 @@ package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRankingResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.RestaurantRequest;
-import com.grepp.matnam.app.controller.api.admin.validator.RestaurantRequestValidator;
 import com.grepp.matnam.app.model.restaurant.RestaurantService;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.infra.error.exceptions.CommonException;
@@ -16,10 +15,8 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,11 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminRestaurantApiController {
 
     private final RestaurantService restaurantService;
-
-    @InitBinder("restaurantRequest")
-    protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(new RestaurantRequestValidator());
-    }
 
     @GetMapping("/{restaurantId}")
     @Operation(summary = "식당 상세 조회", description = "특정 식당의 상세를 조회합니다.")
