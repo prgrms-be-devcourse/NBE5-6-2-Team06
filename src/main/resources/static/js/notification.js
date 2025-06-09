@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(message => {alert(message)});
+          alert("공지사항이 성공적으로 발송되었습니다.");
           createNotificationModal.style.display = 'none';
           notificationForm.reset();
           window.location.reload(); // 페이지 새로고침
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("공지사항이 비활성화되었습니다.");
           window.location.reload(); // 페이지 새로고침
         } else {
           return response.text().then(text => { throw new Error(text) });
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("공지사항이 성공적으로 발송되었습니다.");
           window.location.reload(); // 페이지 새로고침
         } else {
           return response.text().then(text => { throw new Error(text) });

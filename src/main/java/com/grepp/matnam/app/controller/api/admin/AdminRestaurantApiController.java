@@ -11,13 +11,11 @@ import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,43 +51,24 @@ public class AdminRestaurantApiController {
 
     @PatchMapping("/{restaurantId}")
     @Operation(summary = "식당 상세 수정", description = "특정 식당의 상세를 수정합니다.")
-    public ResponseEntity<?> updateRestaurant(@PathVariable Long restaurantId,
-        @RequestBody @Valid RestaurantRequest request, BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(errors);
-        }
-
+    public ResponseEntity<ApiResponse<Void>> updateRestaurant(@PathVariable Long restaurantId,
+        @RequestBody @Valid RestaurantRequest request) {
         restaurantService.updateRestaurant(restaurantId, request);
-        return ResponseEntity.ok("식당이 수정되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @DeleteMapping("/{restaurantId}")
     @Operation(summary = "식당 비활성화", description = "특정 식당을 비활성화합니다.")
-    public ResponseEntity<?> unActivatedRestaurant(@PathVariable Long restaurantId) {
+    public ResponseEntity<ApiResponse<Void>> unActivatedRestaurant(@PathVariable Long restaurantId) {
         restaurantService.unActivatedRestaurant(restaurantId);
-        return ResponseEntity.ok("식당이 삭제되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @PostMapping
     @Operation(summary = "새 식당 추가", description = "새 식당을 추가합니다.")
-    public ResponseEntity<?> createRestaurant(@RequestBody @Valid RestaurantRequest request,
-        BindingResult bindingResult) {
-
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(errors);
-        }
-
+    public ResponseEntity<ApiResponse<Void>> createRestaurant(@RequestBody @Valid RestaurantRequest request) {
         restaurantService.createRestaurant(request);
-        return ResponseEntity.ok("식당이 추가되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @GetMapping("/statistics/category-distribution")
