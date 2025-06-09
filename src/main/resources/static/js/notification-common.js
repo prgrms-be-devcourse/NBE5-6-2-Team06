@@ -95,7 +95,7 @@ class NotificationHandler {
         try {
             const response = await window.auth.fetchWithAuth('/api/notification/unread-count');
             if (response && response.ok) {
-                this.unreadCount = await response.json();
+                this.unreadCount = (await response.json()).data;
                 this.updateBadge();
             }
         } catch (error) {
@@ -114,7 +114,7 @@ class NotificationHandler {
         try {
             const response = await window.auth.fetchWithAuth(url);
             if (response && response.ok) {
-                const data = await response.json();
+                const data = (await response.json()).data;
                 // console.log(data);
                 this.notifications = data;
                 this.renderNotifications();

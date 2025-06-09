@@ -116,22 +116,22 @@ document.addEventListener('DOMContentLoaded', function() {
             body: JSON.stringify(payload)
         })
         .then(async (response) => {
+            const result = (await response.json()).data;
             if (response.ok) {
-                response.text().then(message => {alert(message)});
+                alert("식당이 저장되었습니다.")
                 // 모달 닫기 등 후처리
                 document.getElementById('restaurantModal').style.display = 'none';
                 location.reload(); // 새로고침으로 반영
             } else {
-                const errorMessages = await response.json();
-                document.querySelector('#error-name').textContent = errorMessages.name;
-                document.querySelector('#error-category').textContent = errorMessages.category;
-                document.querySelector('#error-address').textContent = errorMessages.address;
-                document.querySelector('#error-phone').textContent = errorMessages.tel;
-                document.querySelector('#error-hours').textContent = errorMessages.openTime;
-                document.querySelector('#error-main-menu').textContent = errorMessages.mainFood;
-                document.querySelector('#error-description').textContent = errorMessages.summary;
-                document.querySelector('#error-mood').textContent = errorMessages.mood;
-                document.querySelector('#error-google-rating').textContent = errorMessages.googleRating;
+                document.querySelector('#error-name').textContent = result.name;
+                document.querySelector('#error-category').textContent = result.category;
+                document.querySelector('#error-address').textContent = result.address;
+                document.querySelector('#error-phone').textContent = result.tel;
+                document.querySelector('#error-hours').textContent = result.openTime;
+                document.querySelector('#error-main-menu').textContent = result.mainFood;
+                document.querySelector('#error-description').textContent = result.summary;
+                document.querySelector('#error-mood').textContent = result.mood;
+                document.querySelector('#error-google-rating').textContent = result.googleRating;
                 alert('필수 항목을 확인해주세요.');
             }
         })
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .then(response => {
                     if (response.ok) {
-                        response.text().then(message => {alert(message)});
+                        alert("식당이 삭제되었습니다.")
                         window.location.href = "/admin/restaurant";
                     } else {
                         alert("삭제 실패: 서버 오류");
