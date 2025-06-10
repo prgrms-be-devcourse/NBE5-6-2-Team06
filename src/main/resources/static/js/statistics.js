@@ -133,8 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(data => {
       const result = data.data;
-      const labels = result.map(item => item.activityDay);
-      const chartData = result.map(item => item.uniqueUserCount);
+      const labels = result.map(item => item.label);
+      const chartData = result.map(item => item.value);
       new Chart(dailyActiveUsersCtx, {
         type: 'line',
         data: {
@@ -181,6 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     .then(data => {
       const result = data.data;
+      console.log(result)
       new Chart(preferenceCountsCtx, {
         type: 'bar',
         data: {
@@ -259,16 +260,16 @@ document.addEventListener('DOMContentLoaded', function () {
       return response.json();
     })
     .then(data => {
-      const result = data.data
-      const labels = result.map(item => item.month);
-      const successRates = result.map(item => parseFloat(item.successRate));
+      const result = data.data;
+      const labels = result.map(item => item.label);
+      const chartData = result.map(item => item.value);
       new Chart(meetingSuccessRateCtx, {
         type: 'line',
         data: {
           labels: labels,
           datasets: [{
             label: '성공률 (%)',
-            data: successRates,
+            data: chartData,
             borderColor: 'rgba(54, 162, 235, 1)',
             backgroundColor: 'rgba(54, 162, 235, 0.2)',
             tension: 0.3,

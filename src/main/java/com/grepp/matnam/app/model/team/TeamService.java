@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.controller.api.admin.payload.StatDoubleResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamStatusUpdateRequest;
 import com.grepp.matnam.app.controller.web.admin.payload.ActiveTeamResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.NewTeamResponse;
@@ -7,15 +8,13 @@ import com.grepp.matnam.app.controller.web.admin.payload.TeamStatsResponse;
 import com.grepp.matnam.app.facade.NotificationSender;
 import com.grepp.matnam.app.model.chat.entity.ChatRoom;
 import com.grepp.matnam.app.model.chat.repository.ChatRoomRepository;
-
-import com.grepp.matnam.app.model.restaurant.RestaurantRepository;
-import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.grepp.matnam.app.model.mymap.MymapRepository;
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.notification.code.NotificationType;
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Role;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.team.dto.MonthlyMeetingStatsDto;
 import com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto;
 import com.grepp.matnam.app.model.team.entity.Participant;
 import com.grepp.matnam.app.model.team.entity.Team;
@@ -30,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -426,23 +424,18 @@ public class TeamService {
         return String.format("%s%.0f%%", sign, percent);
     }
 
-    public List<Map<String, String>> getMonthlyMeetingSuccessRate() {
+    public List<StatDoubleResponse> getMonthlyMeetingSuccessRate() {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6).withDayOfMonth(1)
             .withHour(0).withMinute(0).withSecond(0).withNano(0);
-        List<Map<String, Long>> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
-
+        List<MonthlyMeetingStatsDto> monthlyStats = teamRepository.findMonthlyMeetingStats(sixMonthsAgo);
         return monthlyStats.stream().map(stat -> {
-            Object monthObj = stat.get("meetingMonth");
-            String month = String.valueOf(monthObj);
+            String month = stat.getMeetingMonth();
+            Long total = stat.getTotalMeetings();
+            Long completed = stat.getCompletedMeetings();
 
-            Long total = stat.get("totalMeetings");
-            Long completed = stat.get("completedMeetings");
-            double successRate = (total > 0) ? ((double) completed / total) * 100 : 0;
+            double successRate = (total != null && total > 0) ? ((double) completed / total) * 100 : 0.0;
 
-            return Map.of(
-                "month", month,
-                "successRate", String.format("%.2f", successRate)
-            );
+            return new StatDoubleResponse(month, Math.round(successRate * 100.0) / 100.0);
         }).collect(Collectors.toList());
     }
 
@@ -565,8 +558,8 @@ public class TeamService {
         statsDto.setCompletedTeams(teamRepository.countByStatusInAndActivatedTrue(List.of(Status.COMPLETED)));
         statsDto.setNewTeamsLast30Days(
             teamRepository.countByCreatedAtAfterAndActivatedTrue(LocalDateTime.now().minusDays(30)));
-        Double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
-        statsDto.setAverageTeamSize(averageSize != null ? averageSize : 0);
+        double averageSize = teamRepository.averageMaxPeopleForActiveTeams();
+        statsDto.setAverageTeamSize(averageSize);
         return statsDto;
     }
 
