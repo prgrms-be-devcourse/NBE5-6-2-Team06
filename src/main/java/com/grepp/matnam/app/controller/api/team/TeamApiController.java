@@ -87,7 +87,7 @@ public class TeamApiController {
     }
 
     // 참여 신청
-    @PostMapping("/{teamId}/apply")
+    @PostMapping("/{teamId}/apply/{userId}")
     @Operation(summary = "모임 참여 신청", description = "사용자가 모임에 참여 신청을 합니다.")
     public ResponseEntity<ApiResponse<String>> applyToJoinTeam(@PathVariable Long teamId) {
 
