@@ -21,22 +21,6 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     // 사용자 ID로 팀 조회 (주최자)
     List<Team> findTeamsByUser_UserIdAndActivatedTrue(String userId);
 
-
-    @Query("SELECT t FROM Team t JOIN t.participants p " +
-        "WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus AND t.activated = true")
-    List<Team> findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
-        @Param("userId") String userId,
-        @Param("participantStatus") ParticipantStatus participantStatus
-    );
-
-    // 페이징(참여중인 모임 조회)
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.activated = true AND t.status != 'COMPLETED' AND t.status != 'CANCELED' ORDER BY t.createdAt DESC")
-    Page<Team> findAllWithParticipantsAndActivatedTrue(Pageable pageable);
-
-    @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user " +
-        "WHERE t.teamId = :teamId AND t.activated = true")
-    Optional<Team> findByIdWithParticipantsAndUserAndActivatedTrue(@Param("teamId") Long teamId);
-
     Optional<Team> findByTeamIdAndActivatedTrue(Long teamId);
 
     long countAllByActivated(Boolean activated);
