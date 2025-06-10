@@ -1,6 +1,5 @@
 package com.grepp.matnam.app.model.restaurant;
 
-import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendRequest;
 import com.grepp.matnam.app.controller.api.restaurant.payload.RestaurantRecommendResponse;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
