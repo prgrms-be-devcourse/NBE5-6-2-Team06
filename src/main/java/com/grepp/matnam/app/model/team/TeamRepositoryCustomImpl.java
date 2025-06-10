@@ -1,16 +1,24 @@
 package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
+import com.grepp.matnam.app.model.team.dto.MonthlyMeetingStatsDto;
+import com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto;
 import com.grepp.matnam.app.model.team.entity.QParticipant;
 import com.grepp.matnam.app.model.team.entity.QTeam;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -127,6 +135,63 @@ public class TeamRepositoryCustomImpl implements TeamRepositoryCustom {
             .from(team);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public List<MonthlyMeetingStatsDto> findMonthlyMeetingStats(LocalDateTime startDate) {
+        Expression<String> monthExpr = Expressions.stringTemplate("DATE_FORMAT({0}, '%Y-%m')", team.teamDate);
+        NumberExpression<Long> completedMeetings = new CaseBuilder()
+            .when(team.status.eq(Status.COMPLETED))
+            .then(1L)
+            .otherwise(0L)
+            .sum();
+
+        return queryFactory
+            .select(Projections.constructor(
+                MonthlyMeetingStatsDto.class,
+                monthExpr,
+                team.count(),
+                completedMeetings
+            ))
+            .from(team)
+            .where(
+                team.teamDate.goe(startDate),
+                team.activated.isTrue()
+            )
+            .groupBy(monthExpr)
+            .orderBy(new OrderSpecifier<>(Order.ASC, monthExpr))
+            .fetch();
+    }
+
+    @Override
+    public double averageMaxPeopleForActiveTeams() {
+        return Optional.ofNullable(
+            queryFactory
+                .select(team.maxPeople.avg())
+                .from(team)
+                .where(
+                    team.status.in(Status.RECRUITING, Status.FULL),
+                    team.activated.isTrue()
+                )
+                .fetchOne()
+        ).orElse(0.0);
+    }
+
+    @Override
+    public List<ParticipantWithUserIdDto> findAllDtoByTeamId(Long teamId) {
+        return queryFactory
+            .select(Projections.constructor(
+                ParticipantWithUserIdDto.class,
+                participant.participantId,
+                user.userId
+            ))
+            .from(participant)
+            .join(participant.user, user)
+            .where(
+                participant.team.teamId.eq(teamId),
+                participant.participantStatus.eq(ParticipantStatus.APPROVED)
+            )
+            .fetch();
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {
