@@ -6,6 +6,7 @@ import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,30 +14,32 @@ import lombok.Setter;
 @Setter
 public class TeamRequest {
 
-    @NotBlank
+    @NotBlank(message = "제목은 필수 입력 값입니다.")
+    @Size(max = 100, message = "제목은 100자를 초과할 수 없습니다.")
     private String title;
-    @NotBlank
+    @NotBlank(message = "설명은 필수 입력 값입니다.")
+    @Size(max = 500, message = "설명은 500자를 초과할 수 없습니다.")
     private String description;
 
-    @NotBlank
+    @NotBlank(message = "날짜는 필수 입력 값입니다.")
     private String date;
-    @NotBlank
+
+    @NotBlank(message = "시간은 필수 입력 값입니다.")
     private String time;
 
-    @NotBlank
     private String category;
+    private Integer maxPeople;
+    private Integer nowPeople;
 
-    @NotBlank
-    private int maxPeople;
-    @NotBlank
-    private int nowPeople;
-
-    @NotBlank
+    @NotBlank(message = "식당 이름은 필수 입력 값입니다.")
     private String restaurantName;
-    @NotBlank
+
+    @NotBlank(message = "식당 주소는 필수 입력 값입니다.")
     private String restaurantAddress;
 
-    public Team toDto(User user) {
+    private String imageUrl;
+
+    public Team toEntity(User user) {
         Team team = new Team();
         team.setUser(user);
         team.setTeamTitle(this.title);
@@ -47,6 +50,7 @@ public class TeamRequest {
         team.setStatus(Status.RECRUITING);
         team.setRestaurantName(this.restaurantName);
         team.setRestaurantAddress(this.restaurantAddress);
+        team.setImageUrl(this.imageUrl);
         return team;
     }
 
