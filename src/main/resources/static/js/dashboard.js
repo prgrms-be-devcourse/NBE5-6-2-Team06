@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             const result = data.data;
-            const labels = result.map(item => item.activityMonth);
-            const chartData = result.map(item => item.uniqueUserCount);
+            const labels = result.map(item => item.label);
+            const chartData = result.map(item => item.value);
 
             new Chart(userActivityCtx, {
                 type: 'line',
@@ -58,9 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
-            const result = data.data
-            const labels = result.map(item => item.month);
-            const successRates = result.map(item => parseFloat(item.successRate));
+            const result = data.data;
+            const labels = result.map(item => item.label);
+            const chartData = result.map(item => item.value);
 
             new Chart(meetingSuccessCtx, {
                 type: 'bar',
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     labels: labels,
                     datasets: [{
                         label: '성공률 (%)',
-                        data: successRates,
+                        data: chartData,
                         backgroundColor: '#4a6cf7'
                     }]
                 },

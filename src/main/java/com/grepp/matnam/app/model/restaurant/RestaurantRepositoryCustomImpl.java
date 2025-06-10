@@ -3,12 +3,12 @@ package com.grepp.matnam.app.model.restaurant;
 import com.grepp.matnam.app.model.restaurant.entity.QRestaurant;
 import com.grepp.matnam.app.model.restaurant.entity.Restaurant;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
 @RequiredArgsConstructor
-public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCustom{
+public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCustom {
+
     private final JPAQueryFactory queryFactory;
     private final QRestaurant restaurant = QRestaurant.restaurant;
 
@@ -122,6 +123,48 @@ public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCusto
             .from(restaurant);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public double averageGoogleRating() {
+        return Optional.ofNullable(queryFactory
+            .select(restaurant.googleRating.avg())
+            .from(restaurant)
+            .where(restaurant.activated.isTrue())
+            .fetchOne()).orElse(0.0);
+    }
+
+    @Override
+    public long sumRecommendedCount() {
+        return Optional.ofNullable(queryFactory
+            .select(restaurant.recommendedCount.sum())
+            .from(restaurant)
+            .where(restaurant.activated.isTrue())
+            .fetchOne()).orElse(0);
+    }
+
+    @Override
+    public double averageGoogleRatingByCategory(String category) {
+        return Optional.ofNullable(queryFactory
+            .select(restaurant.googleRating.avg())
+            .from(restaurant)
+            .where(
+                restaurant.category.eq(category),
+                restaurant.activated.isTrue()
+            )
+            .fetchOne()).orElse(0.0);
+    }
+
+    @Override
+    public long sumRecommendedCountByCategory(String category) {
+        return Optional.ofNullable(queryFactory
+            .select(restaurant.recommendedCount.sum())
+            .from(restaurant)
+            .where(
+                restaurant.category.eq(category),
+                restaurant.activated.isTrue()
+            )
+            .fetchOne()).orElse(0);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {

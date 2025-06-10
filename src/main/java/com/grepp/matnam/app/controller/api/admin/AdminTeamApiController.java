@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.ParticipantResponse;
+import com.grepp.matnam.app.controller.api.admin.payload.StatDoubleResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamStatusUpdateRequest;
 import com.grepp.matnam.app.model.team.TeamService;
@@ -65,7 +66,7 @@ public class AdminTeamApiController {
 
     @GetMapping("/statistics/success-rate/monthly")
     @Operation(summary = "최근 6개월 모임 성공률 조회", description = "최근 6개월간의 모임 성공률을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<Map<String, String>>>> getMonthlyMeetingSuccessRateData() {
+    public ResponseEntity<ApiResponse<List<StatDoubleResponse>>> getMonthlyMeetingSuccessRateData() {
         return ResponseEntity.ok(ApiResponse.success(teamService.getMonthlyMeetingSuccessRate()));
     }
 

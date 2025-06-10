@@ -2,11 +2,9 @@ package com.grepp.matnam.app.model.team;
 
 import com.grepp.matnam.app.model.team.code.ParticipantStatus;
 import com.grepp.matnam.app.model.team.code.Status;
-import com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto;
 import com.grepp.matnam.app.model.team.entity.Team;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,24 +64,6 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     Optional<Team> findByTeamIdAndActivatedTrue(Long teamId);
 
     long countAllByActivated(Boolean activated);
-
-    @Query("SELECT " +
-        "FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') AS meetingMonth, " +
-        "COUNT(t) AS totalMeetings, " +
-        "SUM(CASE WHEN t.status = 'COMPLETED' THEN 1 ELSE 0 END) AS completedMeetings " +
-        "FROM Team t " +
-        "WHERE t.teamDate >= :startDate and t.activated = true " +
-        "GROUP BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m') " +
-        "ORDER BY FUNCTION('DATE_FORMAT', t.teamDate, '%Y-%m')")
-    List<Map<String, Long>> findMonthlyMeetingStats(@Param("startDate") LocalDateTime startDate);
-
-    @Query("SELECT AVG(t.maxPeople) FROM Team t WHERE t.status IN ('RECRUITING', 'FULL') and t.activated = true")
-    Double averageMaxPeopleForActiveTeams();
-
-    @Query("SELECT new com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto(p.participantId, u.userId) " +
-        "FROM Participant p JOIN p.user u " +
-        "WHERE p.team.teamId = :teamId AND p.participantStatus = 'APPROVED'")
-    List<ParticipantWithUserIdDto> findAllDtoByTeamId(@Param("teamId") Long teamId);
 
     long countByCreatedAtBetweenAndActivatedTrue(LocalDateTime localDateTime, LocalDateTime localDateTime1);
 
