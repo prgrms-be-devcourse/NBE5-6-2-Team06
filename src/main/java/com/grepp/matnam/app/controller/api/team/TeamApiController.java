@@ -114,7 +114,7 @@ public class TeamApiController {
     // 승인 처리
     @PostMapping("/{teamId}/approve/{participantId}")
     @Operation(summary = "참여자 승인", description = "모임에 참여한 참가자를 승인합니다.")
-    public ResponseEntity<ApiResponse<?>> approveParticipant(@PathVariable Long teamId,
+    public ResponseEntity<ApiResponse<Object>> approveParticipant(@PathVariable Long teamId,
         @PathVariable Long participantId) {
 
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -140,7 +140,7 @@ public class TeamApiController {
     // 거절 처리
     @PostMapping("/{teamId}/reject/{participantId}")
     @Operation(summary = "참여자 거절", description = "모임에 참여한 참가자를 거절합니다.")
-    public ResponseEntity<ApiResponse<?>> rejectParticipant(@PathVariable Long teamId,
+    public ResponseEntity<ApiResponse<Object>> rejectParticipant(@PathVariable Long teamId,
         @PathVariable Long participantId) {
 
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -190,6 +190,7 @@ public class TeamApiController {
         teamDto.setRestaurantName(team.getRestaurantName());
         teamDto.setMaxPeople(team.getMaxPeople());
         teamDto.setNowPeople(team.getNowPeople());
+        teamDto.setCategory(team.getCategory());
         teamDto.setImageUrl(team.getImageUrl());
         return teamDto;
     }

@@ -174,7 +174,6 @@ public class TeamRepositoryCustomImpl implements TeamRepositoryCustom {
             .and(team.status.ne(Status.COMPLETED))
             .and(team.status.ne(Status.CANCELED));
 
-        // 1) content 조회
         List<Team> content = queryFactory
             .selectDistinct(team)
             .from(team)
