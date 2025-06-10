@@ -4,6 +4,7 @@ import com.grepp.matnam.app.model.team.code.Status;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.user.entity.User;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,18 +13,27 @@ import lombok.Setter;
 @Setter
 public class TeamRequest {
 
+    @NotBlank
     private String title;
+    @NotBlank
     private String description;
 
+    @NotBlank
     private String date;
+    @NotBlank
     private String time;
 
+    @NotBlank
     private String category;
 
+    @NotBlank
     private int maxPeople;
+    @NotBlank
     private int nowPeople;
 
+    @NotBlank
     private String restaurantName;
+    @NotBlank
     private String restaurantAddress;
 
     public Team toDto(User user) {

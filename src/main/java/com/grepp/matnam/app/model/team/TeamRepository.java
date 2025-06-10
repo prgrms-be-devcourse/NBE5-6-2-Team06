@@ -21,46 +21,20 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     // 사용자 ID로 팀 조회 (주최자)
     List<Team> findTeamsByUser_UserIdAndActivatedTrue(String userId);
 
-//    Page<Team> findTeamsByUser_UserIdAndActivatedTrue(String userId, Pageable pageable);
 
     @Query("SELECT t FROM Team t JOIN t.participants p " +
-            "WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus AND t.activated = true")
+        "WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus AND t.activated = true")
     List<Team> findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
-            @Param("userId") String userId,
-            @Param("participantStatus") ParticipantStatus participantStatus
+        @Param("userId") String userId,
+        @Param("participantStatus") ParticipantStatus participantStatus
     );
-//    // 페이징(주최중인 모임 조회)
-//    @Query("SELECT t FROM Team t JOIN t.participants p " +
-//        "WHERE p.user.userId = :userId AND p.participantStatus = :participantStatus AND t.user.userId <> :userId AND t.activated = true")
-//    Page<Team> findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
-//        @Param("userId") String userId,
-//        @Param("participantStatus") ParticipantStatus participantStatus,
-//        Pageable pageable
-//    );
 
     // 페이징(참여중인 모임 조회)
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants WHERE t.activated = true AND t.status != 'COMPLETED' AND t.status != 'CANCELED' ORDER BY t.createdAt DESC")
     Page<Team> findAllWithParticipantsAndActivatedTrue(Pageable pageable);
 
-//    // 페이징(전체 모임 조회)
-//    @Query("""
-//      SELECT DISTINCT t
-//        FROM Team t
-//        LEFT JOIN t.participants p
-//       WHERE t.activated = true
-//         AND (
-//               t.user.userId = :userId
-//            OR (p.user.userId = :userId AND p.participantStatus = :approved)
-//         )
-//    """)
-//    Page<Team> findTeamsForUser(
-//        @Param("userId") String userId,
-//        @Param("approved") ParticipantStatus approved,
-//        Pageable pageable
-//    );
-
     @Query("SELECT t FROM Team t LEFT JOIN FETCH t.participants p LEFT JOIN FETCH p.user " +
-            "WHERE t.teamId = :teamId AND t.activated = true")
+        "WHERE t.teamId = :teamId AND t.activated = true")
     Optional<Team> findByIdWithParticipantsAndUserAndActivatedTrue(@Param("teamId") Long teamId);
 
     Optional<Team> findByTeamIdAndActivatedTrue(Long teamId);
@@ -80,12 +54,15 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     @Query("SELECT AVG(t.maxPeople) FROM Team t WHERE t.status IN ('RECRUITING', 'FULL') and t.activated = true")
     Double averageMaxPeopleForActiveTeams();
 
-    @Query("SELECT new com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto(p.participantId, u.userId) " +
-        "FROM Participant p JOIN p.user u " +
-        "WHERE p.team.teamId = :teamId AND p.participantStatus = 'APPROVED'")
+    @Query(
+        "SELECT new com.grepp.matnam.app.model.team.dto.ParticipantWithUserIdDto(p.participantId, u.userId) "
+            +
+            "FROM Participant p JOIN p.user u " +
+            "WHERE p.team.teamId = :teamId AND p.participantStatus = 'APPROVED'")
     List<ParticipantWithUserIdDto> findAllDtoByTeamId(@Param("teamId") Long teamId);
 
-    long countByCreatedAtBetweenAndActivatedTrue(LocalDateTime localDateTime, LocalDateTime localDateTime1);
+    long countByCreatedAtBetweenAndActivatedTrue(LocalDateTime localDateTime,
+        LocalDateTime localDateTime1);
 
     long countByActivatedTrue();
 
