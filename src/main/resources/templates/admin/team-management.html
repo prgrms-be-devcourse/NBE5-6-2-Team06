@@ -79,6 +79,7 @@
   </div>
   <!-- 모임 상세 모달 (개선) -->
   <div class="modal" id="teamViewModal">
+    <input type="hidden" id="view-team-id" />
     <div class="modal-content large-modal">
       <div class="modal-header">
         <h2>모임 상세 정보</h2>
@@ -114,14 +115,24 @@
                   <span id="team-time"></span>
                 </div>
                 <div class="meta-item">
-                  <i class="fas fa-map-marker-alt"></i>
-                  <span>장소: </span>
-                  <span id="team-location"></span>
+                  <i class="fas fa-list"></i>
+                  <span>카테고리: </span>
+                  <span id="team-category"></span>
                 </div>
                 <div class="meta-item">
                   <i class="fas fa-flag"></i>
                   <span>상태: </span>
                   <span id="team-status" th:class="'status ' + 'RECRUITING'"></span>
+                </div>
+                <div class="meta-item">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <span>장소: </span>
+                  <span id="team-location"></span>
+                </div>
+                <div class="meta-item-address">
+                  <i class="fas fa-map"></i>
+                  <span>주소: </span>
+                  <span id="team-address"></span>
                 </div>
               </div>
             </div>
@@ -151,7 +162,6 @@
                   </tr>
                   </thead>
                   <tbody id="organizer-list">
-                  <!-- 주최자 정보가 여기에 동적으로 로드됩니다 -->
                   </tbody>
                 </table>
               </div>
@@ -173,7 +183,6 @@
                   </tr>
                   </thead>
                   <tbody id="member-list">
-                  <!-- 팀원 목록이 여기에 동적으로 로드됩니다 -->
                   </tbody>
                 </table>
               </div>
@@ -195,7 +204,6 @@
                   </tr>
                   </thead>
                   <tbody id="pending-list">
-                  <!-- 참가 신청 목록이 여기에 동적으로 로드됩니다 -->
                   </tbody>
                 </table>
               </div>
@@ -217,7 +225,6 @@
                   </tr>
                   </thead>
                   <tbody id="rejected-list">
-                  <!-- 참가 거절 목록이 여기에 동적으로 로드됩니다 -->
                   </tbody>
                 </table>
               </div>
@@ -226,6 +233,7 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button class="primary-btn detail-btn">자세히 보기</button>
         <button class="secondary-btn cancel-btn">닫기</button>
       </div>
     </div>

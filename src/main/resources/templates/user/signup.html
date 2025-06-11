@@ -15,37 +15,7 @@
       background: #fff;
       color: #333;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-    .header-left .logo {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-    .header-left nav a {
-      margin-right: 1rem;
-      text-decoration: none;
-      color: #333;
-      font-size: 0.9rem;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .header-right span {
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
+
     .btn-primary {
       background-color: #000;
       color: white;
@@ -62,7 +32,7 @@
       margin-top: 4rem;
     }
     .signup-box {
-      width: 400px;
+      width: 600px;
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 2rem;
@@ -203,25 +173,14 @@
       margin-top: 0.3rem;
     }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
 
 <!-- Header -->
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/teamSearch.html}">모임 찾기</a>
-      <a th:href="@{restaurants/restaurant.html}">맛집 탐색</a>
-    </nav>
-  </div>
-  <div class="header-right">
-    <span title="알림">🔔</span>
-    <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <!-- Main Signup Box -->
 <main>
@@ -396,6 +355,8 @@
     });
   });
 </script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 
 </body>
 </html>

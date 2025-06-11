@@ -2,6 +2,10 @@ package com.grepp.matnam.app.model.user;
 
 import com.grepp.matnam.app.controller.api.admin.payload.AgeDistributionResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.UserStatusRequest;
+import com.grepp.matnam.app.facade.NotificationSender;
+import com.grepp.matnam.app.model.notification.code.NotificationType;
+import com.grepp.matnam.app.model.notification.entity.Notice;
+import com.grepp.matnam.app.model.notification.service.NotificationService;
 import com.grepp.matnam.infra.response.Messages;
 import com.grepp.matnam.app.controller.web.admin.payload.TotalUserResponse;
 import com.grepp.matnam.app.controller.web.admin.payload.UserStatsResponse;
@@ -38,7 +42,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ModelMapper mapper;
+    private final NotificationService notificationService;
+    private final NotificationSender notificationSender;
 
     public User signup(User user) {
         log.info("회원가입 시도: {}, 이메일: {}", user.getUserId(), user.getEmail());
@@ -212,7 +217,7 @@ public class UserService {
     public TotalUserResponse getTotalUserStats() {
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
-        long totalUsers = userRepository.count(); // 현재 전체 회원 수
+        long totalUsers = userRepository.count(); // 현재 전체 회원 수, 탈퇴 회원 포함
         long yesterdayUserCount = userRepository.countByCreatedAtBefore(LocalDateTime.of(today, LocalTime.MIDNIGHT));
         String userGrowth = calculateGrowthRate(totalUsers, yesterdayUserCount);
         return new TotalUserResponse(totalUsers, userGrowth);
@@ -294,5 +299,25 @@ public class UserService {
 
 
         return statsResponse;
+    }
+
+    @Transactional
+    public void sendBroadcastNotification(String content) {
+        // ROLE_USER 이고 활성화된 사용자만 조회
+        List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
+        notificationService.saveNotice(content, null);
+
+        for (User user : usersToSend) {
+            notificationSender.sendNotificationToUser(user.getUserId(), NotificationType.NOTICE, content, null);
+        }
+    }
+
+    public void resendBroadcastNotification(Long noticeId) {
+        List<User> usersToSend = userRepository.findByRoleEqualsAndActivatedIsTrue(Role.ROLE_USER);
+        Notice notice = notificationService.getNotice(noticeId);
+
+        for (User user : usersToSend) {
+            notificationSender.resendNotificationToUser(user.getUserId(), notice);
+        }
     }
 }

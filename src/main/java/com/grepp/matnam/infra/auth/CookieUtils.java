@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -36,6 +38,11 @@ public class CookieUtils {
         addCookie(response, "userRole", role, maxAge, "/");
     }
 
+    public static void addUserNicknameCookie(HttpServletResponse response, String nickname, int maxAge) {
+        String encodedNickname = URLEncoder.encode(nickname, StandardCharsets.UTF_8);
+        addCookie(response, "userNickname", encodedNickname, maxAge, "/");
+    }
+
     public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -48,6 +55,11 @@ public class CookieUtils {
 
     public static Optional<String> getJwtToken(HttpServletRequest request) {
         return getCookie(request, "jwtToken")
+                .map(Cookie::getValue);
+    }
+
+    public static Optional<String> getUserNicknameCookie(HttpServletRequest request) {
+        return getCookie(request, "userNickname")
                 .map(Cookie::getValue);
     }
 

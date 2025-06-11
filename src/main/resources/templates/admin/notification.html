@@ -1,113 +1,100 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{admin/layout}">
 <head>
-    <title>알림 관리</title>
+  <title>알림 관리</title>
 </head>
 <body>
-    <div layout:fragment="content">
-        <h1>알림 관리</h1>
-        <div class="action-bar">
-            <button class="primary-btn" id="add-notification-btn"><i class="fas fa-plus"></i> 새 공지 작성</button>
+<div layout:fragment="content">
+  <h1>알림 관리</h1>
+  <div class="tab-container">
+    <div class="tabs">
+      <div class="tab active" data-tab="team-list">공지사항 목록</div>
+    </div>
+    <div class="tab-content active" id="team-list">
+      <div class="action-bar" style="margin-bottom: 0">
+        <button class="primary-btn" id="create-notification-btn"><i class="fas fa-plus"></i> 새 공지 작성
+        </button>
+        <form method="get" action="/admin/notification">
+          <div th:class="filter-container">
             <div class="search-filter">
-                <input type="text" placeholder="공지 내용 검색">
-                <button class="search-btn"><i class="fas fa-search"></i></button>
+              <input name="keyword" type="text" placeholder="공지 내용 검색" th:value="${param.keyword}">
+              <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
             </div>
             <div class="filter-options">
-                <select id="notification-status-filter">
-                    <option value="all">모든 상태</option>
-                    <option value="active">활성</option>
-                    <option value="inactive">비활성</option>
-                </select>
+              <select name="sort" id="notification-sort" onchange="this.form.submit()">
+                <option value="newest" th:selected="${sort == 'newest'}">최신순</option>
+                <option value="oldest" th:selected="${sort == 'oldest'}">오래된순</option>
+              </select>
             </div>
-        </div>
-        
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>제목</th>
-                        <th>내용</th>
-                        <th>작성일</th>
-                        <th>상태</th>
-                        <th>액션</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="notification : ${notifications}">
-                        <td th:text="${notification.id}">1</td>
-                        <td th:text="${notification.title}">시스템 점검 안내</td>
-                        <td th:text="${notification.content}">2023년 7월 1일 오전 2시부터 4시까지 시스템 점검이 있을 예정입니다.</td>
-                        <td th:text="${#temporals.format(notification.createdAt, 'yyyy-MM-dd HH:mm')}">2023-06-25 10:30</td>
-                        <td><span th:class="'status ' + ${notification.status}" th:text="${notification.statusText}">활성</span></td>
-                        <td>
-                            <button class="action-btn view" th:data-id="${notification.id}"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit" th:data-id="${notification.id}"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete" th:data-id="${notification.id}"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <!-- 기본 데이터 (서버에서 데이터가 없을 경우) -->
-                    <tr th:if="${notifications == null || notifications.isEmpty()}">
-                        <td>1</td>
-                        <td>시스템 점검 안내</td>
-                        <td>2023년 7월 1일 오전 2시부터 4시까지 시스템 점검이 있을 예정입니다.</td>
-                        <td>2023-06-25 10:30</td>
-                        <td><span class="status active">활성</span></td>
-                        <td>
-                            <button class="action-btn view"><i class="fas fa-eye"></i></button>
-                            <button class="action-btn edit"><i class="fas fa-edit"></i></button>
-                            <button class="action-btn delete"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="pagination" th:if="${totalPages > 0}">
-            <button class="page-btn prev" th:disabled="${currentPage == 1}"><i class="fas fa-chevron-left"></i></button>
-            <th:block th:each="i : ${#numbers.sequence(1, totalPages)}">
-                <button class="page-btn" th:classappend="${i == currentPage} ? 'active' : ''" th:text="${i}">1</button>
-            </th:block>
-            <button class="page-btn next" th:disabled="${currentPage == totalPages}"><i class="fas fa-chevron-right"></i></button>
-        </div>
-        
-        <!-- 알림 추가/수정 모달 -->
-        <div class="modal" id="notificationModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 id="notification-modal-title">공지 작성</h2>
-                    <span class="close-modal">&times;</span>
-                </div>
-                <div class="modal-body">
-                    <form id="notificationForm">
-                        <input type="hidden" id="notification-id">
-                        <div class="form-group">
-                            <label for="notification-title">제목</label>
-                            <input type="text" id="notification-title" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="notification-content">내용</label>
-                            <textarea id="notification-content" rows="6" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="notification-status">상태</label>
-                            <select id="notification-status">
-                                <option value="active">활성</option>
-                                <option value="inactive">비활성</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="secondary-btn cancel-btn">취소</button>
-                    <button class="primary-btn save-btn">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
+          </div>
+        </form>
+      </div>
 
-    <th:block layout:fragment="script">
-        <script th:src="@{/js/notification.js}"></script>
-    </th:block>
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th style="width: 10%;">번호</th>
+            <th style="width: 50%;">내용</th>
+            <th style="width: 20%;">작성일</th>
+            <th style="width: 20%;">액션</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="notice, iterStat : ${page.content()}">
+            <td th:text="${iterStat.count + (5 * (page.currentNumber()-1))}"></td>
+            <td th:text="${notice.message}"></td>
+            <td th:text="${#temporals.format(notice.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+            <td>
+              <button class="action-btn send" th:data-id="${notice.id}"><i
+                  class="fas fa-paper-plane"></i></button>
+              <button class="action-btn delete" th:data-id="${notice.id}"><i
+                  class="fas fa-trash"></i></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+
+        <div th:replace="~{admin/fragments/pagination :: pagination}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 새 공지사항 작성 모달 -->
+  <div id="create-notification-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>새 공지사항 작성</h2>
+        <span class="close-modal">&times;</span>
+      </div>
+      <div class="modal-body">
+        <form id="notification-form">
+          <div class="form-group">
+            <label for="notification-target">알림 대상</label>
+            <select id="notification-target" name="notification-target" class="form-control">
+              <option value="all">전체</option>
+              <option value="specific" disabled>직접 지정 (준비 중)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="notification-content">메시지 내용</label>
+            <textarea id="notification-content" name="notification-content" rows="5"
+                      placeholder="공지사항 메시지 내용을 입력하세요" required></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn cancel-btn">취소</button>
+        <button class="btn primary-btn" id="send-notification-btn">공지사항 발송</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<th:block layout:fragment="script">
+  <script th:src="@{/js/notification.js}"></script>
+</th:block>
 </body>
 </html>

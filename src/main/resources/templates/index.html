@@ -20,7 +20,12 @@
             background-color: #fff;
             color: #333;
         }
-        header {
+        section {
+            margin: 0 auto 4rem auto;
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+        #header-anonymous, #header-login {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -41,7 +46,8 @@
         }
         .header-buttons {
             display: flex;
-            gap: 0.5rem;
+            gap: 1rem;
+            align-items: center;
         }
         .btn {
             padding: 0.5rem 1rem;
@@ -60,7 +66,7 @@
         }
         .main-banner {
             padding: 2rem;
-            background-color: #f9f9f9;
+            background-color: #fff;
         }
         .main-banner h1 {
             font-size: 1.8rem;
@@ -160,10 +166,12 @@
             font-size: 0.9rem;
         }
         footer {
+            text-align: center;
             padding: 1rem 2rem;
             font-size: 0.8rem;
             color: #999;
             border-top: 1px solid #eee;
+            background-color: #fff;
         }
         .ranking-section {
             padding: 2rem;
@@ -220,24 +228,11 @@
             font-size: 0.9rem;
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/notification.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-<header>
-    <div style="display: flex; align-items: center; gap: 2rem;">
-        <div class="logo">맛남</div>
-        <nav>
-            <a th:href="@{/}">홈</a> <!-- 홈 페이지 -->
-            <a th:href="@{/team/search}">모임찾기</a> <!-- 모임 찾기 페이지 -->
-            <a th:href="@{/team/create}">모임만들기</a> <!-- 모임 만들기 페이지 -->
-            <a th:href="@{/user/signin}">로그인</a>
-        </nav>
-    </div>
-    <div class="header-buttons">
-        <span style="font-size: 1.2rem; cursor: pointer;">🔔</span>
-        <span style="font-size: 1.2rem; cursor: pointer;">👤</span>
-        <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button> <!-- 모임 만들기 버튼 -->
-    </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <message>
     <div id="messageBox" style="display: none;
@@ -255,15 +250,16 @@
 <section class="main-banner" style="display: flex; align-items: center; justify-content: space-between;">
     <div style="max-width: 50%;">
         <h1 style="font-size: 2.5rem; font-weight: bold; margin-bottom: 1rem;">맛있는 식사와 새로운 만남</h1>
-        <p style="color: #666; margin-bottom: 1.5rem;">맛남에서 다양한 사람들과 함께 맛있는 식사를 즐기세요. 새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
+        <p style="color: #666; margin-bottom: 1.5rem;">맛남에서 다양한 사람들과 함께 맛있는 식사를 즐기세요.
+            새로운 친구를 만들고, 맛집을 공유하고, 즐거운 시간을 보내세요.</p>
         <div class="banner-buttons" style="display: flex; gap: 0.5rem;">
             <button class="btn btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">맛남 모임 만들기</button><!-- 모임 찾기 버튼 -->
-            <button class="btn btn-outline" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
+            <button class="btn btn-outline" id="signup-button" th:onclick="'location.href=\'' + @{/user/signup} + '\''">회원가입</button> <!-- 회원가입 버튼 -->
+
         </div>
     </div>
-    <div style="width: 45%; height: 250px; background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
-        <span style="color: #999;">이미지 영역</span>
-    </div>
+        <img src="/img/index.png" alt="메인 배너 이미지" style="max-width: 60%;">
+
 </section>
 
 <!-- 검색 섹션 -->
@@ -278,16 +274,16 @@
 <!-- 인기 모임 섹션 -->
 <section class="meetings-section">
     <h2>인기 모임</h2>
-    <p>지금 가장 인기 있는 모임을 확인해보세요:</p>
+    <p>지금 가장 인기 있는 모임을 확인해보세요</p>
     <div class="meetings-grid">
         <!-- 첫 번째 모임 카드 -->
         <div class="meeting-card">
             <div class="meeting-image">
-                <!-- 이미지 자리 (그레이색 박스) -->
+                <img src = "/img/food.jpg" alt = "첫번째 모임 카드 이미지" style = "width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="meeting-details">
-                <div class="meeting-title">강남 맛집 탐방 모임</div>
-                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
+                <div class="meeting-title">강남 스테이크 탐방 모임</div>
+                <div class="meeting-date">📅 2025년 05월 24일 (토) 오후 7시</div>
                 <div class="meeting-location">📍 서울 강남구</div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/1} + '\''">자세히 보기</button>
             </div>
@@ -296,12 +292,12 @@
         <!-- 두 번째 모임 카드 -->
         <div class="meeting-card">
             <div class="meeting-image">
-                <!-- 이미지 자리 (그레이색 박스) -->
+                <img src = "/img/food_2.jpg" alt = "두번째 모임 카드 이미지" style = "width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="meeting-details">
-                <div class="meeting-title">강남 맛집 탐방 모임</div>
-                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
-                <div class="meeting-location">📍 서울 강남구</div>
+                <div class="meeting-title">이태원 타코 사랑단</div>
+                <div class="meeting-date">📅 2025년 05월 25일 (일) 오후 6시</div>
+                <div class="meeting-location">📍 서울 용산구</div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/2} + '\''">자세히 보기</button>
             </div>
         </div>
@@ -309,12 +305,12 @@
         <!-- 세 번째 모임 카드 -->
         <div class="meeting-card">
             <div class="meeting-image">
-                <!-- 이미지 자리 (그레이색 박스) -->
+                <img src = "/img/dessert.jpg" alt = "세번째 모임 카드 이미지" style = "width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="meeting-details">
-                <div class="meeting-title">강남 맛집 탐방 모임</div>
-                <div class="meeting-date">📅 2023년 08월 15일 (화) 7시</div>
-                <div class="meeting-location">📍 서울 강남구</div>
+                <div class="meeting-title">성수 카페 투어</div>
+                <div class="meeting-date">📅 2025년 05월 27일 (화) 오후 3시</div>
+                <div class="meeting-location">📍 서울 성동구</div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;" th:onclick="'location.href=\'' + @{/team/detail/3} + '\''">자세히 보기</button>
             </div>
         </div>
@@ -345,30 +341,27 @@
     <div class="features-grid">
         <!-- 첫 번째 기능 -->
         <div class="feature">
-            <div>맞춤형 시스템</div>
             <h3>맞춤형 시스템</h3>
-            <p>원하는 지역과 시간에 맞춰 필터링 검색이 가능해 나에게 딱 맞는 모임을 찾을 수 있습니다.</p>
+            <p>지역과 시간에 따라 모임을 쉽게 필터링하여 나에게 꼭 맞는 모임을 찾을 수 있어요.</p>
         </div>
 
         <!-- 두 번째 기능 -->
         <div class="feature">
-            <div>신사적 매칭</div>
             <h3>신사적 매칭</h3>
-            <p>서로의 관심사와 매너를 고려한 매칭 시스템으로 즐거운 만남을 보장합니다.</p>
+            <p>취향과 관심사를 반영한 매칭으로 즐거운 사람들과의 만남을 도와드립니다.</p>
         </div>
 
-        <!-- 세 번째 기능 -->
+        <!-- 세 번째 기능 (간편 예약 기능 → 기능 변경) -->
         <div class="feature">
-            <div>간편 예약 기능</div>
-            <h3>간편 예약 기능</h3>
-            <p>모바일로 손쉽게 예약하고 결제까지 한번에 가능한 편리한 서비스를 제공합니다.</p>
+            <h3>신뢰 기반 커뮤니티</h3>
+            <p>참여자 후기와 평점을 통해 신뢰할 수 있는 모임만 골라 참여할 수 있어 안심이에요.</p>
         </div>
     </div>
 </section>
 
 <!-- 푸터 -->
 <footer>
-    <p>© 2023 맛남 | 이용약관 | 개인정보처리방침</p>
+    © 2025 맛남. 모든 권리 보유.
 </footer>
 
 <script>
@@ -389,7 +382,15 @@
             }, 5000);
         }
     });
-</script>
 
+    document.addEventListener("DOMContentLoaded", function () {
+        const signupButton = document.getElementById("signup-button");
+        if (auth.isLoggedIn() && signupButton) {
+            signupButton.style.display = "none";
+        }
+    });
+</script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

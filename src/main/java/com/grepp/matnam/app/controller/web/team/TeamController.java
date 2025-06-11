@@ -15,6 +15,7 @@ import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/team")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Team API", description = "모임 관련 REST API")
 public class TeamController {
 
     private final TeamService teamService;
@@ -54,10 +54,11 @@ public class TeamController {
 
     // 모임 생성
     @PostMapping("/create")
-    public String createTeam(@ModelAttribute TeamRequest teamRequest) {
+    public String createTeam(@Valid @ModelAttribute TeamRequest teamRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
+
         Team team = teamRequest.toDto(user);
 
         if (teamRequest.getDate() != null && teamRequest.getTime() != null) {
@@ -88,10 +89,11 @@ public class TeamController {
     // 모임 수정
     @PostMapping("/edit/{teamId}")
     public String updateTeam(@PathVariable Long teamId, @ModelAttribute UpdatedTeamRequest updatedTeamRequest) {
+        String UserId = SecurityContextHolder.getContext().getAuthentication().getName();
         Team team = updatedTeamRequest.toTeam();
         team.setTeamId(teamId);
 
-        teamService.updateTeam(teamId, team);
+        teamService.updateTeam(teamId, team, UserId);
         return "redirect:/team/detail/" + teamId;
     }
 
@@ -108,13 +110,30 @@ public class TeamController {
 
 
     // 모임 상세 조회
-    @Operation(summary = "특정 모임 정보 조회 (REST API)", description = "주어진 ID의 모임 정보를 REST API로 조회")
     @GetMapping("/detail/{teamId}")
     public String teamDetail(@PathVariable Long teamId, Model model) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userService.getUserById(userId);
         Team team = teamService.getTeamByIdWithParticipants(teamId);
         model.addAttribute("team", team);
+
+        // approved 상태인 참가자들만 가져와서 리스트로 변환 - 뷰로 사용
+        List<Participant> approvedParticipants = team.getParticipants().stream()
+            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
+            .toList();
+        model.addAttribute("participants", approvedParticipants);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAnonymous = authentication.getPrincipal().equals("anonymousUser");
+
+        if (isAnonymous) {
+            model.addAttribute("isLeader", false);
+            model.addAttribute("isParticipant", false);
+            model.addAttribute("alreadyApplied", false);
+            model.addAttribute("isAnonymous", true);
+            return "team/teamDetail";
+        }
+
+        String userId = authentication.getName();
+        User user = userService.getUserById(userId);
 
         boolean isLeader = team.getUser().getUserId().equals(userId);
         model.addAttribute("isLeader", isLeader);
@@ -126,15 +145,11 @@ public class TeamController {
         boolean alreadyApplied = participantRepository.existsByUser_UserIdAndTeam_TeamIdAndParticipantStatus(
             userId, teamId, ParticipantStatus.PENDING);
 
-        // approved 상태인 참가자들만 가져와서 리스트로 변환 - 뷰로 사용
-        List<Participant> approvedParticipants = team.getParticipants().stream()
-            .filter(participant -> participant.getParticipantStatus() == ParticipantStatus.APPROVED)
-            .toList();
-        model.addAttribute("participants", approvedParticipants);
 
         model.addAttribute("isParticipant", isParticipant);
         model.addAttribute("alreadyApplied", alreadyApplied);
         model.addAttribute("user", user);
+        model.addAttribute("isAnonymous", false);
 
         return "team/teamDetail";
     }
@@ -144,24 +159,46 @@ public class TeamController {
     @GetMapping("/page/{teamId}")
     public String getTeamPage(@PathVariable Long teamId, Model model) {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+
         User currentUser = userService.getUserById(userId);
         model.addAttribute("userId", userId);
         model.addAttribute("userNickname", currentUser.getNickname());
         model.addAttribute("teamId", teamId);
 
         Team team = teamService.getTeamByIdWithParticipants(teamId);
+        if (team == null) {
+            return "redirect:/error/404";
+        }
+
         model.addAttribute("team", team);
-        if (team != null && team.getUser() != null) {
+        model.addAttribute("teamImageUrl", team.getImageUrl());
+
+        if (team.getUser() != null) {
             model.addAttribute("leader", team.getUser());
         }
 
         List<Participant> approvedParticipants = team.getParticipants().stream()
-            .filter(participant -> participant.getRole() == Role.MEMBER)
-            .toList();
+                .filter(participant -> participant.getRole() == Role.MEMBER)
+                .toList();
         model.addAttribute("participants", approvedParticipants);
+
+        // 주최자인지 확인
+        boolean isLeader = team.getUser().getUserId().equals(currentUser.getUserId());
+        model.addAttribute("isLeader", isLeader);
+
+        boolean isAdmin = currentUser.getRole().equals(com.grepp.matnam.app.model.auth.code.Role.ROLE_ADMIN);
+
+        if (!isAdmin) {
+            log.info("Checking if user {} is a participant in team {}", userId, teamId);
+            Participant participant = participantRepository.findByUser_UserIdAndTeam_TeamId(userId, teamId);
+            if (participant == null) {
+                return "redirect:/team/" + teamId + "?error=notParticipant";
+            }
+        }
 
         return "team/teamPage";
     }
+
 
 
     // 모임 완료 후 리뷰 작성 페이지 표시

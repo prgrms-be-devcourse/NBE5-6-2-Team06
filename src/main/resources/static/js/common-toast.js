@@ -1,16 +1,8 @@
-/**
- * 공통 토스트 메시지 처리 스크립트 (최적화 버전)
- */
-
-// 즉시 실행 함수로 감싸서 초기화 로직 실행
 (function() {
-  // 페이지 로드 시 즉시 실행 (DOMContentLoaded 이벤트 대기 없이)
   checkAndDisplayToast();
 
-  // DOMContentLoaded 이벤트 시에도 한 번 더 확인 (안전장치)
   document.addEventListener('DOMContentLoaded', checkAndDisplayToast);
 
-  // 토스트 메시지가 있는지 확인하고 표시하는 함수
   function checkAndDisplayToast() {
     // 1. URL 파라미터에서 메시지 확인
     const urlParams = new URLSearchParams(window.location.search);
@@ -18,18 +10,15 @@
     const toastType = urlParams.get('toast_type') || 'success';
 
     if (toastMessage) {
-      // URL 디코딩
       const message = decodeURIComponent(toastMessage);
 
-      // 토스트 표시 (약간의 지연으로 DOM이 완전히 로드된 후 실행)
       setTimeout(() => {
         showToast(message, toastType);
       }, 100);
 
-      // 브라우저 히스토리에서 파라미터 제거 (URL 정리)
       const currentUrl = window.location.pathname;
       window.history.replaceState({}, document.title, currentUrl);
-      return; // URL 파라미터로 메시지를 표시했으면 세션 확인 불필요
+      return;
     }
 
     // 2. 세션 스토리지에서 메시지 확인
@@ -37,12 +26,10 @@
     const sessionType = sessionStorage.getItem('toast_type') || 'success';
 
     if (sessionMessage) {
-      // 약간의 지연으로 DOM이 완전히 로드된 후 실행
       setTimeout(() => {
         showToast(sessionMessage, sessionType);
       }, 100);
 
-      // 메시지 표시 후 세션 스토리지에서 제거
       sessionStorage.removeItem('toast_message');
       sessionStorage.removeItem('toast_type');
     }
@@ -55,15 +42,62 @@
  * @param {string} type - 메시지 타입 (success, error, warning, info)
  */
 function showToast(message, type = 'success') {
-  // Toastify가 로드되었는지 확인
-  if (typeof Toastify !== 'function') {
-    console.error('Toastify is not loaded');
-    // 폴백: alert로 표시
-    alert(message);
-    return;
+  if (typeof Toastify === 'function') {
+    let backgroundColor;
+    switch (type) {
+      case 'success':
+        backgroundColor = '#4CAF50';
+        break;
+      case 'error':
+        backgroundColor = '#F44336';
+        break;
+      case 'warning':
+        backgroundColor = '#FF9800';
+        break;
+      case 'info':
+        backgroundColor = '#2196F3';
+        break;
+      default:
+        backgroundColor = '#4CAF50';
+    }
+
+    Toastify({
+      text: message,
+      duration: 3000,
+      close: true,
+      gravity: "top", // 상단 배치 유지
+      position: "right",
+      backgroundColor: backgroundColor,
+      stopOnFocus: true,
+      className: "custom-toast",
+      offset: {
+        y: 70
+      }
+    }).showToast();
+  } else {
+    console.warn('Toastify 라이브러리가 로드되지 않았습니다. toast 메시지를 표시할 수 없습니다.');
+    createCustomToast(message, type);
+  }
+}
+
+/**
+ * Toastify 없이 기본 DOM 요소를 사용한 토스트 메시지 생성
+ * @param {string} message - 표시할 메시지
+ * @param {string} type - 메시지 타입 (success, error, warning, info)
+ */
+function createCustomToast(message, type = 'success') {
+  let toastContainer = document.querySelector('.custom-toast-container');
+
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.className = 'custom-toast-container';
+    toastContainer.style.position = 'fixed';
+    toastContainer.style.top = '70px';
+    toastContainer.style.right = '20px';
+    toastContainer.style.zIndex = '9999';
+    document.body.appendChild(toastContainer);
   }
 
-  // 배경색 결정
   let backgroundColor;
   switch (type) {
     case 'success':
@@ -82,20 +116,50 @@ function showToast(message, type = 'success') {
       backgroundColor = '#4CAF50';
   }
 
-  // Toastify로 메시지 표시
-  Toastify({
-    text: message,
-    duration: 3000,
-    close: true,
-    gravity: "top", // 상단 배치 유지
-    position: "right",
-    backgroundColor: backgroundColor,
-    stopOnFocus: true,
-    className: "custom-toast", // 커스텀 클래스 추가
-    offset: { // 헤더 높이를 고려한 오프셋 추가
-      y: 70 // 헤더 높이에 따라 조정 (px)
+  const toast = document.createElement('div');
+  toast.className = 'custom-toast';
+  toast.style.backgroundColor = backgroundColor;
+  toast.style.color = 'white';
+  toast.style.padding = '12px 20px';
+  toast.style.borderRadius = '4px';
+  toast.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+  toast.style.marginBottom = '10px';
+  toast.style.animation = 'fadeIn 0.3s, fadeOut 0.3s 2.7s';
+  toast.style.minWidth = '250px';
+  toast.style.maxWidth = '400px';
+  toast.style.wordWrap = 'break-word';
+  toast.textContent = message;
+
+  const closeButton = document.createElement('span');
+  closeButton.innerHTML = '&times;';
+  closeButton.style.marginLeft = '10px';
+  closeButton.style.float = 'right';
+  closeButton.style.fontSize = '20px';
+  closeButton.style.fontWeight = 'bold';
+  closeButton.style.cursor = 'pointer';
+  closeButton.onclick = function() {
+    toast.remove();
+  };
+
+  toast.appendChild(closeButton);
+  toastContainer.appendChild(toast);
+
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-  }).showToast();
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-20px); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  setTimeout(() => {
+    toast.remove();
+  }, 3000);
 }
 
 /**
@@ -105,10 +169,8 @@ function showToast(message, type = 'success') {
  * @param {string} type - 메시지 타입 (success, error, warning, info)
  */
 function redirectWithToast(url, message, type = 'success') {
-  // URL 인코딩
   const encodedMessage = encodeURIComponent(message);
 
-  // 파라미터가 있는 URL인지 확인
   if (url.includes('?')) {
     window.location.href = `${url}&toast_message=${encodedMessage}&toast_type=${type}`;
   } else {
@@ -124,7 +186,6 @@ function redirectWithToast(url, message, type = 'success') {
  * @param {string} type - 메시지 타입 (success, error, warning, info)
  */
 function redirectWithSessionToast(url, message, type = 'success') {
-  // 세션 스토리지에 메시지 저장
   try {
     sessionStorage.setItem('toast_message', message);
     sessionStorage.setItem('toast_type', type);
@@ -132,7 +193,6 @@ function redirectWithSessionToast(url, message, type = 'success') {
     console.error('Failed to save toast message to session storage:', e);
   }
 
-  // 페이지 이동
   window.location.href = url;
 }
 

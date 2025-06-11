@@ -3,46 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>맛남 | 내 맛집 지도</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script th:src="@{/js/common-toast.js}"></script>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             font-family: 'Noto Sans KR', sans-serif;
-            font-size: 14px;
             color: #333;
             background-color: #f9f9f9;
             height: 100%;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: #fff;
-            border-bottom: 1px solid #eee;
-        }
-
-        .header-left, .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo {
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        nav a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            padding-bottom: 2px;
-        }
-
-        nav a.active, nav a:hover {
-            border-bottom: 2px solid #000;
         }
 
         .btn-primary,
@@ -162,26 +133,14 @@
             color: #888;
         }
     </style>
-
+    <link rel="stylesheet" th:href="@{/css/notification.css}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 
 <body>
-<header>
-    <div class="header-left">
-        <div class="logo">맛남</div>
-        <nav>
-            <a th:href="@{/}">홈</a>
-            <a th:href="@{/team/list}">모임 찾기</a>
-            <a th:href="@{/map}">맛집 탐색</a>
-            <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-        </nav>
-    </div>
-    <div class="header-right">
-        <span title="알림">🔔</span>
-        <span title="프로필">👤</span>
-        <button class="btn-primary" th:onclick="|location.href='@{/team/create}'|">모임 만들기</button>
-    </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div id="main-container">
     <div id="map"></div>
@@ -493,5 +452,8 @@
 
     window.onload = initMap;
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

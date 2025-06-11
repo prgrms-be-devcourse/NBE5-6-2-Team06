@@ -1,40 +1,46 @@
 document.addEventListener('DOMContentLoaded', function() {
     updateHeader();
-    updateLoginLogoutButton();
+    // updateLoginLogoutButton();
+
+    // 모달 처리
+    const modals = document.querySelectorAll('.modal');
+    const closeButtons = document.querySelectorAll('.close-modal, .cancel-btn');
+
+    // 모달 닫기
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            modals.forEach(modal => {
+                modal.scrollTop = 0;
+                modal.style.display = 'none';
+            });
+        });
+    });
+
+    // 모달 외부 클릭 시 닫기
+    window.addEventListener('click', function (event) {
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.scrollTop = 0;
+                modal.style.display = 'none';
+            }
+        });
+    });
 });
 
 function updateHeader() {
-    const headerButtons = document.querySelector('.header-buttons');
+    const headerLogin = document.getElementById('header-login');
+    const headerAnonymous = document.getElementById('header-anonymous');
 
-    const headerRight = document.querySelector('.header-right');
-
-    if (headerButtons) {
-        if (auth.isLoggedIn()) {
-            const userInfo = auth.getUserInfo();
-
-            headerButtons.innerHTML = `
-                <span style="margin-right: 1rem;">${userInfo.userId}님</span>
-                <span style="font-size: 1.2rem; cursor: pointer;">🔔</span>
-                <span style="font-size: 1.2rem; cursor: pointer;">👤</span>
-                <button class="btn btn-primary" onclick="location.href='/team/create'">맛남 모임 만들기</button>
-                <button class="btn btn-outline" onclick="auth.logout()">로그아웃</button>
-            `;
-        }
+    if (headerAnonymous && headerLogin && auth.isLoggedIn()) {
+        const userInfo = auth.getUserInfo();
+        headerAnonymous.style.display = 'none';
+        headerLogin.style.display = 'flex';
+        document.getElementById('profile-name').textContent = userInfo.nickname + '님';
+    } else if (headerAnonymous && headerLogin && !auth.isLoggedIn()){
+        headerAnonymous.style.display = 'flex';
+        headerLogin.style.display = 'none';
     }
 
-    if (headerRight) {
-        if (auth.isLoggedIn()) {
-            const userInfo = auth.getUserInfo();
-
-            headerRight.innerHTML = `
-                <span style="margin-right: 1rem;">${userInfo.userId}님</span>
-                <span title="알림">🔔</span>
-                <span title="프로필">👤</span>
-                <button class="btn-primary" onclick="location.href='/meeting/create'">모임 만들기</button>
-                <button class="btn-outline" onclick="auth.logout()">로그아웃</button>
-            `;
-        }
-    }
 }
 
 function updateLoginLogoutButton() {

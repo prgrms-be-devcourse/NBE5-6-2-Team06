@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>맛남 | 마이페이지</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -13,67 +16,47 @@
       color: #333;
     }
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
+    /* 기본 카드 스타일 통일 */
+    .card {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
       background-color: #fff;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-
-    .header-left .logo {
-      font-size: 1.3rem;
-      font-weight: bold;
-    }
-
-    .header-left nav a {
-      text-decoration: none;
-      color: #333;
-      margin-right: 1rem;
-      font-weight: 500;
-    }
-
-    .header-left nav a:hover {
-      color: #000;
-    }
-
-    .header-left nav a.active {
-      color: #000;
-      border-bottom: 2px solid #000;
-      padding-bottom: 3px;
-    }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-right span {
-      font-size: 1.2rem;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background-color: #000;
-      color: white;
-      padding: 0.5rem 1rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
+    .card h2, .card h3, .card h4 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
     }
 
     .btn-primary:hover {
       background-color: #333;
+    }
+
+    .btn-secondary {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 500;
+      background-color: #e8b9b9;
+      color: #755252;
+      border-color: #cccccc;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .btn-success {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 500;
+      background-color: #b9e8ba;
+      color: #4a9550;
+      border-color: #cccccc;
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
     .container {
@@ -85,7 +68,8 @@
       padding: 0 1rem;
     }
 
-    .profile-section, .stats-section {
+    /* 프로필 섹션 */
+    .profile-section {
       border: 1px solid #eee;
       border-radius: 8px;
       padding: 1.5rem;
@@ -107,6 +91,8 @@
     .profile-section h3 {
       text-align: center;
       margin-bottom: 0.5rem;
+      border: none;
+      padding: 0;
     }
 
     .profile-temperature {
@@ -145,6 +131,24 @@
       background-color: #fff0f0;
     }
 
+    /* 통계, 정보 섹션 */
+    .stats-section, .profile-info-section {
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-section h4, .profile-info-section h4 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    /* 메인 섹션 통일 */
     .main-section {
       border: 1px solid #eee;
       border-radius: 8px;
@@ -155,6 +159,7 @@
     }
 
     .main-section h2 {
+      margin-top: 0;
       margin-bottom: 1.5rem;
       border-bottom: 1px solid #eee;
       padding-bottom: 0.5rem;
@@ -197,12 +202,15 @@
       background-color: #333;
     }
 
+    /* 모임 아이템 카드 통일 */
     .meeting-item {
       border: 1px solid #eee;
       border-radius: 8px;
-      padding: 1.2rem;
-      margin: 1rem 0;
-      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      background-color: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .meeting-item:hover {
@@ -211,10 +219,13 @@
     }
 
     .meeting-item h4 {
+      margin-top: 0;
       margin-bottom: 0.7rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: none;
+      padding: 0;
     }
 
     .meeting-item p {
@@ -265,7 +276,11 @@
       color: #555;
     }
 
-    .badge {
+    .team-section {
+      margin-top: 2rem;
+    }
+
+    .team_badge {
       display: inline-block;
       background-color: #f0f0f0;
       color: #333;
@@ -399,6 +414,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: none;
+      padding: 0;
     }
 
     .preference-section h4 a {
@@ -406,16 +423,17 @@
       color: #000;
       text-decoration: none;
     }
-
+    .btn-primary,
     .cancel-btn {
-      padding: 12px 24px;
-      font-size: 16px;
+      margin-top: 0.3rem;
+      font-size: 13px;
       background-color: #ff4d4d;
-      color: white;
+      padding: 0.5rem 1rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: bold;
+      font-weight: 500;
+      color: white;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -427,17 +445,29 @@
     }
 
     .cancel-btn:hover {
-      background-color: #ff3333;
-      transform: scale(1.05);
+      background-color: #b13030;
     }
 
-    /* 버튼 비활성화 상태 */
     .cancel-btn:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
 
+    .btn-primary[disabled] {
+      background-color: #cccccc !important;
+      color: #666666 !important;
+      border-color: #cccccc !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+    }
+
     .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .teamPaging-container {
       display: flex;
       justify-content: center;
       margin-top: 2rem;
@@ -484,7 +514,6 @@
     }
 
     footer {
-      margin-top: 5rem;
       text-align: center;
       font-size: 0.8rem;
       color: #999;
@@ -492,27 +521,61 @@
       border-top: 1px solid #eee;
       background-color: #fff;
     }
+
+    /* 맛집 지도 섹션 헤더 스타일 통일 */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.5rem;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+
+    .delete-button button{
+      text-align : right;
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .delete-button button :hover {
+      background-color: #c82333;
+      transition: background-color 0.2s ease;
+    }
+
+    .add-restaurant-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .add-restaurant-btn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
   </style>
-  <script th:src="@{/js/auth.js}"></script>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/search}">모임 찾기</a>
-      <a th:href="@{/map}">맛집 탐색</a>
-      <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    </nav>
-  </div>
-  <div class="header-right">
-    <span title="알림">🔔</span>
-    <span title="프로필">👤</span>
-    <button class="btn-primary" th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기
-    </button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div class="container">
   <div>
@@ -538,10 +601,10 @@
         <strong>가입일:</strong> <span th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd')}">2023-01-01</span>
       </div>
       <div class="info-item" style="white-space: nowrap;">
-      <strong style="margin-right: 4px;">저장 맛집 수:</strong>
-      공개  <span th:text="${visiblePlaceCount}">0</span>
-      숨김  <span th:text="${hiddenPlaceCount}">0</span>
-    </div>
+        <strong style="margin-right: 4px;">저장 맛집 수:</strong>
+        공개 <span th:text="${visiblePlaceCount}">0</span>
+        숨김 <span th:text="${hiddenPlaceCount}">0</span>
+      </div>
 
       <div class="preference-section">
         <h4>
@@ -570,138 +633,265 @@
       <h4>활동 통계</h4>
       <p>주최한 모임: <span th:text="${stats.leaderCount}">5</span>회</p>
       <p>참여한 모임: <span th:text="${stats.participatingCount}">12</span>회</p>
-      <p>왼료한 모임: <span th:text="${stats.completedCount}">8</span>곳</p>
+      <p>완료한 모임: <span th:text="${stats.completedCount}">8</span>곳</p>
     </div>
   </div>
 
   <!-- 내 모임 목록 -->
   <div class="main-section mypage-section">
-    <h2>내 모임 목록</h2>
-    <div class="tabs">
-      <button class="active" id="all-tab" onclick="switchTab('all')">전체</button>
-      <button id="hosting-tab" onclick="switchTab('hosting')">주최 중</button>
-      <button id="participating-tab" onclick="switchTab('participating')">참여 중</button>
-      <button class="create-meeting" onclick="location.href='/team/create'">모임 만들기</button>
-    </div>
+    <div class="main-section team-section">
+      <h2>내 모임 목록</h2>
+      <div class="tabs">
+        <button class="active"
+                id="all-tab"
+                data-tab="all"
+                onclick="switchTab('all')">전체
+        </button>
 
-    <div id="meetings-container">
-      <div id="all-meetings" class="meetings-section">
-        <h3>전체 모임</h3>
-        <div th:if="${#lists.isEmpty(hostingTeams) and #lists.isEmpty(participatingTeams)}" class="empty-state">
-          <p>아직 참여하거나 주최한 모임이 없습니다.</p>
-          <p>모임을 만들거나 다른 사용자의 모임에 참여해보세요!</p>
-        </div>
-        <div th:each="team : ${hostingTeams}" class="meeting-item">
-          <h4>
-            <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge active">주최중</span>
-          </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
-          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+        <button id="hosting-tab"
+                data-tab="hosting"
+                onclick="switchTab('hosting')">주최 중
+        </button>
 
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+        <button id="participating-tab"
+                data-tab="participating"
+                onclick="switchTab('participating')">참여 중
+        </button>
 
-          <!-- 모임 수정 버튼 -->
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
-                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
-            모임 수정
-          </button>
+        <button class="create-meeting"
+                onclick="location.href='/team/create'">모임 만들기
+        </button>
+      </div>
 
-          <!-- 모임 취소 버튼-->
-          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
-            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELED}" class="cancel-btn">모임 취소</button>
-          </form>
+      <div id="meetings-container">
+        <div id="all-meetings" class="meetings-section">
+          <h3>전체 모임</h3>
+          <div th:if="${#lists.isEmpty(hostingTeams) and #lists.isEmpty(participatingTeams)}"
+               class="empty-state">
+            <p>아직 참여하거나 주최한 모임이 없습니다.</p>
+            <p>모임을 만들거나 다른 사용자의 모임에 참여해보세요!</p>
+          </div>
 
-          <div id="application-info-${team.teamId}" class="application-info" style="display: none;">
-            <h4>신청자 목록</h4>
-            <!-- 신청자 정보 동적으로 추가될 부분 -->
-            <ul id="applicant-list-${team.teamId}">
-              <!-- 신청자 정보 리스트 -->
-            </ul>
+          <div th:each="team : ${all}" class="meeting-item">
+            <div th:if="${team.user.userId == user.userId}">
+              <h4>
+                <span th:text="${team.teamTitle}">모임 제목</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+                <span class="status-badge" th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+              </h4>
+              <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+              </p>
+              <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+              <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+
+              <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+              <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+              <hr>
+              <div style="display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;">
+              <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
+                      th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
+                      th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
+                모임 수정
+              </button>
+                <div class="delete-button" style="text-align: right"
+                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                  <button type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+               </div>
+              </div>
+              <div
+                  th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                      method="post" style="display: inline;" class="cancel-form"
+                      th:data-team-id="${team.teamId}">
+                  <button type="submit" class="cancel-btn">모임 취소</button>
+                </form>
+              </div>
+              <div th:if="${#strings.toString(team.status) == 'CANCELED'}"
+                   style="display: inline;">
+                <button class="btn-secondary" disabled>모임 취소 완료</button>
+              </div>
+              <div th:if="${#strings.toString(team.status) == 'COMPLETED'}"
+                   style="display: inline;">
+                <button class="btn-success" disabled>모임 완료</button>
+              </div>
+            </div>
+
+            <div th:if="${team.user.userId != user.userId}">
+              <h4>
+                <span th:text="${team.teamTitle}">모임 제목</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+              </h4>
+              <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+              </p>
+              <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+              <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+              <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+              <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+            </div>
+          </div>
+
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
+            <div class="pagination">
+              <a th:if="${teamCurrentPage > 0}"
+                 th:href="@{/user/mypage(tab='all', teamPage=${teamCurrentPage - 1})}"
+                 class="page-link">&laquo; 이전</a>
+              <span th:each="i : ${#numbers.sequence(0, teamTotalPages - 1)}">
+                <a th:if="${i != teamCurrentPage}"
+                   th:href="@{/user/mypage(tab='all', teamPage=${i})}"
+                   class="page-link" th:text="${i + 1}">1</a>
+                <span th:if="${i == teamCurrentPage}" class="page-link active"
+                      th:text="${i + 1}">1</span>
+                </span>
+              <a th:if="${teamCurrentPage < teamTotalPages - 1}"
+                 th:href="@{/user/mypage(tab='all', teamPage=${teamCurrentPage + 1})}"
+                 class="page-link">다음 &raquo;</a>
+            </div>
           </div>
         </div>
-        <div th:each="team : ${participatingTeams}" class="meeting-item">
-          <h4>
-            <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge">참여중</span>
-          </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
-          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
-          </form>
 
+        <div id="hosting-meetings" class="meetings-section" style="display: none; padding: 0">
+          <h3>주최 중인 모임</h3>
+          <div th:if="${#lists.isEmpty(hostingTeams)}" class="empty-state">
+            <p>아직 주최한 모임이 없습니다.</p>
+            <p>새로운 모임을 만들어보세요!</p>
+          </div>
+          <div th:each="team : ${hostingTeams}" class="meeting-item">
+            <div th:if="${team.user.userId == user.userId}">
+              <h4>
+                <span th:text="${team.teamTitle}">모임 제목</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+                <span class="status-badge"
+                      th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+              </h4>
+              <p>📅 <span
+                  th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+              </p>
+              <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+              <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span>
+              </p>
+
+              <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+              <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
+              <hr>
+              <div style="display: flex; justify-content: space-between; gap: 0.5rem; align-items: center;">
+              <button th:if="${team.user.userId == user.userId and ((#strings.toString(team.status) == 'RECRUITING'
+               or #strings.toString(team.status) == 'FULL'))}" class="btn-primary"
+                      th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''"
+                      th:disabled="${#strings.toString(team.status) == 'CANCELED' or #strings.toString(team.status) == 'COMPLETED'}">
+                모임 수정
+              </button>
+                <div class="delete-button" style="text-align: right"
+                   th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                  <button type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+                </div>
+              </div>
+              <div
+                  th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+                <form th:action="@{/api/team/{teamId}/cancel(teamId=${team.teamId})}"
+                      method="post" style="display: inline;" class="cancel-form"
+                      th:data-team-id="${team.teamId}">
+                  <button type="submit" class="cancel-btn">모임 취소</button>
+                </form>
+              </div>
+              <div th:if="${#strings.toString(team.status) == 'CANCELED'}"
+                   style="display: inline;">
+                <button class="btn-secondary" disabled>모임 취소 완료</button>
+              </div>
+              <div th:if="${#strings.toString(team.status) == 'COMPLETED'}"
+                   style="display: inline;">
+                <button class="btn-success" disabled>모임 완료</button>
+              </div>
+            </div>
+          </div>
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
+            <div class="pagination">
+              <a th:if="${teamCurrentPage > 0}"
+                 th:href="@{/user/mypage(tab='hosting', teamPage=${teamCurrentPage - 1})}"
+                 class="page-link">&laquo; 이전</a>
+              <span th:each="i : ${#numbers.sequence(0, teamTotalPages - 1)}">
+                <a th:if="${i != teamCurrentPage}"
+                   th:href="@{/user/mypage(tab='hosting', teamPage=${i})}"
+                   class="page-link" th:text="${i + 1}">1</a>
+                <span th:if="${i == teamCurrentPage}" class="page-link active"
+                      th:text="${i + 1}">1</span>
+                </span>
+              <a th:if="${teamCurrentPage < teamTotalPages - 1}"
+                 th:href="@{/user/mypage(tab='hosting', teamPage=${teamCurrentPage + 1})}"
+                 class="page-link">다음 &raquo;</a>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div id="hosting-meetings" class="meetings-section" style="display: none;">
-        <h3>주최 중인 모임</h3>
-        <div th:if="${#lists.isEmpty(hostingTeams)}" class="empty-state">
-          <p>아직 주최한 모임이 없습니다.</p>
-          <p>새로운 모임을 만들어보세요!</p>
-        </div>
-        <div th:each="team : ${hostingTeams}" class="meeting-item">
-          <h4>
-            <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge active">주최중</span>
-          </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
-          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a><br>
-
-          <!-- 모임 수정 버튼 -->
-          <button th:if="${team.user.userId == user.userId}" class="btn-primary"
-                  th:onclick="'location.href=\'/team/edit/' + ${team.teamId} + '\''">
-            모임 수정
-          </button>
-
-          <!-- 모임 취소 버튼-->
-          <form th:if="${isLeader}" th:action="@{/team/{teamId}/cancel(teamId=${team.teamId})}" method="post" style="display: inline;">
-            <button type="submit" th:if="${team.status != T(com.grepp.matnam.app.model.team.code.Status).CANCELED}" class="cancel-btn">모임 취소</button>
-          </form>
-
-          <div id="application-info-${teamId}" class="application-info" style="display: none;">
-            <h4>신청자 목록</h4>
-            <!-- 신청자 정보 동적으로 추가될 부분 -->
-            <ul id="applicant-list-${teamId}">
-              <!-- 신청자 정보 리스트 -->
-            </ul>
+        <div id="participating-meetings" class="meetings-section"
+             style="display: none; padding: 0">
+          <h3>참여 중인 모임</h3>
+          <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
+            <p>아직 참여한 모임이 없습니다.</p>
+            <p>다른 사용자의 모임에 참여해보세요!</p>
+          </div>
+          <div th:each="team : ${participatingTeams}" class="meeting-item">
+            <h4>
+              <span th:text="${team.teamTitle}">모임 제목</span>
+              <span class="status-badge"
+                    th:if="${#strings.toString(team.status) == 'RECRUITING'}">모집중</span>
+              <span class="status-badge"
+                    th:if="${#strings.toString(team.status) == 'FULL'}">모집완료</span>
+              <span class="status-badge"
+                    th:if="${#strings.toString(team.status) == 'COMPLETED'}">모임완료</span>
+              <span class="status-badge"
+                    th:if="${#strings.toString(team.status) == 'CANCELED'}">모임취소</span>
+            </h4>
+            <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+            </p>
+            <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
+            <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
+            <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
+            <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
+          </div>
+          <div class="teamPaging-container" th:if="${teamTotalPages > 1}">
+            <div class="pagination">
+              <a th:if="${teamCurrentPage > 0}"
+                 th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage - 1})}"
+                 class="page-link">&laquo; 이전</a>
+              <span th:each="i : ${#numbers.sequence(0, teamTotalPages - 1)}">
+                <a th:if="${i != teamCurrentPage}"
+                   th:href="@{/user/mypage(tab='participating', teamPage=${i})}"
+                   class="page-link" th:text="${i + 1}">1</a>
+                  <span th:if="${i == teamCurrentPage}" class="page-link active"
+                        th:text="${i + 1}">1</span>
+                </span>
+              <a th:if="${teamCurrentPage < teamTotalPages - 1}"
+                 th:href="@{/user/mypage(tab='participating', teamPage=${teamCurrentPage + 1})}"
+                 class="page-link">다음 &raquo;</a>
+            </div>
           </div>
         </div>
       </div>
-
-      <div id="participating-meetings" class="meetings-section" style="display: none;">
-        <h3>참여 중인 모임</h3>
-        <div th:if="${#lists.isEmpty(participatingTeams)}" class="empty-state">
-          <p>아직 참여한 모임이 없습니다.</p>
-          <p>다른 사용자의 모임에 참여해보세요!</p>
-        </div>
-        <div th:each="team : ${participatingTeams}" class="meeting-item">
-          <h4>
-            <span th:text="${team.teamTitle}">모임 제목</span>
-            <span class="status-badge">참여중</span>
-          </h4>
-          <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
-          <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
-          <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-          <a th:href="@{'/team/detail/' + ${team.teamId}}">자세히 보기</a><br>
-          <a th:href="@{'/team/page/' + ${team.teamId}}">팀페이지</a>
-
-        </div>
-      </div>
     </div>
-      <!-- 내 맛집 지도 -->
-      <div class="main-section mypage-section">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h2 style="margin-bottom: 0;">내 맛집 지도</h2>
-          <button onclick="location.href='/map/add'"
-                  style="
+
+    <!-- 내 맛집 지도 -->
+    <div class="main-section mypage-section">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style="margin-bottom: 0;">내 맛집 지도</h2>
+        <button onclick="location.href='/map/add'"
+                style="
           background: #000;
           color: #fff;
           border: none;
@@ -710,74 +900,88 @@
           border-radius: 4px;
           cursor: pointer;
           transition: background 0.2s ease, transform 0.2s ease;"
-                  onmouseover="this.style.background='#333'; this.style.transform='translateY(-1px)'"
-                  onmouseout="this.style.background='#000'; this.style.transform='none'">
-            맛집 검색 및 등록하기
-          </button>
-        </div>
-        <div id="map-container">
-          <div class="map-container">
-            <iframe th:src="@{/map/editMap}"
-                    width="100%"
-                    height="1000px"
-                    style="border: none;
+                onmouseover="this.style.background='#333'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.background='#000'; this.style.transform='none'">
+          맛집 검색 및 등록하기
+        </button>
+      </div>
+      <div id="map-container">
+        <div class="map-container">
+          <iframe th:src="@{/map/editMap}"
+                  width="100%"
+                  height="1000px"
+                  style="border: none;
                     border-radius: 8px;
                     overflow: auto;">
-            </iframe>
-          </div>
+          </iframe>
         </div>
       </div>
+    </div>
 
 
     <!-- 모임 리뷰 -->
-    <div class="main-section reviews-section" th:if="${not #lists.isEmpty(teamsWithoutReview) or currentPage > 0}">
+    <div class="main-section reviews-section"
+         th:if="${not #lists.isEmpty(teamsWithoutReview) or currentPage > 0}">
       <h2>리뷰 작성이 필요한 모임</h2>
 
       <div class="review-alert">
         <p>완료된 모임에 대해 다른 참여자들의 매너 온도를 매겨주세요!</p>
       </div>
 
-      <div th:if="${#lists.isEmpty(teamsWithoutReview) and currentPage == 0}" class="empty-state">
+      <div th:if="${#lists.isEmpty(teamsWithoutReview) and currentPage == 0}"
+           class="empty-state">
         <p>리뷰 작성이 필요한 모임이 없습니다.</p>
       </div>
 
-      <div th:each="team : ${teamsWithoutReview}" class="meeting-item" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
+      <div th:each="team : ${teamsWithoutReview}" class="meeting-item"
+           th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\''">
         <h4>
           <span th:text="${team.teamTitle}">모임 제목</span>
-          <span class="badge">완료됨</span>
+          <span class="team_badge">완료됨</span>
         </h4>
-        <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span></p>
+        <p>📅 <span
+            th:text="${#temporals.format(team.teamDate, 'yyyy년 MM월 dd일 (E) a hh:mm')}">모임 날짜</span>
+        </p>
         <p>📍 <span th:text="${team.restaurantName}">식당 이름</span></p>
         <p>👥 참여 인원: <span th:text="${team.nowPeople + '/' + team.maxPeople}">참여 인원</span></p>
-        <button class="btn-primary review-btn" th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">리뷰 작성</button>
+        <button class="btn-primary review-btn"
+                th:onclick="'location.href=\'' + @{/team/{id}/reviews(id=${team.teamId})} + '\'; event.stopPropagation();'">
+          리뷰 작성
+        </button>
       </div>
 
       <div class="pagination-container" th:if="${totalPages > 1}">
         <div class="pagination">
-          <a th:if="${currentPage > 0}" th:href="@{/user/mypage(page=${currentPage - 1})}" class="page-link">&laquo; 이전</a>
+          <a th:if="${currentPage > 0}" th:href="@{/user/mypage(page=${currentPage - 1})}"
+             class="page-link">&laquo; 이전</a>
           <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
-                <a th:if="${i != currentPage}" th:href="@{/user/mypage(page=${i})}" class="page-link" th:text="${i + 1}">1</a>
-                <span th:if="${i == currentPage}" class="page-link active" th:text="${i + 1}">1</span>
+                <a th:if="${i != currentPage}" th:href="@{/user/mypage(page=${i})}"
+                   class="page-link" th:text="${i + 1}">1</a>
+                <span th:if="${i == currentPage}" class="page-link active"
+                      th:text="${i + 1}">1</span>
             </span>
-          <a th:if="${currentPage < totalPages - 1}" th:href="@{/user/mypage(page=${currentPage + 1})}" class="page-link">다음 &raquo;</a>
+          <a th:if="${currentPage < totalPages - 1}"
+             th:href="@{/user/mypage(page=${currentPage + 1})}" class="page-link">다음 &raquo;</a>
         </div>
       </div>
     </div>
 
-<div id="deactivateModal" class="modal">
-  <div class="modal-content">
-    <h3 class="modal-title">회원 탈퇴</h3>
-    <form id="deactivateForm" action="/user/deactivate" method="post">
-      <div class="modal-body">
-        <p>정말로 회원 탈퇴를 진행하시겠습니까? 탈퇴 후에는 계정을 복구할 수 없습니다.</p>
-        <p>비밀번호를 입력하여 탈퇴를 확인해주세요.</p>
-        <input type="password" id="deactivatePassword" name="password" placeholder="비밀번호">
+    <div id="deactivateModal" class="modal">
+      <div class="modal-content">
+        <h3 class="modal-title">회원 탈퇴</h3>
+        <form id="deactivateForm" action="/user/deactivate" method="post">
+          <div class="modal-body">
+            <p>정말로 회원 탈퇴를 진행하시겠습니까? 탈퇴 후에는 계정을 복구할 수 없습니다.</p>
+            <p>비밀번호를 입력하여 탈퇴를 확인해주세요.</p>
+            <input type="password" id="deactivatePassword" name="password" placeholder="비밀번호">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="cancel" onclick="hideDeactivateModal()">취소</button>
+            <button type="submit" class="confirm">탈퇴하기</button>
+          </div>
+        </form>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="cancel" onclick="hideDeactivateModal()">취소</button>
-        <button type="submit" class="confirm">탈퇴하기</button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -821,28 +1025,70 @@
     switchTab('all');
   });
 
-  // 모임 목록 탭 전환
+  // 모임 취소
+  document.addEventListener('DOMContentLoaded', function () {
+    const cancelForms = document.querySelectorAll('.cancel-form');
+
+    cancelForms.forEach(form => {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const teamId = this.getAttribute('data-team-id');
+
+        if (!confirm("정말로 이 모임을 취소하시겠습니까?")) {
+          return;
+        }
+
+        fetch(`/api/team/${teamId}/cancel`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then(res => {
+          if (!res.ok) {
+            return res.json().then(err => {
+              const errorData = err.message || '모임 취소 실패';
+              alert(errorData);
+              throw new Error(errorData);
+            });
+          }
+          return res.json();
+        })
+        .then(data => {
+          alert(data.message || "모임이 취소되었습니다.");
+          location.reload();
+        })
+        .catch(err => {
+          console.error("모임 취소 오류:", err);
+        });
+      });
+    });
+  });
+
+  // 팀 탭 전환 함수
   function switchTab(tabName) {
     const tabButtons = document.querySelectorAll('.tabs button:not(.create-meeting)');
-    tabButtons.forEach(button => {
-      button.classList.remove('active');
-    });
+    tabButtons.forEach(btn => btn.classList.remove('active'));
     document.getElementById(tabName + '-tab').classList.add('active');
 
-    const allMeetingsDiv = document.getElementById('all-meetings');
-    const hostingMeetingsDiv = document.getElementById('hosting-meetings');
-    const participatingMeetingsDiv = document.getElementById('participating-meetings');
+    ['all', 'hosting', 'participating'].forEach(name => {
+      document.getElementById(name + '-meetings').style.display = 'none';
+    });
 
-    allMeetingsDiv.style.display = 'none';
-    hostingMeetingsDiv.style.display = 'none';
-    participatingMeetingsDiv.style.display = 'none';
+    document.getElementById(tabName + '-meetings').style.display = 'block';
+  }
 
-    if (tabName === 'all') {
-      allMeetingsDiv.style.display = 'block';
-    } else if (tabName === 'hosting') {
-      hostingMeetingsDiv.style.display = 'block';
-    } else if (tabName === 'participating') {
-      participatingMeetingsDiv.style.display = 'block';
+  function scrollToTeamSectionIfNeeded() {
+    if (new URLSearchParams(window.location.search).has('teamPage')) {
+      document.querySelector('.team-section')?.scrollIntoView({behavior: 'smooth'});
+    }
+  }
+
+  function scrollToReviewsIfNeeded() {
+    const pageParam = new URLSearchParams(window.location.search).get('page');
+    if (pageParam !== null && pageParam !== '0') {
+      document.querySelector('.reviews-section')?.scrollIntoView({behavior: 'smooth'});
     }
   }
 
@@ -851,20 +1097,62 @@
       window.location.href = '/user/signin';
       return;
     }
-    switchTab('all'); // 초기 로딩 시 "전체" 탭 활성화
+
+    document.querySelectorAll('.tabs button:not(.create-meeting)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const params = new URLSearchParams(window.location.search);
+        params.set('tab', btn.dataset.tab);
+        params.set('teamPage', '0');
+        window.location.search = params.toString();
+      });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const initialTab = params.get('tab') || 'all';
+    switchTab(initialTab);
+
+    scrollToTeamSectionIfNeeded();
+    scrollToReviewsIfNeeded();
   });
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('page')) {
-      const reviewsSection = document.querySelector('.reviews-section');
-      if (reviewsSection) {
-        setTimeout(() => {
-          reviewsSection.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      }
-    }
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteButtons = document.querySelectorAll('.delete-button button');
+
+    deleteButtons.forEach(button => {
+      const teamId = button.getAttribute('data-team-id');
+
+      button.addEventListener('click', function () {
+        if (!confirm("정말로 이 모임을 삭제하시겠습니까? 삭제 이후 되돌릴 수 없습니다.")) return;
+
+        fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+                .then(res => {
+                  if (!res.ok) {
+                    return res.json().then(err => {
+                      throw new Error(err.message || '삭제 실패');
+                    });
+                  }
+                  return res.json();
+                })
+                .then(data => {
+                  alert(data.message || "삭제되었습니다.");
+                  window.location.href = "/user/mypage";
+                })
+                .catch(err => {
+                  alert(err.message || "삭제 중 오류가 발생했습니다.");
+                });
+      });
+    });
   });
+
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
+
 </html>

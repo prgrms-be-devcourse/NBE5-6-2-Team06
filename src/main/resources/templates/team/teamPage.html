@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>맛남 | 팀 페이지</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -11,20 +14,6 @@
       padding: 0;
       background-color: #f9f9f9;
       color: #333;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background-color: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    nav a {
-      margin-right: 1rem;
-      text-decoration: none;
-      color: #333;
-      font-size: 0.9rem;
     }
     .container {
       max-width: 1200px;
@@ -67,21 +56,30 @@
     .input-group {
       display: flex;
       margin-top: 1rem;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .input-group input {
       flex: 1;
-      padding: 0.5rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px 16px;
+      border: 1px solid #e0e0e0;
+      border-right: none;
+      border-radius: 24px 0 0 24px;
+      font-size: 0.95rem;
     }
     .input-group button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
+      padding: 12px 20px;
       border: none;
-      background-color: #000;
+      background-color: #4CAF50;
       color: #fff;
-      border-radius: 4px;
+      border-radius: 0 24px 24px 0;
       cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .input-group button:hover {
+      background-color: #43a047;
     }
 
     .participant-list {
@@ -139,10 +137,94 @@
     .chat-message:hover {
       background-color: #f0f0f0;
     }
+    .other-message:hover .report-btn {
+      opacity: 1;
+    }
+
+    .chat-box {
+      height: 400px; /* 높이 증가 */
+      overflow-y: auto;
+      border: 1px solid #e0e0e0;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f7f7f7;
+      margin-bottom: 1rem;
+    }
+
+    /* 채팅 메시지 컨테이너 */
+    .chat-message {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 12px;
+      width: 100%;
+      clear: both;
+      font-size: 0.95rem; /* 폰트 크기 조정 */
+    }
+
+    /* 내 메시지 (왼쪽 정렬) */
+    .my-message .message-content {
+      align-self: flex-start;
+      background-color: #dcf8c6; /* 밝은 초록색 배경 */
+      border-radius: 12px 12px 12px 0;
+      padding: 10px 14px;
+      max-width: 70%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      margin-right: auto;
+      color: #333;
+    }
+
+    /* 다른 사람 메시지 (오른쪽 정렬) */
+    .other-message .message-content {
+      align-self: flex-end;
+      background-color: white;
+      border-radius: 12px 12px 0 12px;
+      padding: 10px 14px;
+      max-width: 70%;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      margin-left: auto;
+      color: #333;
+    }
+
+    /* 닉네임 스타일 */
+    .nickname {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    /* 내 메시지 닉네임 */
+    .my-message .nickname {
+      align-self: flex-start;
+      color: #2e7d32; /* 어두운 초록색 */
+    }
+
+    /* 다른 사람 메시지 닉네임 */
+    .other-message .nickname {
+      align-self: flex-end;
+      color: #0277bd; /* 파란색 */
+      text-align: right;
+    }
+    /* 시간 표시 */
+    .timestamp {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+    /* 내 메시지 시간 */
+    .my-message .timestamp {
+      align-self: flex-start;
+    }
+    /* 다른 사람 메시지 시간 */
+    .other-message .timestamp {
+      align-self: flex-end;
+    }
+    /* 신고 버튼 */
     .report-btn {
       position: absolute;
-      right: 5px;
-      top: 5px;
+      top: 2px;
+      left: 5px;
       background-color: #ff5c5c;
       color: white;
       border: none;
@@ -254,6 +336,25 @@
       background-color: #f44336;
     }
 
+    .complete-button{
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .complete-button:hover{
+      background-color: #3da354;
+    }
+
+    .complete-button:disabled {
+      background-color: #9e3c3c;
+      color: #686767;
+      cursor: not-allowed;
+    }
+
     .card-wrapper {
       display: flex;
       flex-wrap: nowrap;
@@ -293,24 +394,132 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .team-banner {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+    .team-banner__bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-position: center;
+      background-size: cover;
+      filter: brightness(0.6);
+    }
+    .team-banner__title {
+      position: relative;
+      z-index: 1;
+      color: #fff;
+      font-size: 2rem;
+      text-align: center;
+      line-height: 220px;
+      margin: 0;
+    }
+
+
+    #notificationArea {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .notification-card {
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    #notificationButton {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background-color: #6565a5;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .delete-button button{
+      text-align : right;
+      margin-top: 0.5rem;
+      padding: 0.4rem 1rem;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .delete-button button :hover {
+      background-color: #c82333;
+      transition: background-color 0.2s ease;
+    }
+
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="logo">
-    <h1>맛남</h1>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
+<div class="team-banner">
+  <div class="team-banner__bg"
+       th:style="|background-image: url('@{/img/food.jpg}');|">
   </div>
-  <nav>
-    <a th:href="@{/}">홈</a>
-    <a th:href="@{/user/mypage}" class="active">마이페이지</a>
-    <a th:href="@{/user/logout}">로그아웃</a>
-  </nav>
-</header>
+  <h1 class="team-banner__title"
+      th:text="'&quot;' + ${team.teamTitle} + '&quot; 모임입니다 👥'">
+    "모임 이름" 모임입니다 👥
+  </h1>
+</div>
+
 <div class="container">
   <div class="section">
-    <h2>방장 정보</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2>방장 정보</h2>
+      <form th:if="${isLeader != null && isLeader
+              && #strings.toString(team.status) != null
+              && #strings.toString(team.status) != 'COMPLETED'
+              && #strings.toString(team.status) != 'CANCELED'}"
+            th:action="@{/api/team/{teamId}/complete(teamId=${team.teamId})}"
+            method="post"
+            style="display: flex; gap: 10px; align-items: center;">
+
+        <button type="submit" class="complete-button"
+                th:data-team-id="${team.teamId}"
+                th:disabled="${#strings.toString(team.status) == 'COMPLETED'}"
+                th:text="${#strings.toString(team.status) == 'COMPLETED' ? '모임 완료된 상태' : '모임 완료하기'}">
+          모임 완료하기
+        </button>
+
+        <div class="delete-button" style="text-align: right"
+             th:if="${#strings.toString(team.status) != 'CANCELED' and #strings.toString(team.status) != 'COMPLETED'}">
+          <button id="deleteButton" type="button" th:attr="data-team-id=${team.teamId}">삭제</button>
+        </div>
+      </form>
+
+      <div th:if="${team.status != null && #strings.toString(team.status) == 'COMPLETED'}">
+        <button type="button" class="btn complete-button" disabled
+                style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
+          모임 완료된 상태
+        </button>
+      </div>
+      <div th:if="${team.status != null && #strings.toString(team.status) == 'CANCELED'}">
+        <button type="button" class="btn complete-button" disabled
+                style="background-color: #e6e4e4; color: #606061; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem;">
+          취소된 모임입니다
+        </button>
+      </div>
+    </div>
+
     <div class="participant-list">
       <div class="participant" th:if="${leader}">
         <div class="participant-info">
@@ -362,9 +571,9 @@
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <h2>참여자 정보</h2>
       <button
-          class="btn"
-          th:onclick="|location.href='/team/map/${teamId}'|"
-          style="padding: 0.4rem 1rem;
+              class="btn"
+              th:onclick="|location.href='/team/map/${teamId}'|"
+              style="padding: 0.4rem 1rem;
               font-size: 0.9rem;
               border: none;
               border-radius: 4px;
@@ -376,7 +585,7 @@
     </div>
     <div class="participant-list">
       <div class="participant" th:each="participant : ${participants}"
-           th:if="${participant.participantStatus == T(com.grepp.matnam.app.model.team.code.ParticipantStatus).APPROVED}">
+           th:if="${participant.participantStatus != null && #strings.toString(participant.participantStatus) == 'APPROVED'}">
         <div class="participant-info">
           <!-- 사용자 닉네임 -->
           <div class="info-item">
@@ -425,7 +634,6 @@
       </div>
     </div>
   </div>
-
   <div class="section">
     <h2>채팅</h2>
     <div class="chat-box" id="chat-box">
@@ -465,7 +673,7 @@
 
     <!-- 안내 메시지 + 추천 버튼 -->
     <div
-        style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+            style="margin-bottom: 2rem; background-color: #fefefe; padding: 1.5rem; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
       <p style="margin-bottom: 1rem; font-size: 1.05rem; line-height: 1.6;">
         🍽️ <strong>오늘의 2차 장소</strong>, 고민하지 마세요!<br>
         <span style="color: #555;">우리 팀을 위해 AI가 분위기 좋은 맛집을 추천해드려요.</span><br>
@@ -509,6 +717,8 @@
     </div>
   </div>
 
+</div>
+
 
 <script th:inline="javascript">
   let stompClient;
@@ -547,7 +757,7 @@
     const input = document.getElementById('chat-input');
     const messageContent = input.value.trim();
     const now = new Date();
-    const time = now.toTimeString().slice(0,5);
+    const time = now.toTimeString().slice(0, 5);
     if (messageContent && stompClient) {
       const chatMessage = {
         teamId: teamId,
@@ -563,33 +773,55 @@
 
   function showMessage(messageText, messageSenderId, chatId) {
     const chatBox = document.getElementById('chat-box');
+
+    // 정규식으로 시간, 닉네임, 내용 분리
+    const messagePattern = /\[(.*?)\] (.*?): (.*)/;
+    const match = messageText.match(messagePattern);
+
+    if (!match) return; // 패턴 매치 실패 시 처리 중단
+
+    const time = match[1];
+    const nickname = match[2];
+    const content = match[3];
+
+    // 새 메시지 요소 생성
     const messageElement = document.createElement('div');
 
-    messageElement.className = 'chat-message';
+    // 내 메시지인지 다른 사람 메시지인지 결정
+    const isMyMessage = messageSenderId === senderId;
+    messageElement.className = `chat-message ${isMyMessage ? 'my-message' : 'other-message'}`;
 
-    messageElement.textContent = messageText;
+    // 닉네임 추가
+    const nicknameElement = document.createElement('div');
+    nicknameElement.className = 'nickname';
+    nicknameElement.textContent = nickname;
+    messageElement.appendChild(nicknameElement);
 
+    // 메시지 내용 추가
+    const contentElement = document.createElement('div');
+    contentElement.className = 'message-content';
+    contentElement.textContent = content;
+    messageElement.appendChild(contentElement);
+
+    // 시간 표시 추가
+    const timeElement = document.createElement('div');
+    timeElement.className = 'timestamp';
+    timeElement.textContent = time;
+    messageElement.appendChild(timeElement);
+
+    // 다른 사람 메시지에만 신고 버튼 추가 (신고 기능 유지)
     if (messageSenderId && messageSenderId !== senderId) {
-      const messagePattern = /\[(.*?)\] (.*?): (.*)/;
-      const match = messageText.match(messagePattern);
+      const reportButton = document.createElement('button');
+      reportButton.className = 'report-btn';
+      reportButton.textContent = '신고';
+      reportButton.title = '이 메시지 신고하기';
 
-      if (match) {
-        const time = match[1];
-        const nickname = match[2];
-        const content = match[3];
+      reportButton.onclick = function (e) {
+        e.stopPropagation();
+        openReportModal(messageSenderId, nickname, chatId);
+      };
 
-        const reportButton = document.createElement('button');
-        reportButton.className = 'report-btn';
-        reportButton.textContent = '신고';
-        reportButton.title = '이 메시지 신고하기';
-
-        reportButton.onclick = function(e) {
-          e.stopPropagation();
-          openReportModal(messageSenderId, nickname, chatId);
-        };
-
-        messageElement.appendChild(reportButton);
-      }
+      messageElement.appendChild(reportButton);
     }
 
     chatBox.appendChild(messageElement);
@@ -604,25 +836,78 @@
   function loadChatHistory() {
     console.log("채팅 이력 불러오기 시도...");
     fetch(`/api/chat/history/${teamId}`)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('채팅 이력을 불러오는데 실패했습니다.');
-      }
-      return response.json();
-    })
-    .then(data => {
-      const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML = ''; // 기존 내용 초기화
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('채팅 이력을 불러오는데 실패했습니다.');
+              }
+              return response.json();
+            })
+            .then(result => {
+              const chatBox = document.getElementById('chat-box');
+              chatBox.innerHTML = ''; // 기존 내용 초기화
 
-      // 채팅 메시지 표시
-      data.forEach(message => {
-        showMessage(`[${message.time}] ${message.senderNickname}: ${message.message}`, message.senderId, message.chatId);
-      });
-    })
-    .catch(error => {
-      console.error("채팅 이력 로딩 오류:", error);
-    });
+              const messages = result.data;
+
+              if (!Array.isArray(messages)) {
+                console.error("채팅 이력이 배열이 아닙니다:", messages);
+                return;
+              }
+
+              // 채팅 메시지 표시
+              messages.forEach(message => {
+                showMessage(
+                        `[${message.time}] ${message.senderNickname}: ${message.message}`,
+                        message.senderId,
+                        message.chatId
+                );
+              });
+            })
+            .catch(error => {
+              console.error("채팅 이력 로딩 오류:", error);
+            });
   }
+
+  // 모임 완료 - 완료 버튼을 비활성화
+  document.addEventListener('DOMContentLoaded', function () {
+    $('.complete-button').on('click', function(event) {
+      event.preventDefault();
+
+      var teamId = $(this).data('team-id');
+      var status = 'COMPLETED';
+      var form = $(this).closest('form');
+      var url = form.attr('action');
+      var button = $(this);
+
+      $.ajax({
+        type: 'PUT',
+        url: url,
+        data: { status: status },
+        success: function(response) {
+          $('#notificationMessage').text(response.message  || '모임이 성공적으로 완료 처리되었습니다.');
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+          location.reload();
+        },
+        error: function(xhr, status, error) {
+          var errorMessage = "모임 완료에 실패했습니다.";
+          if (xhr.responseJSON && xhr.responseJSON.message) {
+            errorMessage = xhr.responseJSON.message;
+          } else if (xhr.responseText) {
+            errorMessage = xhr.responseText;
+          }
+          $('#notificationMessage').text(errorMessage);
+          $('#notificationArea').fadeIn();
+          $('#notificationButton').click(function() {
+            $('#notificationArea').fadeOut();
+          });
+
+          button.prop('disabled', false).text('모임 완료하기');
+        }
+      });
+    });
+  });
 
   function openReportModal(reportedUserId, reportedUserNickname, chatId) {
     const reportModal = document.getElementById('reportModal');
@@ -646,7 +931,7 @@
     reportModal.style.display = 'none';
   }
 
-  function showToast(message, type = '') {
+  function showToastTeamPage(message, type = '') {
     const toast = document.getElementById('toast');
     toast.textContent = message;
     toast.className = 'toast ' + type;
@@ -713,19 +998,19 @@
         },
         body: JSON.stringify(reportData)
       })
-      .then(response => response.json())
-      .then(data => {
-        if (data.code === 'SUCCESS' || data.code === '0000') {
-          closeReportModal();
-          showToast('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
-        } else {
-          showToast('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        showToast('신고 처리 중 오류가 발생했습니다.', 'error');
-      });
+              .then(response => response.json())
+              .then(data => {
+                if (data.code === 'SUCCESS' || data.code === '0000') {
+                  closeReportModal();
+                  showToastTeamPage('신고가 접수되었습니다. 관리자 검토 후 조치하겠습니다.', 'success');
+                } else {
+                  showToastTeamPage('신고 접수에 실패했습니다: ' + (data.message || '오류가 발생했습니다'), 'error');
+                }
+              })
+              .catch(error => {
+                console.error('Error:', error);
+                showToastTeamPage('신고 처리 중 오류가 발생했습니다.', 'error');
+              });
     });
   });
   // ====================================== 추천 ========================================
@@ -750,61 +1035,109 @@
     loading.style.display = "block";
 
     fetch(url)
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('추천 실패');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log("📦 받아온 추천 데이터:", data);
-      const restaurants = data.restaurants;
-      const reason = data.reason;
-      let completed = 0;
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('추천 실패');
+              }
+              return response.json();
+            })
+            .then(result => {
+              console.log("📦 받아온 추천 응답:", result);
 
-      restaurants.forEach(name => {
-        fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
-        .then(res => res.json())
-        .then(dbItem => {
-          const card = document.createElement("div");
-          card.className = "recommend-card";
+              const data = result.data;
 
-          card.innerHTML = `
+              if (!data || !Array.isArray(data.restaurants)) {
+                console.error("❌ 잘못된 응답 형식 (data.restaurants 없음):", data);
+                showToastTeamPage("추천 결과를 불러올 수 없습니다.", "error");
+                loading.style.display = "none";
+                return;
+              }
+
+              const restaurants = data.restaurants;
+              const reason = data.reason;
+              let completed = 0;
+
+              restaurants.forEach(name => {
+                fetch(`/api/ai/restaurant/name?name=${encodeURIComponent(name)}`)
+                        .then(res => res.json())
+                        .then(dbItem => {
+                          const data = dbItem.data;
+                          const card = document.createElement("div");
+                          card.className = "recommend-card";
+
+                          card.innerHTML = `
               <div>
-                <h3 style="margin-top: 0; font-size: 1.2rem;">🍽️ ${dbItem.restaurantName}</h3>
-                <p><strong>📍 위치:</strong> ${dbItem.address}</p>
-                <p><strong>🕒 영업시간:</strong> ${dbItem.openTime}</p>
-                <p><strong>🍱 메인메뉴:</strong> ${dbItem.mainFood}</p>
-                <p><strong>📂 카테고리:</strong> ${dbItem.category}</p>
-                <p><strong>📝 소개:</strong> ${dbItem.description}</p>
-                <p style="margin-top: 1rem;"><strong>🔗 URL:</strong> <a href="#" onclick="window.open('${dbItem.url
-          || '#'}', '_blank')" style="color: blue;">바로가기</a></p>
+                <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.3rem;">🍽️ ${data.restaurantName}</h2>
+                <p style="margin-bottom: 0.6rem;"><strong>📍 위치:</strong> ${data.address}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>🕒 영업시간:</strong> ${data.openTime}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>🍱 메인메뉴:</strong> ${data.mainFood}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>📂 카테고리:</strong> ${data.category}</p>
+                <p style="margin-bottom: 0.6rem;"><strong>📝 소개:</strong> ${data.description}</p>
+                <p style="margin-top: 1rem; margin-bottom: 0;">
+                  <strong>🔗 URL:</strong>
+                  <a href="https://map.kakao.com/?q=${encodeURIComponent(data.restaurantName)}"
+                     target="_blank" style="color: blue;">바로가기</a>
+                </p>
               </div>
             `;
-          wrapper.appendChild(card);
-        })
-        .catch(err => {
-          console.error("식당 정보 조회 실패", err);
-        })
-        .finally(() => {
-          completed++;
-          if (completed === restaurants.length) {
-            loading.style.display = "none";
 
-            reasonBox.innerHTML = `
+                          wrapper.appendChild(card);
+                        })
+                        .catch(err => {
+                          console.error("식당 정보 조회 실패", err);
+                        })
+                        .finally(() => {
+                          completed++;
+                          if (completed === restaurants.length) {
+                            loading.style.display = "none";
+                            reasonBox.innerHTML = `
                 <h2 style="margin-top: 0; margin-bottom: 0.8rem;">💬 추천 이유</h2>
                 <div>${reason}</div>
               `;
-            reasonBox.style.display = "block";
-          }
-        });
-      });
-    })
-    .catch(err => {
-      console.error("추천 요청 실패", err);
-      loading.style.display = "none";
-    });
+                            reasonBox.style.display = "block";
+                          }
+                        });
+              });
+            })
+            .catch(err => {
+              console.error("추천 요청 실패", err);
+              loading.style.display = "none";
+            });
   }
+  //모임 삭제 버튼
+  document.addEventListener('DOMContentLoaded', function () {
+    const deleteBtn = document.getElementById('deleteButton');
+    if (deleteBtn) {
+      const teamId = deleteBtn.getAttribute('data-team-id');
+      deleteBtn.addEventListener('click', function () {
+        if (!confirm("정말로 이 모임을 삭제하시겠습니까? 삭제 이후 되돌릴 수 없습니다.")) return;
+
+        fetch(`${location.origin}/api/team/${teamId}/deactivate`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+                .then(res => {
+                  if (!res.ok) {
+                    return res.json().then(err => { throw new Error(err.message || '삭제 실패'); });
+                  }
+                  return res.json();
+                })
+                .then(data => {
+                  alert(data.message || "삭제되었습니다.");
+                  window.location.href = "/user/mypage";
+                })
+                .catch(err => {
+                  alert(err.message || "삭제 중 오류가 발생했습니다.");
+                });
+      });
+    }
+  });
+
 </script>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>

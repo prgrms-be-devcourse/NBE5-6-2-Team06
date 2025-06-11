@@ -1,14 +1,14 @@
-const auth = {
-    isLoggedIn() {
-        return this.getCookie('jwtToken') !== null;
-    },
+(function(global) {
+    const auth = {
+        isLoggedIn() {
+            return this.getCookie('jwtToken') !== null;
+        },
 
     getUserInfo() {
         if (!this.isLoggedIn()) return null;
 
         return {
-            userId: this.getCookie('userId'),
-            role: this.getCookie('userRole'),
+            nickname: this.getNickname('userNickname'),
             token: this.getCookie('jwtToken')
         };
     },
@@ -33,6 +33,11 @@ const auth = {
             if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
         }
         return null;
+    },
+
+    getNickname(name) {
+        const encodedNickname = this.getCookie('userNickname');
+        return encodedNickname ? decodeURIComponent(encodedNickname) : null;
     },
 
     eraseCookie(name) {
@@ -72,4 +77,7 @@ const auth = {
     }
 };
 
-window.auth = auth;
+    if (!global.auth) {
+        global.auth = auth;
+    }
+})(window);

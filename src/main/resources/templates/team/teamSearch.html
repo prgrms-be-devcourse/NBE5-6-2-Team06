@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>맛남 | 모임 찾기</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script th:src="@{/js/common-toast.js}"></script>
   <style>
     body {
       font-family: 'Noto Sans KR', sans-serif;
@@ -12,31 +15,7 @@
       background-color: #fff;
       color: #333;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      border-bottom: 1px solid #eee;
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 2rem;
-    }
-    nav a {
-      text-decoration: none;
-      color: #333;
-      margin-right: 1rem;
-    }
-    .header-buttons button {
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      background-color: #000;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
+
     .container {
       max-width: 1200px;
       margin: 2rem auto;
@@ -44,15 +23,26 @@
     }
     .search-bar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 1rem;
+      background-color: var(--light-color);
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
     }
+
     .search-bar input {
-      width: 80%;
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      border: none;
+      background: none;
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+
+    .search-bar input:focus {
+      box-shadow: none;
+    }
+
+    .search-bar i {
+      color: var(--gray-color);
+      cursor: pointer;
     }
     .filters {
       margin: 1rem 0;
@@ -142,22 +132,12 @@
       pointer-events: none;
     }
   </style>
+  <link rel="stylesheet" th:href="@{/css/notification.css}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/header.css}">
 </head>
 <body>
-<header>
-  <div class="header-left">
-    <div class="logo">맛남</div>
-    <nav>
-      <a th:href="@{/}">홈</a>
-      <a th:href="@{/team/search}">모임찾기</a>
-      <a th:href="@{restaurant/restaurants}">맛집 탐색</a>
-      <a th:href="@{/user/mypage}">마이페이지</a>
-    </nav>
-  </div>
-  <div class="header-buttons">
-    <button th:onclick="'location.href=\'' + @{/team/create} + '\''">모임 만들기</button>
-  </div>
-</header>
+<header th:replace="~{fragments/header :: siteHeader}"></header>
 
 <div class="container">
   <h1>모임 찾기</h1>
@@ -165,7 +145,7 @@
 
   <div class="search-bar">
     <input type="text" placeholder="모임 검색...">
-    <button>🔍</button>
+    <i class="fas fa-search"></i>
   </div>
 
   <div class="filters">
@@ -180,7 +160,7 @@
       <h3 th:text="${team.teamTitle}"></h3>
       <p>📅 <span th:text="${#temporals.format(team.teamDate, 'yyyy-MM-dd HH:mm')}"></span></p>
       <p>📍 <span th:text="${team.restaurantName}"></span></p>
-      <p>👥 <span th:text="${team.participants.size()}"></span>/ <span th:text="${team.nowPeople}"></span>명 참여중</p>
+      <p>👥 <span th:text="${team.nowPeople}"></span>/ <span th:text="${team.maxPeople}"></span>명 참여중</p>
       <a class="link-button" th:href="@{/team/detail/{teamId}(teamId=${team.teamId})}">자세히 보기</a>
     </div>
     <div th:if="${teams.isEmpty()}">
@@ -199,5 +179,8 @@
     <a th:if="${page.hasNext()}" th:href="@{/team/search(page=${page.number + 1}, size=${page.size})}">다음</a>
   </div>
 </div>
+<script src="/js/auth.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/notification-common.js"></script>
 </body>
 </html>
