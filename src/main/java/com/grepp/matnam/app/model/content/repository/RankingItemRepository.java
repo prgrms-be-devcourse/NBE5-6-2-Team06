@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RankingItemRepository extends JpaRepository<RankingItem, Long> {
+public interface RankingItemRepository extends JpaRepository<RankingItem, Long>, RankingItemRepositoryCustom {
 
     List<RankingItem> findByContentRankingAndIsActiveTrueOrderByRankingAsc(ContentRanking contentRanking);
 
