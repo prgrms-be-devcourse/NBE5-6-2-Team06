@@ -31,7 +31,7 @@
             color: #666;
         }
         .item-description {
-            max-width: 300px;
+            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -46,6 +46,71 @@
             float: right;
         }
 
+        .ranking-item-row {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        .ranking-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 15px;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+        }
+        .item-content {
+            margin-left: 60px;
+        }
+        .item-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .remove-item-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        .remove-item-btn:hover {
+            background-color: #c82333;
+        }
+        .add-item-section {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            border: 2px dashed #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .add-item-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .add-item-btn:hover {
+            background-color: #218838;
+        }
+
         .text-center {
             text-align: center;
         }
@@ -58,7 +123,6 @@
             font-weight: 600;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            cursor: pointer;
         }
         .status-badge.active {
             background-color: #e1f5e9;
@@ -169,9 +233,38 @@
             border-left-color: #f39c12;
             color: #d35400;
         }
-
         .notice i {
             margin-right: 8px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            display: block;
+        }
+        .form-group.error input,
+        .form-group.error textarea {
+            border-color: #dc3545;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 5px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -186,7 +279,7 @@
     <!-- 활성화 제한 알림 메시지 -->
     <div class="notice info">
         <i class="fas fa-info-circle"></i>
-        <span>활성화 상태의 랭킹은 한 개만 설정할 수 있습니다. 새로운 랭킹을 활성화하면 기존 활성화된 랭킹은 자동으로 비활성화됩니다.</span>
+        <span>이제 랭킹과 아이템을 함께 관리합니다.</span>
     </div>
 
     <div class="tab-container">
@@ -204,7 +297,7 @@
                     <div class="form-row">
                         <div class="search-filter">
                             <input type="text" name="title" placeholder="랭킹 제목을 입력하세요"
-                                   th:value="${param.title}"/>
+                                   th:value="${param.title}" id="search-title"/>
                             <button class="search-btn" type="submit"><i class="fas fa-search"></i></button>
                         </div>
 
@@ -244,10 +337,6 @@
                             <span
                                     th:class="${ranking.isActive ? 'status-badge active' : 'status-badge inactive'}"
                                     th:text="${ranking.isActive ? '활성' : '비활성'}"
-                                    th:data-id="${ranking.id}"
-                                    th:data-active="${ranking.isActive}"
-                                    th:onclick="'toggleRankingStatus(' + ${ranking.id} + ')'"
-                                    th:title="${ranking.isActive ? '클릭하여 비활성화' : '클릭하여 활성화'}"
                             ></span>
                         </td>
                         <td th:text="${ranking.subtitle}"></td>
@@ -261,8 +350,8 @@
                             <button class="action-btn edit" th:data-id="${ranking.id}" title="랭킹 수정">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="action-btn info" th:data-id="${ranking.id}" title="항목 관리">
-                                <i class="fas fa-list"></i>
+                            <button class="action-btn info" th:data-id="${ranking.id}" title="상세 보기">
+                                <i class="fas fa-eye"></i>
                             </button>
                             <button class="action-btn delete"
                                     th:onclick="'deleteRanking(' + ${ranking.id} + ')'"
@@ -280,9 +369,8 @@
         </div>
     </div>
 
-    <!-- 랭킹 추가/수정 모달 -->
     <div class="modal" id="rankingModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
                 <h2 id="ranking-modal-title">새 랭킹 추가</h2>
                 <span class="close-modal">&times;</span>
@@ -299,8 +387,8 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="ranking-subtitle">부제목 <span class="required">*</span></label>
-                        <input type="text" id="ranking-subtitle" required
+                        <label for="ranking-subtitle">부제목</label>
+                        <input type="text" id="ranking-subtitle"
                                placeholder="예: 맛남이 알려드리는 소개팅 성공률을 높이는 음식 선택 팁!">
                         <span id="error-subtitle" class="error-message"></span>
                     </div>
@@ -319,18 +407,31 @@
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="ranking-is-active">상태</label>
-                            <div class="switch-container">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="ranking-is-active" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-text active" id="active-status-text">활성화됨</span>
-                            </div>
-                            <div class="helper-text">활성화된 랭킹만 사용자에게 표시됩니다. 이 랭킹을 활성화하면 기존에 활성화된 다른 랭킹은 자동으로 비활성화됩니다.</div>
+                    <div class="form-group">
+                        <label for="ranking-is-active">상태</label>
+                        <div class="switch-container">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="ranking-is-active" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-text active" id="active-status-text">활성화됨</span>
                         </div>
+                        <div class="helper-text">활성화된 랭킹만 사용자에게 표시됩니다.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>랭킹 아이템 <span class="required">*</span></label>
+                        <div class="helper-text">최소 1개 이상의 아이템을 추가해주세요.</div>
+
+                        <div id="ranking-items-container">
+                        </div>
+
+                        <div class="add-item-section">
+                            <button type="button" class="add-item-btn" onclick="addRankingItem()">
+                                <i class="fas fa-plus"></i> 아이템 추가
+                            </button>
+                        </div>
+                        <span id="error-items" class="error-message"></span>
                     </div>
                 </form>
             </div>
@@ -341,35 +442,28 @@
         </div>
     </div>
 
-    <!-- 랭킹 항목 관리 모달 -->
-    <div class="modal" id="itemsModal">
+    <div class="modal" id="detailModal">
         <div class="modal-content large-modal">
             <div class="modal-header">
-                <h2>랭킹 항목 관리</h2>
+                <h2>랭킹 상세 정보</h2>
                 <span class="close-modal">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="ranking-info">
-                    <h3 id="items-ranking-title"></h3>
-                    <p id="items-ranking-subtitle"></p>
+                    <h3 id="detail-ranking-title"></h3>
+                    <p id="detail-ranking-subtitle"></p>
                     <div class="ranking-meta">
                         <div class="meta-item">
                             <i class="fas fa-calendar"></i>
                             <span>기간: </span>
-                            <span id="items-ranking-period"></span>
+                            <span id="detail-ranking-period"></span>
                         </div>
                         <div class="meta-item">
                             <i class="fas fa-toggle-on"></i>
                             <span>상태: </span>
-                            <span id="items-ranking-status"></span>
+                            <span id="detail-ranking-status"></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="action-bar">
-                    <button class="primary-btn" id="add-item-btn">
-                        <i class="fas fa-plus"></i> 새 항목 추가
-                    </button>
                 </div>
 
                 <div class="table-container">
@@ -380,69 +474,15 @@
                             <th>항목명</th>
                             <th>설명</th>
                             <th style="width: 100px;">상태</th>
-                            <th style="width: 120px;">액션</th>
                         </tr>
                         </thead>
-                        <tbody id="items-table-body">
+                        <tbody id="detail-items-table-body">
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="secondary-btn cancel-btn">닫기</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 항목 추가/수정 모달 -->
-    <div class="modal" id="itemModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="item-modal-title">새 항목 추가</h2>
-                <span class="close-modal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="itemForm">
-                    <input type="hidden" id="item-id">
-                    <input type="hidden" id="item-ranking-id">
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="item-ranking">순위 <span class="required">*</span></label>
-                            <input type="number" id="item-ranking" required min="1" value="1">
-                            <span id="error-ranking" class="error-message"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="item-is-active">상태</label>
-                            <div class="switch-container">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="item-is-active" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-text active" id="item-active-status-text">활성화됨</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="item-name">항목명 <span class="required">*</span></label>
-                        <input type="text" id="item-name" required placeholder="예: 짜장면">
-                        <span id="error-item-name" class="error-message"></span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="item-description">설명 <span class="required">*</span></label>
-                        <textarea id="item-description" rows="5" required
-                                  placeholder="항목에 대한 설명을 입력하세요."></textarea>
-                        <span id="error-description" class="error-message"></span>
-                        <span class="helper-text" id="description-char-count">0/1000</span>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="secondary-btn cancel-btn">취소</button>
-                <button class="primary-btn" id="save-item-btn">저장</button>
             </div>
         </div>
     </div>
