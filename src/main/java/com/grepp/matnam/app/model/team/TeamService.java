@@ -499,14 +499,23 @@ public class TeamService {
 
     // 팀 참여자 조회 및 해당 유저별 맛집 목록 불러오기
     public List<Map<String, Object>> getParticipantMymapData(Long teamId) {
-        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId);
+        List<Participant> participants = participantRepository.findParticipantsWithUserByTeamId(teamId).stream()
+                .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED)
+                .toList();
+
+        Map<String, User> userMap = participants.stream()
+                .collect(Collectors.toMap(p -> p.getUser().getUserId(), Participant::getUser));
+
+        List<Mymap> allMymaps = mymapRepository.findActivatedMymapsByUserListAndPinned(userMap.values(), true);
+
+        Map<String, List<Mymap>> mymapsByUser = allMymaps.stream()
+                .collect(Collectors.groupingBy(m -> m.getUser().getUserId()));
 
         return participants.stream()
-                .filter(p -> p.getParticipantStatus() == ParticipantStatus.APPROVED) // 승인된 참여자만
                 .map(p -> {
                     User user = p.getUser();
-                    List<Mymap> mymaps = mymapRepository.findByUserAndActivatedTrueAndPinnedTrue(user); // 맛집 필터링
-                    List<Map<String, Object>> restaurants = mymaps.stream()
+                    List<Map<String, Object>> restaurants = mymapsByUser.getOrDefault(user.getUserId(), List.of())
+                            .stream()
                             .map(m -> {
                                 Map<String, Object> map = new HashMap<>();
                                 map.put("mapId", m.getMapId());
@@ -517,7 +526,8 @@ public class TeamService {
                                 map.put("memo", m.getMemo());
                                 return map;
                             })
-                            .toList();
+                            .collect(Collectors.toList());
+
                     return Map.of(
                             "userId", user.getUserId(),
                             "nickname", user.getNickname(),

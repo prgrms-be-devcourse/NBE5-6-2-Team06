@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.mymap;
 
+import com.grepp.matnam.app.model.mymap.dto.MymapRequestDto;
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -18,12 +19,17 @@ public class MymapService {
 
     @Transactional(readOnly = true)
     public List<Mymap> getPinnedPlaces(User user) {
-        return mymapRepository.findByUserAndPinnedTrue(user);
+        return mymapRepository.findActivatedMymapsByDynamicConditions(user, true);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Mymap> getFilteredActivatedPlaces(User user, Boolean pinned) {
+        return mymapRepository.findActivatedMymapsByDynamicConditions(user, pinned);
     }
 
     @Transactional(readOnly = true)
     public List<Mymap> getActivatedPlaces(User user) {
-        return mymapRepository.findByUserAndActivatedTrue(user);
+        return mymapRepository.findActivatedMymapsByDynamicConditions(user, null);
     }
 
     @Transactional(readOnly = true)
@@ -32,7 +38,18 @@ public class MymapService {
     }
 
     @Transactional
-    public Mymap savePlace(Mymap mymap) {
+    public Mymap savePlace(MymapRequestDto dto, User user) {
+        Mymap mymap = Mymap.builder()
+                .placeName(dto.getPlaceName())
+                .roadAddress(dto.getRoadAddress())
+                .latitude(dto.getLatitude())
+                .longitude(dto.getLongitude())
+                .memo(dto.getMemo())
+                .pinned(dto.getPinned())
+                .activated(true)
+                .user(user)
+                .build();
+
         return mymapRepository.save(mymap);
     }
 
@@ -41,7 +58,10 @@ public class MymapService {
         Mymap place = mymapRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 장소를 찾을 수 없습니다."));
         place.setPinned(isPinned);
-        mymapRepository.save(place);
+
+        if (!place.getActivated()) {
+            throw new IllegalStateException("비활성화(삭제)된 장소는 공개 여부를 수정할 수 없습니다.");
+        }
     }
 
     @Transactional
@@ -49,7 +69,6 @@ public class MymapService {
         Mymap place = mymapRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 장소를 찾을 수 없습니다."));
         place.setActivated(isActivated);
-        mymapRepository.save(place);
     }
 
     @Transactional(readOnly = true)

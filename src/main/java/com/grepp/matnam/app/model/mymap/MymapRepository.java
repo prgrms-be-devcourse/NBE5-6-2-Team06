@@ -8,13 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface MymapRepository extends JpaRepository<Mymap, Long> {
-
-    List<Mymap> findByUserAndPinnedTrue(User user);
+public interface MymapRepository extends JpaRepository<Mymap, Long>, MymapRepositoryCustom {
 
     List<Mymap> findByUserAndActivatedTrue(User user);
-
-    List<Mymap> findByUserAndActivatedTrueAndPinnedTrue(User user);
 
     long countByUserAndActivatedTrue(User user);
 
