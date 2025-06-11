@@ -13,8 +13,6 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.entity.TeamReview;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,11 +26,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping("/team")
@@ -48,18 +49,31 @@ public class TeamController {
 
     // 모임 생성 페이지
     @GetMapping("/create")
-    public String create() {
+    public String create(Model model) {
+        model.addAttribute("teamRequest", new TeamRequest());
         return "team/teamCreate";
     }
 
     // 모임 생성
     @PostMapping("/create")
-    public String createTeam(@Valid @ModelAttribute TeamRequest teamRequest) {
+    public String createTeam(@Valid @ModelAttribute TeamRequest teamRequest,
+        BindingResult bindingResult,
+        @RequestParam(value="image", required=false) MultipartFile imageFile
+    ) {
+        if (bindingResult.hasErrors()) {
+            return "team/teamCreate";
+        }
+
+//        String imageUrl = null;
+//        if (imageFile != null && !imageFile.isEmpty()) {
+//            imageUrl = storageService.storeAndGetUrl(imageFile);
+//        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userId = authentication.getName();
         User user = userService.getUserById(userId);
 
-        Team team = teamRequest.toDto(user);
+        Team team = teamRequest.toEntity(user);
 
         if (teamRequest.getDate() != null && teamRequest.getTime() != null) {
             String dateTimeString = teamRequest.getDate() + "T" + teamRequest.getTime() + ":00";

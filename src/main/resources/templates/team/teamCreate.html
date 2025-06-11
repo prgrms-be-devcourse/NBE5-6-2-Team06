@@ -15,27 +15,7 @@
       background-color: #fff;
       color: #333;
     }
-    /*header {*/
-    /*  display: flex;*/
-    /*  justify-content: space-between;*/
-    /*  align-items: center;*/
-    /*  padding: 1rem 2rem;*/
-    /*  border-bottom: 1px solid #eee;*/
-    /*}*/
-    /*nav a {*/
-    /*  margin-right: 1rem;*/
-    /*  text-decoration: none;*/
-    /*  color: #333;*/
-    /*  font-size: 0.9rem;*/
-    /*}*/
-    /*.header-buttons button {*/
-    /*  padding: 0.5rem 1rem;*/
-    /*  border-radius: 4px;*/
-    /*  background-color: #000;*/
-    /*  color: #fff;*/
-    /*  border: none;*/
-    /*  cursor: pointer;*/
-    /*}*/
+
     .container {
       max-width: 800px;
       margin: 2rem auto;
@@ -105,6 +85,17 @@
       border: none;
       padding: 0;
     }
+    .error-message {
+      color: #e74c3c;
+      font-weight: bold;
+      margin-top: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    .input-error {
+      border: 1px solid #e74c3c !important;
+      box-shadow: 0 0 3px rgba(231,76,60,0.5);
+    }
   </style>
   <link rel="stylesheet" th:href="@{/css/notification.css}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -115,23 +106,60 @@
 
 <div class="container">
   <h1>모임 만들기</h1>
-  <form th:action="@{/team/create}" method="post" enctype="multipart/form-data">
+  <form th:action="@{/team/create}"
+        th:object="${teamRequest}"
+        method="post"
+        enctype="multipart/form-data"
+        novalidate>
+
     <div class="section">
-      <label>모임 제목</label>
-      <input type="text" name="title" placeholder="모임 제목을 입력하세요" required>
+      <label for="title">모임 제목</label>
+      <input type="text"
+             id="title"
+             class=""
+             th:field="*{title}"
+             th:classappend="${#fields.hasErrors('title')} ? 'input-error' : ''"
+             placeholder="모임 제목을 입력하세요" />
+      <div th:if="${#fields.hasErrors('title')}"
+           th:errors="*{title}"
+           class="error-message"></div>
 
-      <label>모임 설명</label>
-      <textarea name="description" placeholder="간단한 모임 설명을 입력하세요" required></textarea>
+      <label for="description">모임 설명</label>
+      <textarea id="description"
+                class=""
+                th:field="*{description}"
+                th:classappend="${#fields.hasErrors('description')} ? 'input-error' : ''"
+                placeholder="간단한 모임 설명을 입력하세요"></textarea>
+      <div th:if="${#fields.hasErrors('description')}"
+           th:errors="*{description}"
+           class="error-message"></div>
 
-      <label>날짜</label>
-      <input type="date" name="date" required>
+      <label for="date">날짜</label>
+      <input type="date"
+             id="date"
+             class=""
+             th:field="*{date}"
+             th:classappend="${#fields.hasErrors('date')} ? 'input-error' : ''" />
+      <div th:if="${#fields.hasErrors('date')}"
+           th:errors="*{date}"
+           class="error-message"></div>
 
-      <label>시간</label>
-      <input type="time" name="time" required>
+      <label for="time">시간</label>
+      <input type="time"
+             id="time"
+             class=""
+             th:field="*{time}"
+             th:classappend="${#fields.hasErrors('time')} ? 'input-error' : ''" />
+      <div th:if="${#fields.hasErrors('time')}"
+           th:errors="*{time}"
+           class="error-message"></div>
 
-      <label>음식 카테고리</label>
-      <select name="category" required>
-        <option value="">카테고리 선택</option>
+      <label for="category">음식 카테고리</label>
+      <select id="category"
+              class=""
+              th:field="*{category}"
+              th:classappend="${#fields.hasErrors('category')} ? 'input-error' : ''">
+        <option value="" disabled>카테고리 선택</option>
         <option value="한식">한식</option>
         <option value="일식">일식</option>
         <option value="중식">중식</option>
@@ -139,31 +167,52 @@
         <option value="분식">분식</option>
         <option value="디저트">디저트</option>
       </select>
+      <div th:if="${#fields.hasErrors('category')}"
+           th:errors="*{category}"
+           class="error-message"></div>
 
-      <label>최대 인원</label>
-      <select name="maxPeople" required>
-        <option value="2">2명</option>
-        <option value="3">3명</option>
-        <option value="4">4명</option>
-        <option value="5">5명</option>
-        <option value="6">6명</option>
-        <option value="7">7명</option>
-        <option value="8">8명</option>
-        <option value="9">9명</option>
-        <option value="10">10명</option>
+      <label for="maxPeople">최대 인원</label>
+      <select id="maxPeople"
+              class=""
+              th:field="*{maxPeople}"
+              th:classappend="${#fields.hasErrors('maxPeople')} ? 'input-error' : ''">
+        <option value="" disabled>인원 선택</option>
+        <option th:each="n : ${#numbers.sequence(2,10)}"
+                th:value="${n}"
+                th:text="${n + '명'}"></option>
       </select>
+      <div th:if="${#fields.hasErrors('maxPeople')}"
+           th:errors="*{maxPeople}"
+           class="error-message"></div>
     </div>
 
     <div class="section">
       <h2>식당 정보</h2>
-      <label>식당 이름</label>
-      <input type="text" name="restaurantName" placeholder="식당 이름을 입력하세요" required>
+      <label for="restaurantName">식당 이름</label>
+      <input type="text"
+             id="restaurantName"
+             class=""
+             th:field="*{restaurantName}"
+             th:classappend="${#fields.hasErrors('restaurantName')} ? 'input-error' : ''"
+             placeholder="식당 이름을 입력하세요" />
+      <div th:if="${#fields.hasErrors('restaurantName')}"
+           th:errors="*{restaurantName}"
+           class="error-message"></div>
 
-      <label>주소</label>
-      <input type="text" name="restaurantAddress" placeholder="식당 주소를 입력하세요" required>
+      <label for="restaurantAddress">주소</label>
+      <input type="text"
+             id="restaurantAddress"
+             class=""
+             th:field="*{restaurantAddress}"
+             th:classappend="${#fields.hasErrors('restaurantAddress')} ? 'input-error' : ''"
+             placeholder="식당 주소를 입력하세요" />
+      <div th:if="${#fields.hasErrors('restaurantAddress')}"
+           th:errors="*{restaurantAddress}"
+           class="error-message"></div>
 
       <label>위치 선택</label>
-      <div id="map-placeholder" style="width:100%; height:300px; border:1px solid #ccc;"></div>
+      <div id="map-placeholder"
+           style="width:100%; height:300px; border:1px solid #ccc;"></div>
     </div>
 
     <div class="section">
@@ -171,12 +220,15 @@
       <div class="image-upload-box">
         클릭하여 업로드 또는 드래그 앤 드롭 (JPG, PNG, JPEG 파일 / 최대 10MB)
       </div>
-      <input type="file" name="image" accept="image/*">
+      <input type="file" name="image" accept="image/*" />
     </div>
 
     <div class="btn-row">
-      <button type="button" class="btn cancel" onclick="history.back()">취소</button>
-      <button type="submit" class="btn submit">모임 생성하기</button>
+      <button type="button"
+              class="btn cancel"
+              onclick="history.back()">취소</button>
+      <button type="submit"
+              class="btn submit">모임 생성하기</button>
     </div>
   </form>
 </div>

@@ -1,14 +1,18 @@
 package com.grepp.matnam.app.model.team;
 
+import com.grepp.matnam.app.model.team.code.ParticipantStatus;
+import com.grepp.matnam.app.model.team.entity.QParticipant;
 import com.grepp.matnam.app.model.team.entity.QTeam;
 import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.app.model.team.code.Status;
+import com.grepp.matnam.app.model.user.entity.QUser;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +25,8 @@ public class TeamRepositoryCustomImpl implements TeamRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
     private final QTeam team = QTeam.team;
+    private final QParticipant participant = QParticipant.participant;
+    private final QUser user = QUser.user;
 
     @Override
     public Page<Team> findAllUsers(Pageable pageable) {
@@ -138,5 +144,71 @@ public class TeamRepositoryCustomImpl implements TeamRepositoryCustom {
                 throw new IllegalArgumentException("정렬 불가능한 속성: " + property);
             })
             .toArray(OrderSpecifier[]::new);
+    }
+
+    // 사용자 참가자 기준 팀 조회(activated = true)
+    @Override
+    public List<Team> findTeamsByParticipantUserIdAndParticipantStatusAndActivatedTrue(
+        String userId,
+        ParticipantStatus participantStatus
+    ) {
+        BooleanBuilder builder = new BooleanBuilder();
+        builder
+            .and(participant.user.userId.eq(userId))
+            .and(participant.participantStatus.eq(participantStatus))
+            .and(team.activated.isTrue());
+
+        return queryFactory
+            .select(team)
+            .from(team)
+            .join(team.participants, participant)
+            .where(builder)
+            .fetch();
+    }
+
+    // 페이징: activated=true, 상태가 COMPLETED/CANCELED 가 아닌 팀을 참여자 정보 포함하여 조회
+    @Override
+    public Page<Team> findAllWithParticipantsAndActivatedTrue(Pageable pageable) {
+        BooleanBuilder builder = new BooleanBuilder()
+            .and(team.activated.isTrue())
+            .and(team.status.ne(Status.COMPLETED))
+            .and(team.status.ne(Status.CANCELED));
+
+        List<Team> content = queryFactory
+            .selectDistinct(team)
+            .from(team)
+            .leftJoin(team.participants, participant).fetchJoin()
+            .where(builder)
+            .orderBy(team.createdAt.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        long total = Optional.ofNullable(
+            queryFactory
+                .select(team.count())
+                .from(team)
+                .where(builder)
+                .fetchOne()
+        ).orElse(0L);
+
+        return PageableExecutionUtils.getPage(content, pageable, () -> total);
+    }
+
+
+
+    // 단건 조회: teamId 기준, activated=true, participants + user fetch join
+    @Override
+    public Optional<Team> findByIdWithParticipantsAndUserAndActivatedTrue(Long teamId) {
+        Team result = queryFactory
+            .select(team)
+            .from(team)
+            .leftJoin(team.participants, participant).fetchJoin()
+            .leftJoin(participant.user, user).fetchJoin()
+            .where(team.teamId.eq(teamId),
+                team.activated.isTrue())
+            .fetchOne();
+
+        return Optional.ofNullable(result);
     }
 }
