@@ -75,7 +75,7 @@ public class TeamService {
     @Transactional
     public void addParticipant(Long teamId, User user) {
         Team team = teamRepository.findByTeamIdAndActivatedTrue(teamId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
+            .orElseThrow(() -> new IllegalArgumentException("해당 모임이 존재하지 않습니다."));
 
         if (!participantRepository.existsByUser_UserIdAndTeam_TeamId(user.getUserId(), teamId)) {
             // 이미 참가한 여부 파악 -> 예외처리
@@ -144,7 +144,7 @@ public class TeamService {
     @Transactional
     public void rejectParticipant(Long participantId, String userId) {
         Participant participant = participantRepository.findById(participantId)
-                .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("참가자를 찾을 수 없습니다."));
 
         if (participant.getParticipantStatus() == ParticipantStatus.PENDING) {
             Team team = participant.getTeam();
