@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ContentRankingRepository extends JpaRepository<ContentRanking, Long> {
+public interface ContentRankingRepository extends JpaRepository<ContentRanking, Long>, ContentRankingRepositoryCustom {
 
     @Query("SELECT cr FROM ContentRanking cr WHERE cr.isActive = true " +
             "AND cr.startDate <= CURRENT_DATE " +
