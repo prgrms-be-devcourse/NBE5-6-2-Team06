@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,19 +33,24 @@ public class RestaurantApiController {
     // LLM 간단한 테스트 채팅 메시지[LLM 연결 확인용]
     @GetMapping("chat")
     @Operation(summary = "LLM 연결 테스트", description = "메세지를 통해 LLM 연결 테스트합니다.")
-    public ApiResponse<String> chat(String message) {
+    public ResponseEntity<ApiResponse<String>> chat(String message) {
         try {
-            return ApiResponse.success(restaurantAiService.chat(message));
+            return ResponseEntity.ok(ApiResponse.success(restaurantAiService.chat(message)));
         } catch (Exception e) {
             log.error("LLM 오류", e);
-            return ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError()
+                .body(ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR));
         }
     }
 
     @GetMapping("recommend/restaurant/{teamId}")
     @Operation(summary = "추천", description = "팀에 속한 사용자의 취향 키워드를 종합하여 이를 기반으로 추천을 제공합니다.")
-    public ApiResponse<RestaurantRecommendResponse> recommend(@PathVariable Long teamId) {
+    public ResponseEntity<ApiResponse<RestaurantRecommendResponse>> recommend(@PathVariable Long teamId) {
         try {
+            if(teamId == null||teamId <= 0) {
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
+            }
             List<String> keywords = teamService.countPreferenceKeyword(teamId);
             log.info("teamId {}에 대한 추출된 키워드: {}", teamId, keywords);
 
@@ -52,41 +59,52 @@ public class RestaurantApiController {
             log.info("keywordPrompt {}", keywordPrompt);
 
             RestaurantRecommendResponse response = restaurantAiService.recommendRestaurant(keywordPrompt);
-            return ApiResponse.success(response);
+            return ResponseEntity.ok(ApiResponse.success(response));
         } catch (Exception e) {
             log.error("추천 처리 중 오류 발생", e);
-            return ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError()
+                .body(ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR));
         }
     }
 
     // 재추천
     @GetMapping("reRecommend/restaurant")
     @Operation(summary = "재추천", description = "취향 기반 추천이 마음에 들지 않을 때 제공하는 재추천입니다.")
-    public ApiResponse<RestaurantRecommendResponse> reRecommend() {
+    public ResponseEntity<ApiResponse<RestaurantRecommendResponse>> reRecommend() {
         try {
-            return ApiResponse.success(restaurantAiService.reRecommendRestaurant());
+            return ResponseEntity.ok(ApiResponse.success(restaurantAiService.reRecommendRestaurant()));
         } catch (Exception e) {
             log.error("재추천 오류 발생", e);
-            return ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError()
+                .body(ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR));
         }
     }
 
     //식당 정보 불러오기
     @GetMapping("/restaurant/name")
     @Operation(summary = "식당 정보 조회", description = "사용자에게 전달하기 위해 식당 정보 조회입니다.")
-    public ApiResponse<RestaurantDto> getRestaurantByName(@RequestParam String name) {
+    public ResponseEntity<ApiResponse<RestaurantDto>> getRestaurantByName(@RequestParam String name) {
         try {
+            if(name==null){
+                log.warn("매개변수 name 문제");
+                return ResponseEntity.badRequest()
+                    .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
+            }
+
             RestaurantDto dto = restaurantService.findByName(name);
             if (dto == null) {
-                return ApiResponse.error(ResponseCode.NOT_FOUND);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.error(ResponseCode.NOT_FOUND));
             }
-            return ApiResponse.success(dto);
+            return ResponseEntity.ok(ApiResponse.success(dto));
         } catch (IllegalArgumentException e) {
             log.warn("잘못된 요청 파라미터: {}", name);
-            return ApiResponse.error(ResponseCode.BAD_REQUEST);
+            return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
         } catch (Exception e) {
             log.error("식당 정보 조회 실패", e);
-            return ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.internalServerError()
+                .body(ApiResponse.error(ResponseCode.INTERNAL_SERVER_ERROR));
         }
     }
 }

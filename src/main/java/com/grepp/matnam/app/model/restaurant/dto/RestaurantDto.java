@@ -13,12 +13,12 @@ public class RestaurantDto {
     private String address;
     private String openTime;
 
-    public RestaurantDto(String name, String description, String address, String category ,String openTime, String mainFood) {
+    public RestaurantDto(String name, String mainFood, String description, String category , String address,String openTime) {
         this.restaurantName = name;
-        this.description = description;
-        this.address = address;
-        this.category = category;
-        this.openTime = openTime;
         this.mainFood = mainFood;
+        this.description = description;
+        this.category = category;
+        this.address = address;
+        this.openTime = openTime;
     }
 }

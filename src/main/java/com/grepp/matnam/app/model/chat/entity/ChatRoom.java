@@ -30,17 +30,5 @@ public class ChatRoom {
 
     private String name;
 
-//    @Builder
-//    public ChatRoom(String name, Team team) {
-//        this.name = name;
-//        this.team = team;
-//    }
-//
-//    public static ChatRoom createRoom(String name, Team team) {
-//        return ChatRoom.builder()
-//            .name(name)
-//            .team(team)
-//            .build();
-//    }
 }
 
