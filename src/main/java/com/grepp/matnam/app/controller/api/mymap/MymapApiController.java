@@ -1,18 +1,19 @@
 package com.grepp.matnam.app.controller.api.mymap;
 
 import com.grepp.matnam.app.model.mymap.MymapService;
+import com.grepp.matnam.app.model.mymap.dto.MymapRequestDto;
 import com.grepp.matnam.app.model.mymap.entity.Mymap;
 import com.grepp.matnam.app.model.user.UserService;
 import com.grepp.matnam.app.model.user.entity.User;
+import com.grepp.matnam.infra.response.ApiResponse;
+import com.grepp.matnam.infra.response.ResponseCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Map;
@@ -27,95 +28,69 @@ public class MymapApiController {
     private final UserService userService;
 
     @GetMapping("/mine")
-    @Operation(
-            summary = "내가 저장한 장소 목록 조회",
-            description = "로그인한 사용자가 공개 상태로 표시한 장소 리스트를 반환합니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "장소 목록 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-    })
-    public List<Mymap> getMyPinnedPlaces() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+    @Operation(summary = "공개된 내 장소 목록 조회", description = "공개 설정된 장소만 반환합니다.")
+    public ResponseEntity<ApiResponse<List<Mymap>>> getMyPinnedPlaces() {
+        String userId = getCurrentUserId();
         User user = userService.getUserById(userId);
-        return mymapService.getPinnedPlaces(user);
+        List<Mymap> places = mymapService.getPinnedPlaces(user);
+        return ResponseEntity.status(ResponseCode.OK.status())
+                .body(ApiResponse.success(places));
     }
 
     @GetMapping("/activated")
-    @Operation(
-            summary = "내가 활성화한 장소 목록 조회",
-            description = "로그인한 사용자가 공개/비공개 상태로 표시한 장소 리스트를 반환합니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "장소 목록 조회 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-    })
-    public List<Mymap> getMyActivatedPlaces() {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+    @Operation(summary = "내 장소 전체 조회", description = "공개/비공개 여부와 상관없이 활성화된 모든 장소를 반환합니다.")
+    public ResponseEntity<ApiResponse<List<Mymap>>> getMyActivatedPlaces(@RequestParam(required = false) Boolean pinned) {
+        String userId = getCurrentUserId();
         User user = userService.getUserById(userId);
-        return mymapService.getActivatedPlaces(user);
+        List<Mymap> places = mymapService.getFilteredActivatedPlaces(user, pinned);
+        return ResponseEntity.status(ResponseCode.OK.status())
+                .body(ApiResponse.success(places));
     }
 
     @PostMapping
-    @Operation(
-            summary = "장소 저장",
-            description = "새로운 장소를 저장하며 기본으로 활성화 및 공개 상태로 설정됩니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "장소 저장 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 데이터"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")
-    })
-    public String savePlace(@RequestBody Mymap mymap) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+    @Operation(summary = "장소 저장", description = "새로운 장소를 저장하며 기본적으로 활성화된 상태입니다.")
+    public ResponseEntity<ApiResponse<String>> savePlace(@RequestBody @Valid MymapRequestDto dto) {
+        String userId = getCurrentUserId();
         User user = userService.getUserById(userId);
-        mymap.setUser(user);
-        mymap.setActivated(true);
-        mymap.setPinned(true);
-        mymapService.savePlace(mymap);
-        return "저장 완료";
+        mymapService.savePlace(dto, user);
+        return ResponseEntity.status(ResponseCode.OK.status())
+                .body(ApiResponse.success("장소가 저장되었습니다."));
     }
 
     @PatchMapping("/{id}/pinned")
-    @Operation(
-            summary = "장소의 공개 여부(Pinned) 수정",
-            description = "장소의 핀 여부를 업데이트하여 공개/비공개 상태를 변경합니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "핀 상태 업데이트 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청. pinned 값 누락"),
-            @ApiResponse(responseCode = "404", description = "해당 장소를 찾을 수 없음")
-    })
-    public ResponseEntity<String> updatePinnedStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
+    @Operation(summary = "장소 공개 여부 수정", description = "pinned 값에 따라 공개 또는 숨김 상태로 변경합니다.")
+    public ResponseEntity<ApiResponse<String>> updatePinnedStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> body) {
         Boolean isPinned = body.get("pinned");
         if (isPinned == null) {
-            return ResponseEntity.badRequest().body("공개 여부 값이 필요합니다.");
+            return ResponseEntity.status(ResponseCode.BAD_REQUEST.status())
+                    .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
         }
 
         try {
             mymapService.updatePinnedStatus(id, isPinned);
-            return ResponseEntity.ok(isPinned ? "공개로 설정되었습니다." : "숨김 처리되었습니다.");
+            return ResponseEntity.status(ResponseCode.OK.status())
+                    .body(ApiResponse.success(isPinned ? "공개로 설정되었습니다." : "숨김 처리되었습니다."));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 장소를 찾을 수 없습니다.");
+            return ResponseEntity.status(ResponseCode.BAD_REQUEST.status())
+                    .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
         }
     }
 
     @DeleteMapping("/{id}")
-    @Operation(
-            summary = "장소 삭제 처리",
-            description = "장소의 활성화 상태를 false로 설정하여 삭제 처리합니다. 실제 DB에서 삭제되지는 않습니다."
-    )
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "장소 삭제 처리 완료"),
-            @ApiResponse(responseCode = "404", description = "삭제할 장소를 찾을 수 없음")
-    })
-    public ResponseEntity<String> updateActivatedStatus(@PathVariable Long id) {
+    @Operation(summary = "장소 삭제", description = "논리적 삭제: 활성화 상태를 false로 전환합니다.")
+    public ResponseEntity<ApiResponse<String>> updateActivatedStatus(@PathVariable Long id) {
         Mymap place = mymapService.findById(id);
         if (place == null || !place.getActivated()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("삭제할 장소를 찾을 수 없습니다.");
+            return ResponseEntity.status(ResponseCode.BAD_REQUEST.status())
+                    .body(ApiResponse.error(ResponseCode.BAD_REQUEST));
         }
 
         mymapService.updateActivatedStatus(id, false);
-        return ResponseEntity.ok("장소가 삭제 처리되었습니다.");
+        return ResponseEntity.status(ResponseCode.OK.status())
+                .body(ApiResponse.success("장소가 삭제 처리되었습니다."));
+    }
+
+    private String getCurrentUserId() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
