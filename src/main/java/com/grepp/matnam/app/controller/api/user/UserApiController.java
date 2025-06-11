@@ -9,8 +9,6 @@ import com.grepp.matnam.infra.auth.AuthenticationUtils;
 import com.grepp.matnam.infra.auth.CookieUtils;
 import com.grepp.matnam.infra.jwt.JwtTokenProvider;
 import com.grepp.matnam.infra.response.ApiResponse;
-import com.grepp.matnam.infra.response.Messages;
-import com.grepp.matnam.infra.response.ResponseCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -34,7 +35,7 @@ public class UserApiController {
 
     @PostMapping("/signup")
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
-    public ResponseEntity<ApiResponse> signup(
+    public ResponseEntity<ApiResponse<JwtResponse>> signup(
             @Validated @RequestBody UserSignupRequest request,
             HttpServletResponse response) {
 
@@ -54,12 +55,12 @@ public class UserApiController {
                 .expiration(maxAge)
                 .build();
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_SIGNUP, jwtResponse));
+        return ResponseEntity.ok(ApiResponse.success(jwtResponse));
     }
 
     @PostMapping("/signin")
     @Operation(summary = "로그인", description = "사용자 로그인 후 JWT 토큰을 발급합니다.")
-    public ResponseEntity<ApiResponse> signin(
+    public ResponseEntity<ApiResponse<JwtResponse>> signin(
             @Validated @RequestBody UserSigninRequest request,
             HttpServletResponse response) {
 
@@ -81,54 +82,59 @@ public class UserApiController {
 
         userActivityLogService.logIfFirstToday(user.getUserId());
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_SIGNIN, jwtResponse));
+        return ResponseEntity.ok(ApiResponse.success(jwtResponse));
     }
 
     @PostMapping("/preference")
     @Operation(summary = "취향 설정", description = "사용자의 취향을 설정합니다.")
-    public ResponseEntity<ApiResponse> setPreference(@Validated @RequestBody PreferenceRequest request) {
+    public ResponseEntity<ApiResponse<PreferenceRequest>> setPreference(@Validated @RequestBody PreferenceRequest request) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
 
         preferenceService.savePreference(currentUserId, request);
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PREFERENCE, null));
+        return ResponseEntity.ok(ApiResponse.success(request));
     }
 
     @PutMapping("/preference")
     @Operation(summary = "취향 변경", description = "사용자의 취향을 변경합니다.")
-    public ResponseEntity<ApiResponse> updatePreference(@Validated @RequestBody PreferenceRequest request) {
+    public ResponseEntity<ApiResponse<PreferenceRequest>> updatePreference(@Validated @RequestBody PreferenceRequest request) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
 
         preferenceService.updatePreference(currentUserId, request);
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PREFERENCE_UPDATE, null));
+        return ResponseEntity.ok(ApiResponse.success(request));
     }
 
     @DeleteMapping
     @Operation(summary = "회원 탈퇴", description = "사용자 계정을 비활성화(탈퇴) 처리합니다.")
-    public ResponseEntity<ApiResponse> deactivateAccount(@Validated @RequestBody UserDeactivateRequest request) {
+    public ResponseEntity<ApiResponse<Void>> deactivateAccount(@Validated @RequestBody UserDeactivateRequest request) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
 
         userService.deactivateAccount(currentUserId, request.getPassword());
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_DEACTIVATE, null));
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @PutMapping("/password")
     @Operation(summary = "비밀번호 변경", description = "사용자의 비밀번호를 변경합니다.")
-    public ResponseEntity<ApiResponse> changePassword(@Validated @RequestBody PasswordChangeRequest request) {
+    public ResponseEntity<ApiResponse<Void>> changePassword(@Validated @RequestBody PasswordChangeRequest request) {
         String currentUserId = AuthenticationUtils.getCurrentUserId();
 
         userService.changePassword(currentUserId, request.getCurrentPassword(), request.getNewPassword());
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_PASSWORD_CHANGE, null));
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @GetMapping("{userId}/temperature")
     @Operation(summary = "사용자 매너온도 조회", description = "특정 사용자의 매너 온도를 조회합니다.")
-    public ResponseEntity<ApiResponse> getUserTemperature(@PathVariable String userId) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getUserTemperature(@PathVariable String userId) {
         User user = userService.getUserById(userId);
 
-        return ResponseEntity.ok(new ApiResponse(ResponseCode.OK.code(), Messages.SUCCESS_TEMPERATURE, user.getTemperature()));
+        Map<String, Object> temperature = new HashMap<>();
+
+        temperature.put("userId", user.getUserId());
+        temperature.put("temperature", user.getTemperature());
+
+        return ResponseEntity.ok(ApiResponse.success(temperature));
     }
 }
