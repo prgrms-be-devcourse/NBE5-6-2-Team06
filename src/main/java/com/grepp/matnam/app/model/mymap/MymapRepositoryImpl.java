@@ -48,4 +48,25 @@ public class MymapRepositoryImpl implements MymapRepositoryCustom {
                 )
                 .fetch();
     }
+
+    @Override
+    public long countActivatedByUser(User user, Boolean pinned) {
+        QMymap mymap = QMymap.mymap;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(mymap.user.eq(user))
+                .and(mymap.activated.isTrue());
+
+        if (pinned != null) {
+            builder.and(mymap.pinned.eq(pinned));
+        }
+
+        Long result = queryFactory
+                .select(mymap.count())
+                .from(mymap)
+                .where(builder)
+                .fetchOne();
+
+        return result != null ? result : 0;
+    }
 }

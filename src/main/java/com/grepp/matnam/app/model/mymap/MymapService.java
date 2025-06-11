@@ -68,14 +68,20 @@ public class MymapService {
     public void updateActivatedStatus(Long id, boolean isActivated) {
         Mymap place = mymapRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 장소를 찾을 수 없습니다."));
+        if (place.getActivated() == isActivated) {
+            return;
+        }
         place.setActivated(isActivated);
+        if (!isActivated && Boolean.TRUE.equals(place.getPinned())) {
+            place.setPinned(false);
+        }
     }
 
     @Transactional(readOnly = true)
     public Map<String, Long> getPlaceCounts(User user) {
-        long total = mymapRepository.countByUserAndActivatedTrue(user);
-        long visible = mymapRepository.countByUserAndActivatedTrueAndPinnedTrue(user);
-        long hidden = mymapRepository.countByUserAndActivatedTrueAndPinnedFalse(user);
+        long total = mymapRepository.countActivatedByUser(user, null);
+        long visible = mymapRepository.countActivatedByUser(user, true);
+        long hidden = mymapRepository.countActivatedByUser(user, false);
 
         Map<String, Long> result = new HashMap<>();
         result.put("total", total);

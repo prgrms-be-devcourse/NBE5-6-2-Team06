@@ -9,4 +9,5 @@ import java.util.List;
 public interface MymapRepositoryCustom {
     List<Mymap> findActivatedMymapsByDynamicConditions(User user, Boolean pinned);
     List<Mymap> findActivatedMymapsByUserListAndPinned(Collection<User> users, boolean pinned);
+    long countActivatedByUser(User user, Boolean pinned);
 }
