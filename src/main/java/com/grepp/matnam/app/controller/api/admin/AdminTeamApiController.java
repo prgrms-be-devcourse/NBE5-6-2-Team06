@@ -1,6 +1,7 @@
 package com.grepp.matnam.app.controller.api.admin;
 
 import com.grepp.matnam.app.controller.api.admin.payload.ParticipantResponse;
+import com.grepp.matnam.app.controller.api.admin.payload.StatDoubleResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamResponse;
 import com.grepp.matnam.app.controller.api.admin.payload.TeamStatusUpdateRequest;
 import com.grepp.matnam.app.model.team.TeamService;
@@ -9,6 +10,7 @@ import com.grepp.matnam.app.model.team.entity.Team;
 import com.grepp.matnam.infra.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -50,21 +52,21 @@ public class AdminTeamApiController {
 
     @PatchMapping("/{teamId}")
     @Operation(summary = "모임 상태 변경", description = "특정 모임 상태를 변경합니다.")
-    public ResponseEntity<?> updateTeamStatus(@PathVariable Long teamId, @RequestBody TeamStatusUpdateRequest teamStatusUpdateRequest) {
+    public ResponseEntity<ApiResponse<Void>> updateTeamStatus(@PathVariable Long teamId, @RequestBody @Valid TeamStatusUpdateRequest teamStatusUpdateRequest) {
         teamService.updateTeamStatus(teamId, teamStatusUpdateRequest);
-        return ResponseEntity.ok("모임 상태가 변경되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @DeleteMapping("/{teamId}")
     @Operation(summary = "모임 비활성화", description = "특정 모임을 비활성화합니다.")
-    public ResponseEntity<?> unActivatedTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ApiResponse<Void>> unActivatedTeam(@PathVariable Long teamId) {
         teamService.unActivatedById(teamId);
-        return ResponseEntity.ok("모임이 비활성화되었습니다.");
+        return ResponseEntity.ok(ApiResponse.noContent());
     }
 
     @GetMapping("/statistics/success-rate/monthly")
     @Operation(summary = "최근 6개월 모임 성공률 조회", description = "최근 6개월간의 모임 성공률을 조회합니다.")
-    public ResponseEntity<ApiResponse<List<Map<String, String>>>> getMonthlyMeetingSuccessRateData() {
+    public ResponseEntity<ApiResponse<List<StatDoubleResponse>>> getMonthlyMeetingSuccessRateData() {
         return ResponseEntity.ok(ApiResponse.success(teamService.getMonthlyMeetingSuccessRate()));
     }
 

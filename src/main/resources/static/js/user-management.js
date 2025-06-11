@@ -67,23 +67,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const suspendDuration = document.getElementById('edit-suspend-duration').value;
             const suspendReason = document.getElementById('edit-suspend-reason').value;
 
-            // 상태가 SUSPENDED일 때는 정지 기간/사유 필수 입력 검증
-            if (status === 'SUSPENDED') {
-                if (!suspendDuration || !suspendReason.trim()) {
-                    alert('정지 기간과 사유를 모두 입력해야 합니다.');
-                    return;
-                }
-            }
-            if (status === 'BANNED') {
-                if (!suspendReason.trim()) {
-                    alert('정지 사유를 입력해야 합니다.');
-                    return;
-                }
-            }
-
             // PATCH 요청을 위한 payload 구성
             const payload = {
-                status: status
+                status: status,
+                suspendDuration: 0,
+                dueReason: "정상"
             };
 
             if (status === 'SUSPENDED') {
@@ -105,12 +93,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 if (!response.ok) {
-                    const error = await response.text();
-                    alert('저장 실패: ' + error);
+                    const errorMessage = (await response.json()).data
+                    document.querySelector('#error-suspend-reason').textContent = errorMessage.dueReason;
+                    alert('필수 항목을 확인해주세요.');
                     return;
                 }
 
-                alert('사용자 정보가 저장되었습니다.');
+                alert("사용자 상태가 수정되었습니다.");
                 document.getElementById('userEditModal').style.display = 'none';
                 window.location.reload(); // 새로고침으로 반영
 
@@ -135,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("사용자가 비활성화되었습니다.")
                     window.location.reload(); // 페이지 새로고침
                 } else {
                     return response.text().then(text => { throw new Error(text) });
@@ -298,60 +287,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 정지 적용 버튼 클릭 이벤트
-    const confirmSuspendBtn = document.getElementById('confirm-suspend-btn');
-    if (confirmSuspendBtn) {
-        confirmSuspendBtn.addEventListener('click', async function() {
-            // 폼 유효성 검사
-            const suspendReason = document.getElementById('suspend-reason').value;
-            const suspendDuration = document.getElementById('suspend-duration').value;
-            const userId = document.getElementById('suspend-user-name').value;
-
-            if (!suspendDuration || !suspendReason.trim()) {
-                alert('정지 기간과 사유를 모두 입력해야 합니다.');
-                return;
-            }
-
-            // PATCH 요청을 위한 payload 구성
-            const payload = {
-            };
-
-            if (suspendDuration === 'permanent') {
-                payload.status = 'BANNED'
-                payload.dueReason = suspendReason.trim();
-            } else {
-                payload.status = 'SUSPENDED'
-                payload.suspendDuration = parseInt(suspendDuration); // 숫자로 전송
-                payload.dueReason = suspendReason.trim();
-            }
-
-            try {
-                const response = await fetch(`/api/admin/user/list/${userId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    const error = await response.text();
-                    alert('정지 실패: ' + error);
-                    return;
-                }
-
-                alert('사용자가 정지되었습니다.');
-                document.getElementById('suspendUserModal').style.display = 'none';
-                window.location.reload(); // 새로고침으로 반영
-
-            } catch (error) {
-                console.error('정지 오류:', error);
-                alert('오류가 발생했습니다.');
-            }
-
-        });
-    }
-
     // 신고 해결 처리 버튼 클릭 이벤트
     document.querySelectorAll('.action-btn.resolve').forEach(button => {
         button.addEventListener('click', function () {
@@ -366,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("신고 처리가 완료되었습니다.")
                     window.location.reload(); // 페이지 새로고침
                 } else {
                     return response.text().then(text => { throw new Error(text) });
@@ -394,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => {
                 if (response.ok) {
-                    response.text().then(text => { alert(text)});
+                    alert("신고 처리가 완료되었습니다.")
                     document.getElementById('reportViewModal').style.display = 'none';
                     window.location.reload(); // 페이지 새로고침
                 } else {

@@ -20,11 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const content = document.getElementById('notification-content').value.trim();
       const target = document.getElementById('notification-target').value;
 
-      if (!content) {
-        alert('메시지 내용을 입력해주세요.');
-        return;
-      }
-
       const notificationData = {
         content: content,
         target: target
@@ -38,15 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify(notificationData)
       })
-      .then(response => {
+      .then(async (response) => {
         if (response.ok) {
-          response.text().then(message => {alert(message)});
+          alert("공지사항이 성공적으로 발송되었습니다.");
           createNotificationModal.style.display = 'none';
           notificationForm.reset();
           window.location.reload(); // 페이지 새로고침
         } else {
-          console.error('공지사항 발송 실패:', response.status, response.statusText);
-          alert('공지사항 발송에 실패했습니다.');
+          const result = (await response.json()).data
+          document.querySelector('#error-content').textContent = result.content;
+          alert('필수 항목을 확인해주세요.');
         }
       })
       .catch(error => {
@@ -85,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("공지사항이 비활성화되었습니다.");
           window.location.reload(); // 페이지 새로고침
         } else {
           return response.text().then(text => { throw new Error(text) });
@@ -108,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("공지사항이 성공적으로 발송되었습니다.");
           window.location.reload(); // 페이지 새로고침
         } else {
           return response.text().then(text => { throw new Error(text) });

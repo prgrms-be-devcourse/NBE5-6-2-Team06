@@ -95,7 +95,7 @@ class NotificationHandler {
         try {
             const response = await window.auth.fetchWithAuth('/api/notification/unread-count');
             if (response && response.ok) {
-                this.unreadCount = await response.json();
+                this.unreadCount = (await response.json()).data;
                 this.updateBadge();
             }
         } catch (error) {
@@ -114,7 +114,7 @@ class NotificationHandler {
         try {
             const response = await window.auth.fetchWithAuth(url);
             if (response && response.ok) {
-                const data = await response.json();
+                const data = (await response.json()).data;
                 // console.log(data);
                 this.notifications = data;
                 this.renderNotifications();
@@ -276,6 +276,15 @@ class NotificationHandler {
             this.isServerRestarting = true;
             this.eventSource.close();  // SSE 연결 종료
             this.eventSource = null;
+        });
+
+        // 페이지 언로드(새로고침/탭 닫기) 직전에 SSE 연결 닫기
+        window.addEventListener('beforeunload', () => {
+            if (this.eventSource) {
+                console.log("beforeunload : SSE 연결 종료")
+                this.eventSource.close();
+                this.eventSource = null;
+            }
         });
     }
 

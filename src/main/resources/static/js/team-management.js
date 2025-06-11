@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
       }).then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("모임 상태가 변경되었습니다.")
           document.getElementById('teamStatusModal').style.display = 'none';
           window.location.reload(); // 페이지 새로고침
         } else {
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(response => {
         if (response.ok) {
-          response.text().then(text => { alert(text)});
+          alert("모임이 비활성화되었습니다.")
           window.location.reload(); // 페이지 새로고침
         } else {
           return response.text().then(text => { throw new Error(text) });

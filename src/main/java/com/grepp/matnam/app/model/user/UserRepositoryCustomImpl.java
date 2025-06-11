@@ -1,5 +1,6 @@
 package com.grepp.matnam.app.model.user;
 
+import com.grepp.matnam.app.model.user.code.Gender;
 import com.grepp.matnam.app.model.user.code.Status;
 import com.grepp.matnam.app.model.user.entity.QUser;
 import com.grepp.matnam.app.model.user.entity.User;
@@ -9,6 +10,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -128,6 +130,44 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .from(user);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
+    @Override
+    public List<Integer> findAllAges() {
+        return queryFactory
+            .select(user.age)
+            .from(user)
+            .where(user.activated.isTrue())
+            .fetch();
+    }
+
+    @Override
+    public List<Gender> findAllGenders() {
+        return queryFactory
+            .select(user.gender)
+            .from(user)
+            .fetch();
+    }
+
+    @Override
+    public long countByStatusNotActive() {
+        return Optional.ofNullable(queryFactory
+            .select(user.count())
+            .from(user)
+            .where(user.status.ne(Status.ACTIVE))
+            .fetchOne()).orElse(0L);
+    }
+
+    @Override
+    public long countByGenderAndStatusNotActive(Gender gender) {
+        return Optional.ofNullable(queryFactory
+            .select(user.count())
+            .from(user)
+            .where(
+                user.gender.eq(gender),
+                user.status.ne(Status.ACTIVE)
+            )
+            .fetchOne()).orElse(0L);
     }
 
     private OrderSpecifier<?>[] getOrderSpecifiers(Sort sort) {
